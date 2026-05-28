@@ -6,6 +6,8 @@ CREATE TABLE profiles (
   full_name TEXT,
   email TEXT UNIQUE,
   role TEXT DEFAULT 'customer' CHECK (role IN ('admin', 'customer')),
+  needs_password_reset BOOLEAN DEFAULT true,
+  secret_answer TEXT DEFAULT 'Udi',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -55,6 +57,14 @@ CREATE TABLE settings (
   shipping_fee_inside_lagos_abuja DECIMAL(12, 2) DEFAULT 0.00,
   shipping_fee_outside_lagos_abuja DECIMAL(12, 2) DEFAULT 0.00,
   shipping_fee_african_countries DECIMAL(12, 2) DEFAULT 0.00,
+  paystack_public_key TEXT,
+  flutterwave_public_key TEXT,
+  monnify_api_key TEXT,
+  monnify_contract_code TEXT,
+  bank_transfer_details TEXT,
+  opay_merchant_id TEXT,
+  palmpay_merchant_id TEXT,
+  warranty_policy_text TEXT DEFAULT 'This is the default warranty policy. It can be changed in the admin dashboard.',
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -65,6 +75,18 @@ CREATE TABLE messages (
   sender TEXT NOT NULL CHECK (sender IN ('user', 'admin')),
   text TEXT NOT NULL,
   is_read BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 7. Contact Submissions table (Support and Contact forms)
+CREATE TABLE contact_submissions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  status TEXT DEFAULT 'unread' CHECK (status IN ('unread', 'read', 'resolved')),
+  type TEXT DEFAULT 'contact' CHECK (type IN ('contact', 'support')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -108,6 +130,31 @@ CREATE POLICY "Admins can view all messages." ON messages FOR SELECT
 CREATE POLICY "Users can view their own session messages." ON messages FOR SELECT 
   USING (session_id = current_setting('request.jwt.claims', true)::jsonb->>'session_id' OR true); -- Permissive select, frontend filters by session id.
 
+-- Policies for Contact Submissions
+ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can insert contact submissions." ON contact_submissions FOR INSERT WITH CHECK (true);
+CREATE POLICY "Only admins can view and modify contact submissions." ON contact_submissions FOR ALL 
+  USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin'));
+
+-- Function to get order status safely (bypasses RLS)
+CREATE OR REPLACE FUNCTION public.get_order_status(p_order_id UUID)
+RETURNS jsonb AS $$
+DECLARE
+  v_order jsonb;
+BEGIN
+  SELECT jsonb_build_object(
+    'id', id,
+    'status', status,
+    'payment_status', payment_status,
+    'created_at', created_at
+  ) INTO v_order
+  FROM public.orders
+  WHERE id = p_order_id;
+  
+  RETURN v_order;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Trigger for new user profile
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
@@ -130,5 +177,5 @@ VALUES
 ('iPad Pro 12.9', 'M2 chip, 128GB, Space Gray', 1250000, 'pads', 'new', 'Apple', 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&q=80', 5, 'In Stock', true),
 ('Sony WH-1000XM5', 'Industry Leading Noise Cancelling Headphones', 450000, 'gadgets', 'new', 'Sony', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80', 20, 'In Stock', true);
 
-INSERT INTO settings (id, usdt_wallet_address, usdt_network, shipping_fee_inside_lagos_abuja, shipping_fee_outside_lagos_abuja, shipping_fee_african_countries)
-VALUES (1, 'TYP89...YourWalletAddress', 'TRC20', 3500.00, 7500.00, 25000.00);
+INSERT INTO settings (id, usdt_wallet_address, usdt_network, shipping_fee_inside_lagos_abuja, shipping_fee_outside_lagos_abuja, shipping_fee_african_countries, warranty_policy_text)
+VALUES (1, 'TYP89...YourWalletAddress', 'TRC20', 3500.00, 7500.00, 25000.00, 'Our premium items come with a standard 1-Year warranty directly from our global partners. For more details, please contact technical support.');

@@ -29,7 +29,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="bg-[#FFFDF5] min-h-screen py-12">
+    <div className="bg-[#FFFDF5] min-h-screen py-12 pb-32">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-black text-[#1B1B5E] uppercase tracking-tighter mb-12">Shopping Bag ({cartCount})</h1>
 
@@ -102,7 +102,7 @@ export default function CartPage() {
               </Link>
               
               <p className="text-[10px] text-[#F8F9FA]/40 mt-6 text-center font-bold uppercase tracking-[0.2em]">
-                Secure Payment via Crypto (USDT)
+                Secure Payment via Crypto, Cards & Transfers
               </p>
             </div>
           </div>

@@ -60,11 +60,11 @@ export default function Footer() {
             <ul className="space-y-6">
               <li className="flex items-start space-x-4">
                 <MapPin className="w-5 h-5 text-[#00AEEF] flex-shrink-0 mt-0.5" />
-                <span className="text-[#1B1B5E]/70 text-sm font-bold">Lagos, Nigeria</span>
+                <span className="text-[#1B1B5E]/70 text-sm font-bold">Lagos/Abuja Nigeria</span>
               </li>
               <li className="flex items-center space-x-4">
                 <Phone className="w-5 h-5 text-[#00AEEF] flex-shrink-0" />
-                <span className="text-[#1B1B5E]/70 text-sm font-bold">+234 800 000 0000</span>
+                <span className="text-[#1B1B5E]/70 text-sm font-bold">+234 814 852 7697</span>
               </li>
               <li className="flex items-center space-x-4">
                 <Mail className="w-5 h-5 text-[#00AEEF] flex-shrink-0" />

@@ -23,6 +23,17 @@
     font-family: var(--font-sans), sans-serif;
     -webkit-font-smoothing: antialiased;
   }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes slide-left {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
 }
 
 @layer utilities {

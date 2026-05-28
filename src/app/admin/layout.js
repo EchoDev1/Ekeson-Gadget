@@ -10,6 +10,8 @@ import {
   ShoppingCart, 
   Settings, 
   MessageSquare,
+  Users,
+  HelpCircle,
   LogOut,
   Loader2,
   ChevronRight
@@ -43,6 +45,11 @@ export default function AdminLayout({ children }) {
         .single();
 
       if (profile?.role === 'admin') {
+        const isVerified = sessionStorage.getItem('admin_secret_verified') === 'true';
+        if (!isVerified) {
+          router.push("/admin/login");
+          return;
+        }
         setIsAdmin(true);
       } else {
         router.push("/admin/login");
@@ -54,6 +61,7 @@ export default function AdminLayout({ children }) {
   }, [pathname, router]);
 
   const handleLogout = async () => {
+    sessionStorage.removeItem('admin_secret_verified');
     await supabase.auth.signOut();
     router.push("/admin/login");
   };
@@ -78,7 +86,9 @@ export default function AdminLayout({ children }) {
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-    { name: "Messages", href: "/admin/messages", icon: MessageSquare },
+    { name: "Customers", href: "/admin/customers", icon: Users },
+    { name: "Live Chat", href: "/admin/chat", icon: MessageSquare },
+    { name: "Support Inbox", href: "/admin/support", icon: HelpCircle },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
 

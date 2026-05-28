@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Save, Loader2, Wallet, MapPin, Globe } from "lucide-react";
+import { Save, Loader2, Wallet, MapPin, Globe, FileText } from "lucide-react";
 
 export default function AdminSettings() {
   const [loading, setLoading] = useState(true);
@@ -13,6 +13,14 @@ export default function AdminSettings() {
     shipping_fee_inside_lagos_abuja: 0,
     shipping_fee_outside_lagos_abuja: 0,
     shipping_fee_african_countries: 0,
+    paystack_public_key: "",
+    flutterwave_public_key: "",
+    monnify_api_key: "",
+    monnify_contract_code: "",
+    bank_transfer_details: "",
+    opay_merchant_id: "",
+    palmpay_merchant_id: "",
+    warranty_policy_text: "",
   });
 
   useEffect(() => {
@@ -113,6 +121,95 @@ export default function AdminSettings() {
           <p className="text-xs text-[#1B1B5E]/50 font-medium">* System automatically fetches live market rate and adds a $3 premium.</p>
         </div>
 
+        {/* Other Payment Gateways */}
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
+          <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
+            <Wallet className="w-6 h-6 text-[#1B1B5E]" />
+            Local Payment Gateways
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Paystack Public Key</label>
+              <input 
+                type="text" 
+                name="paystack_public_key"
+                value={settings.paystack_public_key || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+                placeholder="pk_live_..."
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Flutterwave Public Key</label>
+              <input 
+                type="text" 
+                name="flutterwave_public_key"
+                value={settings.flutterwave_public_key || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+                placeholder="FLWPUBK_..."
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Monnify API Key</label>
+              <input 
+                type="text" 
+                name="monnify_api_key"
+                value={settings.monnify_api_key || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+                placeholder="MK_PROD_..."
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Monnify Contract Code</label>
+              <input 
+                type="text" 
+                name="monnify_contract_code"
+                value={settings.monnify_contract_code || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+                placeholder="e.g. 1234567890"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">OPay Merchant ID / Info</label>
+              <input 
+                type="text" 
+                name="opay_merchant_id"
+                value={settings.opay_merchant_id || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+                placeholder="OPay Details"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">PalmPay Merchant ID / Info</label>
+              <input 
+                type="text" 
+                name="palmpay_merchant_id"
+                value={settings.palmpay_merchant_id || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+                placeholder="PalmPay Details"
+              />
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Bank Transfer Details</label>
+              <textarea 
+                name="bank_transfer_details"
+                value={settings.bank_transfer_details || ""}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+                placeholder="Bank Name: GTBank&#10;Account Number: 0123456789&#10;Account Name: Ekeson Group"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-[#1B1B5E]/50 font-medium">* Leave keys empty to disable specific payment methods at checkout.</p>
+        </div>
+
         {/* Shipping Settings */}
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
           <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
@@ -177,6 +274,27 @@ export default function AdminSettings() {
                 />
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Content Management */}
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
+          <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
+            <FileText className="w-6 h-6 text-purple-500" />
+            Content Management
+          </h2>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Warranty Policy Text</label>
+            <textarea 
+              name="warranty_policy_text"
+              value={settings.warranty_policy_text || ""}
+              onChange={handleChange}
+              rows={6}
+              className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+              placeholder="Enter the official warranty policy..."
+            />
+            <p className="text-xs text-[#1B1B5E]/50 font-medium">This text is displayed on the public Warranty Policy page.</p>
           </div>
         </div>
 

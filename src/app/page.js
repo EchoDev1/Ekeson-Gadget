@@ -79,6 +79,18 @@ export default function Home() {
               Verified standards, transparent pricing.
             </p>
 
+            {/* Promotional Flash Banner */}
+            <div className="w-[100vw] relative left-1/2 -translate-x-1/2 overflow-hidden mt-4 pointer-events-none h-10 flex items-center">
+              <div className="inline-block animate-[slide-left_12s_linear_infinite] whitespace-nowrap">
+                <div className="inline-flex items-center gap-2 bg-[#1B1B5E]/90 backdrop-blur-md text-white py-1 px-4 rounded-full border border-[#00AEEF]/30 shadow-[0_0_10px_rgba(0,174,239,0.3)]">
+                  <span className="text-[10px] animate-bounce">🎁</span>
+                  <span className="font-black uppercase tracking-widest text-[9px] md:text-[10px]">
+                    In every purchase you get a <span className="text-[#00AEEF]">free accessories!</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
               <Link
                 href="/products"
@@ -112,10 +124,10 @@ export default function Home() {
               </p>
               <div className="grid grid-cols-2 gap-8">
                 {[
-                  { label: "Warranty", val: "1-2 Years" },
+                  { label: "Warranty", val: "1-Years" },
                   { label: "Verification", val: "Serial Check" },
                   { label: "Origin", val: "Direct Global" },
-                  { label: "Support", val: "Lagos Based" }
+                  { label: "Support", val: "Lagos/Abuja Based" }
                 ].map((item) => (
                   <div key={item.label}>
                     <p className="text-[#00AEEF] text-[10px] font-black uppercase tracking-widest mb-1">{item.label}</p>
