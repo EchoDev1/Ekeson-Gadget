@@ -60,15 +60,15 @@ export default function Footer() {
             <ul className="space-y-6">
               <li className="flex items-start space-x-4">
                 <MapPin className="w-5 h-5 text-[#00AEEF] flex-shrink-0 mt-0.5" />
-                <span className="text-[#1B1B5E]/70 text-sm font-bold">Lagos/Abuja Nigeria</span>
+                <a href="https://maps.google.com/?q=Lagos,Nigeria" target="_blank" rel="noopener noreferrer" className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">Lagos/Abuja Nigeria</a>
               </li>
               <li className="flex items-center space-x-4">
                 <Phone className="w-5 h-5 text-[#00AEEF] flex-shrink-0" />
-                <span className="text-[#1B1B5E]/70 text-sm font-bold">+234 814 852 7697</span>
+                <a href="tel:+2348148527697" className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">+234 814 852 7697</a>
               </li>
               <li className="flex items-center space-x-4">
                 <Mail className="w-5 h-5 text-[#00AEEF] flex-shrink-0" />
-                <span className="text-[#1B1B5E]/70 text-sm font-bold">office@ekesongroup.com</span>
+                <a href="mailto:office@ekesongroup.com" className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">office@ekesongroup.com</a>
               </li>
             </ul>
           </div>
