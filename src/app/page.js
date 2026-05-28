@@ -58,24 +58,24 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-[#F7F3E9]">
       
       {/* Original Hero Section Style */}
-      <section className="relative pt-12 pb-24 overflow-hidden">
-        <div className="absolute top-8 right-8 md:top-12 md:right-12 z-20">
+      <section className="relative pt-12 md:pt-20 pb-24 overflow-hidden">
+        <div className="absolute top-2 right-2 md:top-12 md:right-12 z-20 scale-75 origin-top-right md:scale-100 opacity-60 md:opacity-100">
           <SealBadge className="w-24 h-24 md:w-32 md:h-32" />
         </div>
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center space-y-10">
+          <div className="max-w-4xl mx-auto text-center space-y-8 md:space-y-10 relative z-10">
             <div className="inline-flex items-center space-x-3 bg-white border border-[#1B1B5E]/5 px-4 py-2 rounded-full shadow-sm">
-              <span className="text-[10px] font-black text-[#1B1B5E] uppercase tracking-[0.2em]">Authentic Technology 🇳🇬</span>
+              <span className="text-[9px] md:text-[10px] font-black text-[#1B1B5E] uppercase tracking-[0.2em]">Authentic Technology 🇳🇬</span>
             </div>
 
-            <h1 className="text-5xl md:text-8xl font-black text-[#1B1B5E] tracking-tighter leading-[0.9]">
+            <h1 className="text-5xl md:text-8xl font-black text-[#1B1B5E] tracking-tighter leading-[0.9] mt-6 md:mt-0">
               PREMIUM <span className="text-[#00AEEF]">TECH</span><br />
               SIMPLE <span className="opacity-20">ACCESS</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-[#1B1B5E]/60 max-w-2xl mx-auto font-medium leading-relaxed">
-              Nigeria&apos;s most trusted destination for genuine brand new and Grade-A UK used electronics. 
+            <p className="text-base md:text-xl text-[#1B1B5E]/60 max-w-2xl mx-auto font-medium leading-relaxed px-2">
+              Nigeria&apos;s most trusted destination for genuine brand new and Grade-A UK used gadgets. 
               Verified standards, transparent pricing.
             </p>
 
