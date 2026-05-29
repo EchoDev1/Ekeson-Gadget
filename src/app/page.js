@@ -11,8 +11,8 @@ const categories = [
   { id: "smart_watches", title: "Smart Watches", icon: Watch, image: "/images/luxury_watch.png" },
   { id: "earbuds", title: "Earbuds", icon: Headphones, image: "/images/luxury_earbuds.jpg" },
   { id: "accessories", title: "Accessories", icon: Package, image: "/images/home_accessories.png" },
-  { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "/images/playstation_uk_used_fit.png" },
-  { id: "drones", title: "Drones", icon: Drone, image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&q=80" }
+  { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "" },
+  { id: "drones", title: "Drones", icon: Drone, image: "" }
 ];
 
 const CategorySection = ({ title, id, icon: Icon, image }) => (
@@ -39,15 +39,22 @@ const CategorySection = ({ title, id, icon: Icon, image }) => (
             Enter {title} Portal <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="relative w-full aspect-[16/9] rounded-[2.5rem] overflow-hidden shadow-2xl group">
-          <Image 
-            src={image} 
-            alt={title} 
-            fill 
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className={`${id === 'playstation' || id === 'drones' ? 'object-contain p-4' : 'object-cover'} transition-transform duration-1000 group-hover:scale-105`}
-            priority={id === 'phones'}
-          />
+        <div className="relative w-full aspect-[16/9] rounded-[2.5rem] overflow-hidden shadow-2xl group bg-[#1B1B5E]/5 flex items-center justify-center">
+          {image ? (
+            <Image 
+              src={image} 
+              alt={title} 
+              fill 
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className={`${id === 'playstation' || id === 'drones' ? 'object-contain p-4' : 'object-cover'} transition-transform duration-1000 group-hover:scale-105`}
+              priority={id === 'phones'}
+            />
+          ) : (
+            <div className="text-[#1B1B5E]/20 flex flex-col items-center gap-4">
+              <Icon className="w-16 h-16" />
+              <span className="text-xs font-black uppercase tracking-widest text-[#1B1B5E]/40">Image Pending</span>
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#1B1B5E]/20 to-transparent pointer-events-none" />
         </div>
       </div>
