@@ -26,7 +26,7 @@ export default function Login() {
         <div className="text-center">
           <div className="flex flex-col items-center mb-6">
              <div className="flex flex-col items-center">
-                <span className="text-2xl font-extrabold text-[#1B1B5E] tracking-widest uppercase">EKESON GADGET</span>
+                <span className="text-2xl font-extrabold text-[#1B1B5E] tracking-widest uppercase">EKESON GADGETS</span>
                 <span className="text-[#00AEEF] text-[10px] tracking-[0.3em] uppercase font-bold mt-1">Building Wealth</span>
               </div>
           </div>

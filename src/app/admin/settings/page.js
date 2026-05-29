@@ -203,7 +203,7 @@ export default function AdminSettings() {
                 onChange={handleChange}
                 rows={3}
                 className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
-                placeholder="Bank Name: GTBank&#10;Account Number: 0123456789&#10;Account Name: Ekeson Gadget"
+                placeholder="Bank Name: GTBank&#10;Account Number: 0123456789&#10;Account Name: Ekeson Gadgets"
               />
             </div>
           </div>

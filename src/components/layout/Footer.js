@@ -86,7 +86,7 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center text-[#1B1B5E]/30 text-[10px] font-black uppercase tracking-widest">
-          <p>&copy; {new Date().getFullYear()} Ekeson Gadget. Nigeria 🇳🇬</p>
+          <p>&copy; {new Date().getFullYear()} Ekeson Gadgets. Nigeria 🇳🇬</p>
           <div className="flex space-x-8 mt-4 md:mt-0">
             <Link href="/privacy" className="hover:text-[#1B1B5E] transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-[#1B1B5E] transition-colors">Terms</Link>
