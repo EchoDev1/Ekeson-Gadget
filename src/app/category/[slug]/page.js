@@ -72,7 +72,7 @@ const categoryData = {
     icon: Drone,
     subtitle: "Aerial Mastery",
     portals: [
-      { name: "Direct / Brand New", path: "/category/drones/new", image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&q=80", subtitle: "Factory Sealed", description: "DJI & premium drones. Brand new in sealed packaging." }
+      { name: "Direct / Brand New", path: "/category/drones/new", image: "/images/brand_dji_drone.png", subtitle: "Factory Sealed", description: "DJI & premium drones. Brand new in sealed packaging." }
     ]
   }
 };

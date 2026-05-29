@@ -860,7 +860,7 @@ export default function CategoryConditionPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 max-w-7xl mx-auto">
             <button onClick={() => setActiveBrand("dji")} className="group relative rounded-[3rem] bg-white border border-[#1B1B5E]/5 shadow-xl transition-all duration-700 aspect-[3/4] flex flex-col justify-end p-10 hover:-translate-y-4 overflow-hidden text-left">
               <div className="absolute inset-0">
-                <Image src="https://images.unsplash.com/photo-1579822438596-f9479b122241?w=800&q=80" alt="DJI Drones" fill className="object-cover transition-transform duration-[1500ms] group-hover:scale-110 opacity-90" />
+                <Image src="/images/brand_dji_drone.png" alt="DJI Drones" fill className="object-cover transition-transform duration-[1500ms] group-hover:scale-110 opacity-90" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1B1B5E] via-[#1B1B5E]/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
               </div>
               <div className="relative z-10 space-y-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-700">
