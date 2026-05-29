@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Award, Zap, Smartphone, Laptop, Tablet, Watch, Headphones, Package } from "lucide-react";
+import { ArrowLeft, Award, Zap, Smartphone, Laptop, Tablet, Watch, Headphones, Package, Gamepad2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const icons = {
@@ -14,7 +14,8 @@ const icons = {
   watches: Watch,
   smart_watches: Watch,
   earbuds: Headphones,
-  accessories: Package
+  accessories: Package,
+  playstation: Gamepad2
 };
 
 // Beautiful inline SVG Apple Logo
@@ -32,6 +33,28 @@ const GoogleIcon = (props) => (
 
 // High-fidelity fallback products database
 const fallbackProducts = {
+  playstation: [
+    {
+      id: 801,
+      name: "PlayStation 5 Disc Edition",
+      price: 850000,
+      category: "playstation",
+      image_url: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80",
+      condition: "uk-used",
+      is_featured: true,
+      brand: "Sony"
+    },
+    {
+      id: 811,
+      name: "PlayStation 5 Slim (Sealed)",
+      price: 1100000,
+      category: "playstation",
+      image_url: "https://images.unsplash.com/photo-1605901309584-818e25960b8f?w=800&q=80",
+      condition: "new",
+      is_featured: true,
+      brand: "Sony"
+    }
+  ],
   phones: [
     // Apple UK Used
     {

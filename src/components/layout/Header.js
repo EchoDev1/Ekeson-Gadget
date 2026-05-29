@@ -20,7 +20,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-10">
-            {['Phones', 'Laptops', 'Pads', 'Accessories'].map((item) => (
+            {['Phones', 'Laptops', 'Pads', 'Accessories', 'PlayStation'].map((item) => (
               <Link 
                 key={item} 
                 href={`/category/${item.toLowerCase()}`} 
@@ -65,7 +65,7 @@ export default function Header() {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-[#1B1B5E]/10 animate-in slide-in-from-top duration-300">
           <div className="px-6 py-8 space-y-6">
-            {['Phones', 'Laptops', 'Pads', 'Accessories'].map((item) => (
+            {['Phones', 'Laptops', 'Pads', 'Accessories', 'PlayStation'].map((item) => (
               <Link 
                 key={item} 
                 href={`/category/${item.toLowerCase()}`} 

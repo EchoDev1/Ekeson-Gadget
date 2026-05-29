@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ChevronRight, Award, Zap, Smartphone, Laptop, Tablet, Watch, Headphones, Package } from "lucide-react";
+import { ArrowLeft, ChevronRight, Award, Zap, Smartphone, Laptop, Tablet, Watch, Headphones, Package, Gamepad2 } from "lucide-react";
 
 const categoryData = {
   phones: {
@@ -56,6 +56,15 @@ const categoryData = {
     subtitle: "Essential Add-ons",
     portals: [
       { name: "Premium Accessories", path: "/category/accessories/new", image: "/images/home_accessories.png", subtitle: "Complete Your Setup", description: "Cases, protectors, chargers, cables, and more." }
+    ]
+  },
+  playstation: {
+    title: "Sony PlayStation",
+    icon: Gamepad2,
+    subtitle: "Next-Gen Gaming",
+    portals: [
+      { name: "Direct / Brand New", path: "/category/playstation/new", image: "/images/playstation_brand_new.png", subtitle: "Factory Sealed", description: "Sony PlayStation. Brand new in sealed packaging." },
+      { name: "Highest Grade UK Used", path: "/category/playstation/uk-used", image: "/images/playstation_uk_used.png", subtitle: "Pristine Condition", description: "Tested and verified for ultimate gaming performance." }
     ]
   }
 };
