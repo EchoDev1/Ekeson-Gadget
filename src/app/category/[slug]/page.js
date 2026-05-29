@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ChevronRight, Award, Zap, Smartphone, Laptop, Tablet, Watch, Headphones, Package, Gamepad2 } from "lucide-react";
+import { ArrowLeft, ChevronRight, Award, Zap, Smartphone, Laptop, Tablet, Watch, Headphones, Package, Gamepad2, Drone } from "lucide-react";
 
 const categoryData = {
   phones: {
@@ -65,6 +65,14 @@ const categoryData = {
     portals: [
       { name: "Direct / Brand New", path: "/category/playstation/new", image: "/images/playstation_brand_new.png", subtitle: "Factory Sealed", description: "Sony PlayStation. Brand new in sealed packaging." },
       { name: "Highest Grade UK Used", path: "/category/playstation/uk-used", image: "/images/playstation_uk_used.png", subtitle: "Pristine Condition", description: "Tested and verified for ultimate gaming performance." }
+    ]
+  },
+  drones: {
+    title: "Drones",
+    icon: Drone,
+    subtitle: "Aerial Mastery",
+    portals: [
+      { name: "Direct / Brand New", path: "/category/drones/new", image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&q=80", subtitle: "Factory Sealed", description: "DJI & premium drones. Brand new in sealed packaging." }
     ]
   }
 };

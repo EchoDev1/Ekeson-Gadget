@@ -12,7 +12,8 @@ const categoryPortals = [
   { id: "smart_watches", title: "Smart Watches", description: "Discover our curated collection of smart watches. From the latest releases to certified pre-owned excellence.", image: "/images/luxury_watch.png", link: "/category/smart_watches" },
   { id: "earbuds", title: "Earbuds", description: "Discover our curated collection of earbuds. From the latest releases to certified pre-owned excellence.", image: "/images/luxury_earbuds.jpg", link: "/category/earbuds" },
   { id: "accessories", title: "Accessories", description: "Discover our curated collection of accessories. From the latest releases to certified pre-owned excellence.", image: "/images/home_accessories.png", link: "/category/accessories" },
-  { id: "playstation", title: "Sony PlayStation", description: "Discover our curated collection of Sony PlayStation consoles. From the latest releases to certified pre-owned excellence.", image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80", link: "/category/playstation" }
+  { id: "playstation", title: "Sony PlayStation", description: "Discover our curated collection of Sony PlayStation consoles. From the latest releases to certified pre-owned excellence.", image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80", link: "/category/playstation" },
+  { id: "drones", title: "Drones", description: "Discover our curated collection of drones. From DJI to premium aerial vehicles.", image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&q=80", link: "/category/drones" }
 ];
 
 const brandPortals = [

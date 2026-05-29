@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Award, Zap, Smartphone, Laptop, Tablet, Watch, Headphones, Package, Gamepad2 } from "lucide-react";
+import { ArrowLeft, Award, Zap, Smartphone, Laptop, Tablet, Watch, Headphones, Package, Gamepad2, Drone } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const icons = {
@@ -15,7 +15,8 @@ const icons = {
   smart_watches: Watch,
   earbuds: Headphones,
   accessories: Package,
-  playstation: Gamepad2
+  playstation: Gamepad2,
+  drones: Drone
 };
 
 // Beautiful inline SVG Apple Logo
@@ -33,6 +34,28 @@ const GoogleIcon = (props) => (
 
 // High-fidelity fallback products database
 const fallbackProducts = {
+  drones: [
+    {
+      id: 901,
+      name: "DJI Mavic 3 Pro",
+      price: 2500000,
+      category: "drones",
+      image_url: "https://images.unsplash.com/photo-1579822438596-f9479b122241?w=800&q=80",
+      condition: "new",
+      is_featured: true,
+      brand: "DJI"
+    },
+    {
+      id: 902,
+      name: "DJI Mini 4 Pro",
+      price: 950000,
+      category: "drones",
+      image_url: "https://images.unsplash.com/photo-1629856557675-7da76632c02c?w=800&q=80",
+      condition: "new",
+      is_featured: true,
+      brand: "DJI"
+    }
+  ],
   playstation: [
     {
       id: 801,
@@ -559,6 +582,7 @@ export default function CategoryConditionPage() {
   const speakersProducts = products.filter(p => p.brand === "speakers" || p.name.toLowerCase().includes("speaker"));
   const bagsProducts = products.filter(p => p.brand === "bags" || p.name.toLowerCase().includes("bag"));
   const stylusProducts = products.filter(p => p.brand === "stylus" || p.name.toLowerCase().includes("stylus") || p.name.toLowerCase().includes("pen"));
+  const djiProducts = products.filter(p => p.brand === "DJI" || p.name.toLowerCase().includes("dji"));
 
   const otherProducts = products.filter(p => 
     !appleProducts.some(ap => ap.id === p.id) && 
@@ -578,7 +602,8 @@ export default function CategoryConditionPage() {
     !strapsProducts.some(sp => sp.id === p.id) &&
     !speakersProducts.some(sp => sp.id === p.id) &&
     !bagsProducts.some(bp => bp.id === p.id) &&
-    !stylusProducts.some(sp => sp.id === p.id)
+    !stylusProducts.some(sp => sp.id === p.id) &&
+    !djiProducts.some(dp => dp.id === p.id)
   );
 
   return (
@@ -586,7 +611,7 @@ export default function CategoryConditionPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="max-w-4xl mb-20">
-          {(slug === "phones" || slug === "laptops" || slug === "pads" || slug === "smart_watches" || slug === "accessories") && activeBrand !== "all" ? (
+          {(slug === "phones" || slug === "laptops" || slug === "pads" || slug === "smart_watches" || slug === "accessories" || slug === "drones") && activeBrand !== "all" ? (
             <button onClick={() => setActiveBrand("all")} className="inline-flex items-center gap-2 text-[#1B1B5E]/40 hover:text-[#1B1B5E] transition-colors mb-12">
               <ArrowLeft className="w-4 h-4" />
               <span className="text-xs font-black uppercase tracking-widest">Back to Brands</span>
@@ -830,6 +855,23 @@ export default function CategoryConditionPage() {
                 </button>
               </>
             )}
+          </div>
+        ) : slug === "drones" && activeBrand === "all" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20 max-w-7xl mx-auto">
+            <button onClick={() => setActiveBrand("dji")} className="group relative rounded-[3rem] bg-white border border-[#1B1B5E]/5 shadow-xl transition-all duration-700 aspect-[3/4] flex flex-col justify-end p-10 hover:-translate-y-4 overflow-hidden text-left">
+              <div className="absolute inset-0">
+                <Image src="https://images.unsplash.com/photo-1579822438596-f9479b122241?w=800&q=80" alt="DJI Drones" fill className="object-cover transition-transform duration-[1500ms] group-hover:scale-110 opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1B1B5E] via-[#1B1B5E]/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+              </div>
+              <div className="relative z-10 space-y-4 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-700">
+                <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center mb-6 shadow-md border border-white/20">
+                  <span className="font-black text-xl tracking-wider">DJI</span>
+                </div>
+                <h3 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tighter">DJI</h3>
+                <p className="text-white/80 font-medium tracking-tight">Mavic & Mini Series.</p>
+                <div className="inline-block mt-4 px-8 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white text-xs font-black uppercase tracking-widest group-hover:bg-white group-hover:text-[#1B1B5E] transition-colors duration-500">View Collection</div>
+              </div>
+            </button>
           </div>
         ) : slug === "smart_watches" && activeBrand === "all" ? (
           <div className={`grid grid-cols-1 md:grid-cols-2 ${isNew ? 'lg:grid-cols-3' : ''} gap-8 mb-20 max-w-7xl mx-auto`}>
@@ -1700,8 +1742,33 @@ export default function CategoryConditionPage() {
                     </div>
                   )}
 
+                  {/* DJI Section */}
+                  {slug === "drones" && djiProducts.length > 0 && activeBrand === "dji" && (
+                    <div className="space-y-10">
+                      <div className="flex items-center justify-between border-b border-[#1B1B5E]/5 pb-6">
+                        <div className="flex items-center gap-5">
+                          <div className="w-12 h-12 rounded-2xl bg-white border border-[#1B1B5E]/10 shadow-sm flex items-center justify-center text-[#1B1B5E] hover:scale-105 transition-transform">
+                            <span className="font-black text-xs tracking-wider">DJI</span>
+                          </div>
+                          <div>
+                            <h2 className="text-3xl font-black text-[#1B1B5E] uppercase tracking-tighter">DJI Collection</h2>
+                            <p className="text-xs text-[#1B1B5E]/40 font-black uppercase tracking-widest mt-1">Aerial Mastery</p>
+                          </div>
+                        </div>
+                        <div className="px-5 py-2 bg-[#1B1B5E]/5 border border-[#1B1B5E]/10 rounded-full text-[10px] font-black text-[#1B1B5E] uppercase tracking-widest shadow-sm">
+                          {djiProducts.length} Items Available
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                        {djiProducts.map((product) => (
+                          <ProductCard key={product.id} product={product} isNew={isNew} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Other Products Section */}
-                  {otherProducts.length > 0 && activeBrand !== "apple" && activeBrand !== "samsung" && activeBrand !== "google" && slug !== "accessories" && (
+                  {otherProducts.length > 0 && activeBrand !== "apple" && activeBrand !== "samsung" && activeBrand !== "google" && activeBrand !== "dji" && slug !== "accessories" && (
                     <div className="space-y-10">
                       <div className="flex items-center justify-between border-b border-[#1B1B5E]/5 pb-6">
                         <div className="flex items-center gap-5">

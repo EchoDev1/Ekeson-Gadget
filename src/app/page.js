@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Laptop, Smartphone, Tablet, ChevronRight, Watch, Headphones, ShieldCheck, Package, Gamepad2 } from "lucide-react";
+import { ArrowRight, Laptop, Smartphone, Tablet, ChevronRight, Watch, Headphones, ShieldCheck, Package, Gamepad2, Drone } from "lucide-react";
 import { SealBadge } from "@/components/ui/BrandIdentity";
 
 const categories = [
@@ -11,7 +11,8 @@ const categories = [
   { id: "smart_watches", title: "Smart Watches", icon: Watch, image: "/images/luxury_watch.png" },
   { id: "earbuds", title: "Earbuds", icon: Headphones, image: "/images/luxury_earbuds.jpg" },
   { id: "accessories", title: "Accessories", icon: Package, image: "/images/home_accessories.png" },
-  { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "/images/brand_playstation.png" }
+  { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "/images/brand_playstation.png" },
+  { id: "drones", title: "Drones", icon: Drone, image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&q=80" }
 ];
 
 const CategorySection = ({ title, id, icon: Icon, image }) => (

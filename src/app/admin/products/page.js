@@ -174,7 +174,7 @@ export default function AdminProducts() {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Category</label>
                   <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20">
-                    {['phones', 'laptops', 'pads', 'smart_watches', 'earbuds', 'accessories', 'playstation', 'gadgets'].map(c => <option key={c} value={c}>{c}</option>)}
+                    {['phones', 'laptops', 'pads', 'smart_watches', 'earbuds', 'accessories', 'playstation', 'drones', 'gadgets'].map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
 
