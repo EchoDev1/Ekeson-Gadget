@@ -39,7 +39,7 @@ export default function CartPage() {
             {cart.map((item) => (
               <div key={item.id} className="bg-white p-6 rounded-[2rem] border border-[#1B1B5E]/5 flex items-center gap-6 group hover:shadow-xl transition-all duration-500">
                 <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-[#F8F9FA] flex-shrink-0">
-                  <Image src={item.image} alt={item.name} fill className="object-cover" />
+                  <Image src={item.image_url || item.image || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80"} alt={item.name} fill className="object-cover" />
                 </div>
                 
                 <div className="flex-1 min-w-0">

@@ -11,8 +11,8 @@ const categories = [
   { id: "smart_watches", title: "Smart Watches", icon: Watch, image: "/images/luxury_watch.png" },
   { id: "earbuds", title: "Earbuds", icon: Headphones, image: "/images/luxury_earbuds.jpg" },
   { id: "accessories", title: "Accessories", icon: Package, image: "/images/home_accessories.png" },
-  { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "" },
-  { id: "drones", title: "Drones", icon: Drone, image: "" }
+  { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "/images/home_playstation_real.jpg" },
+  { id: "drones", title: "Drones", icon: Drone, image: "/images/home_drones_real.jpg" }
 ];
 
 const CategorySection = ({ title, id, icon: Icon, image }) => (
@@ -46,7 +46,7 @@ const CategorySection = ({ title, id, icon: Icon, image }) => (
               alt={title} 
               fill 
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              className={`${id === 'playstation' || id === 'drones' ? 'object-contain p-4' : 'object-cover'} transition-transform duration-1000 group-hover:scale-105`}
+              className="object-cover transition-transform duration-1000 group-hover:scale-105"
               priority={id === 'phones'}
             />
           ) : (

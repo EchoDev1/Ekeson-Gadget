@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,6 +9,10 @@ import { supabase } from "@/lib/supabase";
 import { fallbackProducts } from "@/lib/data";
 
 export default function ProductDetail({ params }) {
+  // Unwrap params using React.use()
+  const unwrappedParams = use(params);
+  const productId = unwrappedParams.id;
+
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,7 +27,7 @@ export default function ProductDetail({ params }) {
       // Try to find in local data first as fallback
       let localProduct = null;
       Object.values(fallbackProducts).forEach((cat) => {
-        const found = cat.find(p => p.id.toString() === params.id.toString());
+        const found = cat.find(p => p.id.toString() === productId.toString());
         if (found) localProduct = found;
       });
 
@@ -31,7 +35,7 @@ export default function ProductDetail({ params }) {
         const { data, error } = await supabase
           .from("products")
           .select("*")
-          .eq("id", params.id)
+          .eq("id", productId)
           .single();
         
         if (!error && data) {
@@ -47,7 +51,7 @@ export default function ProductDetail({ params }) {
     }
     
     fetchProduct();
-  }, [params.id]);
+  }, [productId]);
 
   const handleAddToCart = () => {
     if (!product) return;
