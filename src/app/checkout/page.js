@@ -142,7 +142,7 @@ export default function Checkout() {
         name: formData.fullName,
       },
       customizations: {
-        title: "Ekeson Group Gadgets",
+        title: "Ekeson Gadget",
         description: "Payment for gadgets in cart",
         logo: "https://ekesontech.com/logo.png",
       },

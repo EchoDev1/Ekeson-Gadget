@@ -18,7 +18,7 @@ export const Logo = ({ className = "h-12 w-auto", showText = true }) => {
       
       {showText && (
         <div className="flex flex-col leading-none">
-          <span className="text-xl font-black tracking-tighter text-[#1B1B5E]">EKESON GROUP</span>
+          <span className="text-xl font-black tracking-tighter text-[#1B1B5E]">EKESON GADGET</span>
           <div className="flex items-center gap-1">
             <div className="h-[1px] w-4 bg-[#1B1B5E]/30" />
             <span className="text-[7px] font-bold tracking-[0.2em] text-[#00AEEF] uppercase">Building Wealth Through Technology</span>
@@ -39,7 +39,7 @@ export const SealBadge = ({ className = "" }) => {
           <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="transparent" />
           <text className="text-[7px] font-black fill-[#1B1B5E] uppercase tracking-[0.3em]">
             <textPath href="#circlePath">
-              • GENUINE TECHNOLOGY • EKESON GROUP • NIGERIA • QUALITY •
+              • GENUINE TECHNOLOGY • EKESON GADGET • NIGERIA • QUALITY •
             </textPath>
           </text>
         </svg>

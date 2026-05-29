@@ -11,9 +11,9 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Ekeson Group | Premium Technology",
-  description: "Building Wealth Through Technology. Nigeria's premier source for genuine global electronics.",
-  keywords: "gadgets, electronics, premium tech, smartphones, laptops, fast delivery, Nigeria, Ekeson Group",
+  title: "Ekeson Gadget | Premium Technology",
+  description: "Nigeria's most trusted destination for genuine brand new and Grade-A UK used electronics.",
+  keywords: "gadgets, electronics, premium tech, smartphones, laptops, fast delivery, Nigeria, Ekeson Gadget",
 };
 
 export default function RootLayout({ children }) {
