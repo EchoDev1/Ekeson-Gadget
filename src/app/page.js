@@ -11,7 +11,7 @@ const categories = [
   { id: "smart_watches", title: "Smart Watches", icon: Watch, image: "/images/luxury_watch.png" },
   { id: "earbuds", title: "Earbuds", icon: Headphones, image: "/images/luxury_earbuds.jpg" },
   { id: "accessories", title: "Accessories", icon: Package, image: "/images/home_accessories.png" },
-  { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "/images/brand_playstation.png" },
+  { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "/images/playstation_uk_used_fit.png" },
   { id: "drones", title: "Drones", icon: Drone, image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&q=80" }
 ];
 
