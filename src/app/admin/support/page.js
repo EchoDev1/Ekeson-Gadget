@@ -20,10 +20,14 @@ export default function AdminSupport() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
-      setSubmissions(data);
+      if (error) {
+        console.warn("Could not fetch submissions (likely offline mode or RLS):", error);
+        setSubmissions([]);
+      } else if (data) {
+        setSubmissions(data);
+      }
     } catch (err) {
-      console.error("Error fetching submissions:", err);
+      console.warn("Error fetching submissions:", err);
     } finally {
       setLoading(false);
     }
@@ -67,14 +71,6 @@ export default function AdminSupport() {
     if (filter === "unread") return sub.status === "unread";
     return true;
   });
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" />
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

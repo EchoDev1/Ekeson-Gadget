@@ -1,33 +1,49 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import { Send, User, Bot, MoreVertical, Search, CheckCheck } from "lucide-react";
 
 export default function AdminChatRoom() {
-  const [messages, setMessages] = useState([
-    { id: 1, sender: 'user', name: 'Chinedu Okafor', text: 'Hi, I need help with my order ORD-001. It says delivered but I haven\'t received it yet in my Lekki office.', time: '10:42 AM', read: true },
-    { id: 2, sender: 'admin', name: 'Support', text: 'Hello Chinedu! I apologize for the delay. Let me check the courier status for Lagos deliveries right away.', time: '10:45 AM', read: true },
-    { id: 3, sender: 'admin', name: 'Support', text: 'Our delivery agent is currently in your building. Could you please check with the security at the gate?', time: '10:48 AM', read: true },
-    { id: 4, sender: 'user', name: 'Chinedu Okafor', text: 'Yes, they just brought it up! Thank you so much for the swift response.', time: '11:05 AM', read: false },
-  ]);
-
+  const [messages, setMessages] = useState([]);
+  const [chats, setChats] = useState([]); // Clear dummy chats
   const [newMessage, setNewMessage] = useState("");
 
-  const handleSend = (e) => {
+  useEffect(() => {
+    // Listen for incoming live chat messages swiftly using Supabase Broadcast
+    const channel = supabase.channel('public:live-chat');
+    
+    channel.on('broadcast', { event: 'message' }, (payload) => {
+      setMessages(prev => [...prev, payload.payload]);
+    }).subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const handleSend = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
     
-    setMessages([
-      ...messages,
-      {
-        id: Date.now(),
-        sender: 'admin',
-        name: 'Support',
-        text: newMessage,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        read: false
-      }
-    ]);
+    const msg = {
+      id: Date.now(),
+      sender: 'admin',
+      name: 'Support',
+      text: newMessage,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      read: false
+    };
+
+    // Optimistically update UI instantly for swift responsiveness
+    setMessages(prev => [...prev, msg]);
     setNewMessage("");
+
+    // Broadcast instantly to customer
+    await supabase.channel('public:live-chat').send({
+      type: 'broadcast',
+      event: 'message',
+      payload: msg
+    });
   };
 
   return (
@@ -47,26 +63,28 @@ export default function AdminChatRoom() {
         </div>
         
         <div className="flex-1 overflow-y-auto">
-          {[
-            { id: 1, name: "Chinedu Okafor", lastMessage: "Yes, they just brought it up! Thank you...", time: "11:05 AM", unread: 1, active: true },
-            { id: 2, name: "Amina Yusuf", lastMessage: "Is the Samsung Galaxy Watch in stock?", time: "09:30 AM", unread: 0, active: false },
-            { id: 3, name: "Tunde Balogun", lastMessage: "I want to change my delivery address to Abuja.", time: "Yesterday", unread: 0, active: false },
-          ].map((chat) => (
-            <div key={chat.id} className={`p-4 border-b border-[#00AEEF]/5 cursor-pointer transition-all ${chat.active ? 'bg-[#1B1B5E]/40 border-l-4 border-l-[#00AEEF]' : 'hover:bg-white/5'}`}>
-              <div className="flex justify-between items-start mb-1">
-                <h3 className={`text-sm font-bold ${chat.active ? 'text-white' : 'text-gray-400'}`}>{chat.name}</h3>
-                <span className="text-[10px] text-gray-500 font-medium uppercase">{chat.time}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <p className="text-xs text-gray-500 truncate max-w-[85%]">{chat.lastMessage}</p>
-                {chat.unread > 0 && (
-                  <span className="bg-[#00AEEF] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,174,239,0.4)]">
-                    {chat.unread}
-                  </span>
-                )}
-              </div>
+          {chats.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 text-xs font-bold uppercase tracking-widest">
+              No active chats
             </div>
-          ))}
+          ) : (
+            chats.map((chat) => (
+              <div key={chat.id} className={`p-4 border-b border-[#00AEEF]/5 cursor-pointer transition-all ${chat.active ? 'bg-[#1B1B5E]/40 border-l-4 border-l-[#00AEEF]' : 'hover:bg-white/5'}`}>
+                <div className="flex justify-between items-start mb-1">
+                  <h3 className={`text-sm font-bold ${chat.active ? 'text-white' : 'text-gray-400'}`}>{chat.name}</h3>
+                  <span className="text-[10px] text-gray-500 font-medium uppercase">{chat.time}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-gray-500 truncate max-w-[85%]">{chat.lastMessage}</p>
+                  {chat.unread > 0 && (
+                    <span className="bg-[#00AEEF] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(0,174,239,0.4)]">
+                      {chat.unread}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
@@ -74,18 +92,29 @@ export default function AdminChatRoom() {
       <div className="flex-1 flex flex-col bg-[#050510]/30">
         {/* Chat Header */}
         <div className="h-20 border-b border-[#00AEEF]/10 flex items-center justify-between px-6 bg-[#0A0A20]">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-[#1B1B5E] border border-[#00AEEF]/20 flex items-center justify-center text-[#00AEEF]">
-              <User className="w-5 h-5" />
+          {chats.length > 0 ? (
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-[#1B1B5E] border border-[#00AEEF]/20 flex items-center justify-center text-[#00AEEF]">
+                <User className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white">Active Customer</h3>
+                <p className="text-[10px] text-green-400 font-bold flex items-center uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-green-500 mr-2 inline-block shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
+                  Active Now
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold text-white">Chinedu Okafor</h3>
-              <p className="text-[10px] text-green-400 font-bold flex items-center uppercase tracking-widest">
-                <span className="w-2 h-2 rounded-full bg-green-500 mr-2 inline-block shadow-[0_0_8px_rgba(34,197,94,0.5)]"></span>
-                Active Now
-              </p>
+          ) : (
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-[#1B1B5E]/30 flex items-center justify-center text-gray-500">
+                <Bot className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-400">Waiting for messages...</h3>
+              </div>
             </div>
-          </div>
+          )}
           <button className="text-gray-500 hover:text-white transition-colors">
             <MoreVertical className="w-5 h-5" />
           </button>

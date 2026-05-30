@@ -199,6 +199,22 @@ export default function Checkout() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (settings?.is_checkout_locked) {
+      alert("Checkout is temporarily disabled by the administrator. Please try again later.");
+      return;
+    }
+
+    try {
+      const { data: blockedUser } = await supabase.from('blocked_customers').select('id').eq('phone', formData.phone).single();
+      if (blockedUser) {
+        alert("Your account has been restricted from placing orders. Please contact support.");
+        return;
+      }
+    } catch (err) {
+      // Ignore if table doesn't exist yet or offline
+    }
+
     if (formData.paymentMethod === 'paystack') {
       handlePaystack();
     } else if (formData.paymentMethod === 'flutterwave') {

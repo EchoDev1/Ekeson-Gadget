@@ -65,10 +65,20 @@ CREATE TABLE settings (
   opay_merchant_id TEXT,
   palmpay_merchant_id TEXT,
   warranty_policy_text TEXT DEFAULT 'This is the default warranty policy. It can be changed in the admin dashboard.',
+  is_maintenance_mode BOOLEAN DEFAULT false,
+  is_checkout_locked BOOLEAN DEFAULT false,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 6. Messages table (Customer Care Chat)
+-- 6. Blocked Customers table (Restricts abusive users by phone number)
+CREATE TABLE blocked_customers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  phone TEXT UNIQUE NOT NULL,
+  reason TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 7. Messages table (Customer Care Chat)
 CREATE TABLE messages (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   session_id TEXT NOT NULL, -- To group chats for non-logged in users by cookie/session

@@ -21,6 +21,8 @@ export default function AdminSettings() {
     opay_merchant_id: "",
     palmpay_merchant_id: "",
     warranty_policy_text: "",
+    is_maintenance_mode: false,
+    is_checkout_locked: false,
   });
 
   useEffect(() => {
@@ -67,14 +69,6 @@ export default function AdminSettings() {
       setSaving(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" />
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -273,6 +267,50 @@ export default function AdminSettings() {
                   required
                 />
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* God Mode Operations */}
+        <div className="bg-red-50 p-8 rounded-3xl shadow-sm border border-red-200 space-y-6">
+          <h2 className="text-xl font-black text-red-600 uppercase tracking-wider flex items-center gap-3">
+            <Globe className="w-6 h-6" />
+            God Mode Operations
+          </h2>
+
+          <div className="space-y-6">
+            <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-red-100 shadow-sm">
+              <div>
+                <h4 className="font-bold text-[#1B1B5E]">Store Maintenance Mode</h4>
+                <p className="text-xs text-[#1B1B5E]/60 max-w-sm mt-1">When active, the entire public storefront is replaced with a maintenance screen. Customers cannot browse products.</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  name="is_maintenance_mode"
+                  checked={settings.is_maintenance_mode || false}
+                  onChange={e => setSettings({...settings, is_maintenance_mode: e.target.checked})}
+                  className="sr-only peer" 
+                />
+                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-500"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-orange-100 shadow-sm">
+              <div>
+                <h4 className="font-bold text-[#1B1B5E]">Checkout Lock</h4>
+                <p className="text-xs text-[#1B1B5E]/60 max-w-sm mt-1">Allows customers to browse products, but globally disables the "Place Order" button at checkout.</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  name="is_checkout_locked"
+                  checked={settings.is_checkout_locked || false}
+                  onChange={e => setSettings({...settings, is_checkout_locked: e.target.checked})}
+                  className="sr-only peer" 
+                />
+                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-orange-500"></div>
+              </label>
             </div>
           </div>
         </div>

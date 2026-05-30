@@ -3,6 +3,7 @@ import Footer from "@/components/layout/Footer";
 import { Inter } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
 import ChatWidget from "@/components/ChatWidget";
+import MaintenanceWrapper from "@/components/MaintenanceWrapper";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,14 +21,16 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased min-h-screen flex flex-col bg-[#FFFDF5]`}>
-        <CartProvider>
-          <Header />
-          <main className="flex-grow">
-            {children}
-          </main>
-          <Footer />
-          <ChatWidget />
-        </CartProvider>
+        <MaintenanceWrapper>
+          <CartProvider>
+            <Header />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+            <ChatWidget />
+          </CartProvider>
+        </MaintenanceWrapper>
       </body>
     </html>
   );

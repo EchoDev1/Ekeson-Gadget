@@ -32,7 +32,8 @@ export default function AdminOrders() {
     setLoading(true);
     const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
     if (data) setOrders(data);
-    if (error) console.error("Error fetching orders:", error);
+    else setOrders([]);
+    if (error) console.warn("Could not fetch orders (likely offline mode or RLS):", error);
     setLoading(false);
   };
 
@@ -43,9 +44,7 @@ export default function AdminOrders() {
     }
   };
 
-  if (loading) {
-    return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" /></div>;
-  }
+  // Removed blocking loader for superfast rendering
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -72,7 +71,11 @@ export default function AdminOrders() {
             </tr>
           </thead>
           <tbody>
-            {orders.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="6" className="p-8 text-center text-[#1B1B5E]/40 font-bold uppercase"><Loader2 className="w-6 h-6 animate-spin mx-auto text-[#00AEEF]" /></td>
+              </tr>
+            ) : orders.length === 0 ? (
               <tr>
                 <td colSpan="6" className="p-8 text-center text-[#1B1B5E]/40 font-bold uppercase">No orders found.</td>
               </tr>

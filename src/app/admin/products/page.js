@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Package, Plus, Edit2, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { Package, Plus, Edit2, Trash2, Loader2, AlertCircle, Upload } from "lucide-react";
 import Image from "next/image";
 
 export default function AdminProducts() {
@@ -26,7 +26,8 @@ export default function AdminProducts() {
     setLoading(true);
     const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
     if (data) setProducts(data);
-    if (error) console.error("Error fetching products:", error);
+    else setProducts([]);
+    if (error) console.warn("Could not fetch products (likely offline mode or RLS):", error);
     setLoading(false);
   };
 
@@ -64,9 +65,57 @@ export default function AdminProducts() {
     }
   };
 
-  if (loading) {
-    return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" /></div>;
-  }
+  const handleQuickUpdate = async (id, field, value) => {
+    // Optimistic UI update for "god mode" speed
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
+    const { error } = await supabase.from("products").update({ [field]: value }).eq("id", id);
+    if (error) {
+       console.error("Failed to quick update", error);
+       fetchProducts(); // revert on fail
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to webp base64 format for optimization
+        const dataUrl = canvas.toDataURL("image/webp", 0.8);
+        setFormData({ ...formData, image_url: dataUrl });
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Removed blocking loader for superfast rendering
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -98,7 +147,11 @@ export default function AdminProducts() {
             </tr>
           </thead>
           <tbody>
-            {products.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="5" className="p-8 text-center text-[#1B1B5E]/40 font-bold uppercase"><Loader2 className="w-6 h-6 animate-spin mx-auto text-[#00AEEF]" /></td>
+              </tr>
+            ) : products.length === 0 ? (
               <tr>
                 <td colSpan="5" className="p-8 text-center text-[#1B1B5E]/40 font-bold uppercase">No products found.</td>
               </tr>
@@ -119,15 +172,36 @@ export default function AdminProducts() {
                     </div>
                   </td>
                   <td className="p-4 text-sm font-bold text-[#1B1B5E]/80 uppercase">{product.category}</td>
-                  <td className="p-4 text-sm font-bold text-[#00AEEF]">₦{product.price.toLocaleString()}</td>
                   <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                      product.status === 'In Stock' ? 'bg-green-100 text-green-700' :
-                      product.status === 'Out of Stock' ? 'bg-red-100 text-red-700' :
-                      'bg-orange-100 text-orange-700'
-                    }`}>
-                      {product.status}
-                    </span>
+                    <div className="flex items-center gap-1 font-bold text-[#00AEEF] text-sm hover:bg-[#00AEEF]/5 px-2 py-1 rounded-lg transition-colors group">
+                      ₦
+                      <input 
+                        type="number" 
+                        defaultValue={product.price}
+                        onBlur={(e) => {
+                          const newPrice = parseFloat(e.target.value);
+                          if (newPrice !== product.price && !isNaN(newPrice)) {
+                            handleQuickUpdate(product.id, 'price', newPrice);
+                          }
+                        }}
+                        className="w-24 bg-transparent outline-none border-b border-transparent group-hover:border-[#00AEEF]/30 focus:border-[#00AEEF] transition-colors font-bold text-[#00AEEF]"
+                      />
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <select 
+                      value={product.status}
+                      onChange={(e) => handleQuickUpdate(product.id, 'status', e.target.value)}
+                      className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer appearance-none text-center hover:opacity-80 transition-opacity ${
+                        product.status === 'In Stock' ? 'bg-green-100 text-green-700 border-green-200' :
+                        product.status === 'Out of Stock' ? 'bg-red-100 text-red-700 border-red-200' :
+                        'bg-orange-100 text-orange-700 border-orange-200'
+                      } border`}
+                    >
+                      <option value="In Stock" className="text-black bg-white">In Stock</option>
+                      <option value="Out of Stock" className="text-black bg-white">Out of Stock</option>
+                      <option value="Restocking Soon" className="text-black bg-white">Restocking Soon</option>
+                    </select>
                   </td>
                   <td className="p-4 pr-6 text-right space-x-2">
                     <button onClick={() => handleOpenModal(product)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
@@ -201,8 +275,20 @@ export default function AdminProducts() {
                 </div>
 
                 <div className="space-y-2 col-span-2">
-                  <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Image URL</label>
-                  <input type="text" value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20" placeholder="/images/your_image.png or https://..." />
+                  <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Product Image</label>
+                  <div className="flex items-center gap-4">
+                    {formData.image_url && (
+                      <div className="w-20 h-20 relative rounded-xl overflow-hidden border-2 border-[#1B1B5E]/10 shrink-0">
+                        <Image src={formData.image_url} alt="Preview" fill className="object-cover" />
+                      </div>
+                    )}
+                    <label className="flex-1 cursor-pointer flex flex-col items-center justify-center border-2 border-dashed border-[#1B1B5E]/20 hover:border-[#00AEEF] hover:bg-[#00AEEF]/5 transition-colors rounded-xl py-6 bg-[#F5F5F7]">
+                      <Upload className="w-6 h-6 text-[#1B1B5E]/40 mb-2" />
+                      <span className="text-sm font-bold text-[#1B1B5E]/60">Click to Select from Gallery</span>
+                      <span className="text-[10px] text-[#1B1B5E]/40 mt-1 uppercase font-bold tracking-widest">Auto-converts and optimizes</span>
+                      <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                    </label>
+                  </div>
                 </div>
 
                 <div className="space-y-2 col-span-2">
