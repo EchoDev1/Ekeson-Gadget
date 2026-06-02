@@ -30,17 +30,24 @@ export default function AdminOrders() {
 
   const fetchOrders = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
-    if (data) setOrders(data);
-    else setOrders([]);
-    if (error) console.warn("Could not fetch orders (likely offline mode or RLS):", error);
+    try {
+      const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+      if (data) setOrders(data);
+      if (error) console.warn("Error fetching orders:", error);
+    } catch (err) {
+      console.warn("Failed to fetch orders natively:", err);
+    }
     setLoading(false);
   };
 
   const updateOrderStatus = async (id, status) => {
-    const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-    if (!error) {
-      setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
+    try {
+      const { error } = await supabase.from("orders").update({ status }).eq("id", id);
+      if (!error) {
+        setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
+      }
+    } catch (err) {
+      console.warn("Failed to update status natively:", err);
     }
   };
 

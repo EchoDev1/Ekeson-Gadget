@@ -43,7 +43,7 @@ export default function AdminSupport() {
       if (error) throw error;
       setSubmissions(prev => prev.map(sub => sub.id === id ? { ...sub, status } : sub));
     } catch (err) {
-      console.error("Error updating status:", err);
+      console.warn("Error updating status:", err);
       alert("Failed to update status.");
     }
   };
@@ -59,7 +59,7 @@ export default function AdminSupport() {
       if (error) throw error;
       setSubmissions(prev => prev.filter(sub => sub.id !== id));
     } catch (err) {
-      console.error("Error deleting submission:", err);
+      console.warn("Error deleting submission:", err);
       alert("Failed to delete submission.");
     }
   };

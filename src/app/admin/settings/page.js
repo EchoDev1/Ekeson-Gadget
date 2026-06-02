@@ -36,7 +36,7 @@ export default function AdminSettings() {
         setSettings(data);
       }
     } catch (err) {
-      console.error("Error fetching settings:", err);
+      console.warn("Error fetching settings:", err);
     } finally {
       setLoading(false);
     }
@@ -63,7 +63,7 @@ export default function AdminSettings() {
       if (error) throw error;
       alert("Settings saved successfully!");
     } catch (err) {
-      console.error("Error saving settings:", err);
+      console.warn("Error saving settings:", err);
       alert("Failed to save settings.");
     } finally {
       setSaving(false);

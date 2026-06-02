@@ -30,7 +30,7 @@ export default function AdminDashboard() {
           newMessages: messagesRes.count || 0
         });
       } catch (error) {
-        console.error("Error fetching stats:", error);
+        console.warn("Error fetching stats:", error);
       }
     };
 

@@ -24,10 +24,15 @@ export default function AdminProducts() {
 
   const fetchProducts = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-    if (data) setProducts(data);
-    else setProducts([]);
-    if (error) console.warn("Could not fetch products (likely offline mode or RLS):", error);
+    try {
+      const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
+      if (data) setProducts(data);
+      else setProducts([]);
+      if (error) console.warn("Could not fetch products (likely offline mode or RLS):", error);
+    } catch (err) {
+      console.warn("Failed to fetch products natively:", err);
+      setProducts([]);
+    }
     setLoading(false);
   };
 
@@ -44,34 +49,47 @@ export default function AdminProducts() {
 
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
-    const { error } = await supabase.from("products").delete().eq("id", id);
-    if (!error) fetchProducts();
+    try {
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      if (!error) fetchProducts();
+    } catch (err) {
+      console.warn("Failed to delete natively:", err);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingProduct) {
-      const { error } = await supabase.from("products").update(formData).eq("id", editingProduct.id);
-      if (!error) {
-        setIsModalOpen(false);
-        fetchProducts();
+    try {
+      if (editingProduct) {
+        const { error } = await supabase.from("products").update(formData).eq("id", editingProduct.id);
+        if (!error) {
+          setIsModalOpen(false);
+          fetchProducts();
+        }
+      } else {
+        const { error } = await supabase.from("products").insert([formData]);
+        if (!error) {
+          setIsModalOpen(false);
+          fetchProducts();
+        }
       }
-    } else {
-      const { error } = await supabase.from("products").insert([formData]);
-      if (!error) {
-        setIsModalOpen(false);
-        fetchProducts();
-      }
+    } catch (err) {
+      console.warn("Failed to submit natively:", err);
     }
   };
 
   const handleQuickUpdate = async (id, field, value) => {
     // Optimistic UI update for "god mode" speed
     setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
-    const { error } = await supabase.from("products").update({ [field]: value }).eq("id", id);
-    if (error) {
-       console.error("Failed to quick update", error);
-       fetchProducts(); // revert on fail
+    try {
+      const { error } = await supabase.from("products").update({ [field]: value }).eq("id", id);
+      if (error) {
+         console.warn("Failed to quick update", error);
+         fetchProducts(); // revert on fail
+      }
+    } catch (err) {
+       console.warn("Failed to quick update natively:", err);
+       fetchProducts();
     }
   };
 

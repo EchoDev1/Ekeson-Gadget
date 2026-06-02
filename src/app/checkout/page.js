@@ -122,7 +122,7 @@ export default function Checkout() {
       setSuccess(true);
       window.scrollTo(0, 0);
     } catch (err) {
-      console.error("Order submission failed:", err);
+      console.warn("Order submission failed:", err);
       alert("Failed to submit order. Please try again.");
     } finally {
       setSubmitting(false);
