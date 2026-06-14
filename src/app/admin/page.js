@@ -5,8 +5,10 @@ import { supabase } from "@/lib/supabase";
 import { Users, Package, ShoppingCart, DollarSign, Activity } from "lucide-react";
 import Link from "next/link";
 
+let cachedStats = null;
+
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState(cachedStats || {
     totalProducts: 0,
     totalOrders: 0,
     totalRevenue: 0,
@@ -23,12 +25,14 @@ export default function AdminDashboard() {
           supabase.from('messages').select('*', { count: 'exact', head: true }).eq('is_read', false).eq('sender', 'user')
         ]);
         
-        setStats({
+        const newStats = {
           totalProducts: productsRes.count || 0,
           totalOrders: ordersRes.count || 0,
           totalRevenue: 0, // Would sum up completed orders total_amount
           newMessages: messagesRes.count || 0
-        });
+        };
+        setStats(newStats);
+        cachedStats = newStats;
       } catch (error) {
         console.warn("Error fetching stats:", error);
       }

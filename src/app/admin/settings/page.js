@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Save, Loader2, Wallet, MapPin, Globe, FileText } from "lucide-react";
 
+let cachedSettings = null;
+
 export default function AdminSettings() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedSettings);
   const [saving, setSaving] = useState(false);
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState(cachedSettings || {
     usdt_wallet_address: "",
     usdt_network: "TRC20",
     shipping_fee_inside_lagos_abuja: 0,
@@ -34,6 +36,7 @@ export default function AdminSettings() {
       const { data, error } = await supabase.from("settings").select("*").eq("id", 1).single();
       if (data) {
         setSettings(data);
+        cachedSettings = data;
       }
     } catch (err) {
       console.warn("Error fetching settings:", err);
@@ -54,12 +57,11 @@ export default function AdminSettings() {
     e.preventDefault();
     setSaving(true);
     try {
-      // Upsert logic for id=1
-      const { error } = await supabase.from("settings").upsert({
-        id: 1,
+      // Update logic for id=1
+      const { error } = await supabase.from("settings").update({
         ...settings,
-        updated_at: new Date()
-      });
+        updated_at: new Date().toISOString()
+      }).eq("id", 1);
       if (error) throw error;
       alert("Settings saved successfully!");
     } catch (err) {

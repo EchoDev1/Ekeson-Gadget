@@ -5,9 +5,11 @@ import { supabase } from "@/lib/supabase";
 import { Package, Plus, Edit2, Trash2, Loader2, AlertCircle, Upload } from "lucide-react";
 import Image from "next/image";
 
+let cachedProducts = null;
+
 export default function AdminProducts() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState(cachedProducts || []);
+  const [loading, setLoading] = useState(!cachedProducts);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   
@@ -26,8 +28,12 @@ export default function AdminProducts() {
     setLoading(true);
     try {
       const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
-      if (data) setProducts(data);
-      else setProducts([]);
+      if (data) {
+        setProducts(data);
+        cachedProducts = data;
+      } else {
+        setProducts([]);
+      }
       if (error) console.warn("Could not fetch products (likely offline mode or RLS):", error);
     } catch (err) {
       console.warn("Failed to fetch products natively:", err);

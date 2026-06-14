@@ -180,12 +180,7 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- Seed some initial data
-INSERT INTO products (name, description, price, category, condition, brand, image_url, inventory, status, is_featured)
-VALUES 
-('MacBook Pro M3', '14-inch, M3 chip, 8GB RAM, 512GB SSD', 2450000, 'laptops', 'new', 'Apple', 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&q=80', 10, 'In Stock', true),
-('iPhone 15 Pro Max', '256GB, Titanium Blue', 1850000, 'phones', 'new', 'Apple', 'https://images.unsplash.com/photo-1696446701796-da61225697cc?w=800&q=80', 15, 'In Stock', true),
-('iPad Pro 12.9', 'M2 chip, 128GB, Space Gray', 1250000, 'pads', 'new', 'Apple', 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=800&q=80', 5, 'In Stock', true),
-('Sony WH-1000XM5', 'Industry Leading Noise Cancelling Headphones', 450000, 'gadgets', 'new', 'Sony', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80', 20, 'In Stock', true);
+-- (Dummy products removed for live production)
 
 INSERT INTO settings (id, usdt_wallet_address, usdt_network, shipping_fee_inside_lagos_abuja, shipping_fee_outside_lagos_abuja, shipping_fee_african_countries, warranty_policy_text)
 VALUES (1, 'TYP89...YourWalletAddress', 'TRC20', 3500.00, 7500.00, 25000.00, 'Our premium items come with a standard 1-Year warranty directly from our global partners. For more details, please contact technical support.');

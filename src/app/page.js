@@ -1,4 +1,3 @@
-"use client";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Laptop, Smartphone, Tablet, ChevronRight, Watch, Headphones, ShieldCheck, Package, Gamepad2, Drone } from "lucide-react";

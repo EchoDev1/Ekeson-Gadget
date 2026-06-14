@@ -18,8 +18,20 @@ import {
 } from "lucide-react";
 
 export default function AdminLayout({ children }) {
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('admin_mock_logged_in') === 'true' && sessionStorage.getItem('admin_secret_verified') === 'true';
+    }
+    return false;
+  });
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      if (sessionStorage.getItem('admin_mock_logged_in') === 'true' && sessionStorage.getItem('admin_secret_verified') === 'true') {
+        return false;
+      }
+    }
+    return true;
+  });
   const router = useRouter();
   const pathname = usePathname();
 
