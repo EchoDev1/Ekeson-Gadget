@@ -53,7 +53,8 @@ export default function AdminSettings() {
     }));
   };
 
-  const handleSave = async () => {
+  const handleSave = async (e) => {
+    if (e) e.preventDefault();
     setSaving(true);
     try {
       const response = await fetch('/api/admin/settings', {

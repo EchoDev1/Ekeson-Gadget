@@ -39,7 +39,28 @@ export default function Checkout() {
     try {
       // Fetch settings for fees and wallet
       const { data: settingsData } = await supabase.from('settings').select('*').eq('id', 1).single();
-      if (settingsData) setSettings(settingsData);
+      if (settingsData) {
+        setSettings(settingsData);
+        
+        // Auto-select first available payment method
+        const availableMethods = [];
+        if (settingsData.usdt_wallet_address) availableMethods.push('crypto');
+        if (settingsData.paystack_public_key) availableMethods.push('paystack');
+        if (settingsData.flutterwave_public_key) availableMethods.push('flutterwave');
+        if (settingsData.monnify_api_key && settingsData.monnify_contract_code) availableMethods.push('monnify');
+        if (settingsData.bank_transfer_details) availableMethods.push('bank_transfer');
+        if (settingsData.opay_merchant_id) availableMethods.push('opay');
+        if (settingsData.palmpay_merchant_id) availableMethods.push('palmpay');
+
+        setFormData(prev => {
+          if (availableMethods.length > 0 && !availableMethods.includes(prev.paymentMethod)) {
+            return { ...prev, paymentMethod: availableMethods[0] };
+          } else if (availableMethods.length === 0) {
+            return { ...prev, paymentMethod: "" };
+          }
+          return prev;
+        });
+      }
 
       // Fetch Live USDT/NGN rate
       let rate = 1500; // Base fallback rate
@@ -340,48 +361,68 @@ export default function Checkout() {
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'crypto' ? 'border-[#1B1B5E] bg-[#1B1B5E]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
-                  <input type="radio" name="payment" value="crypto" checked={formData.paymentMethod === 'crypto'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
-                  <Wallet className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'crypto' ? 'text-[#1B1B5E]' : 'text-gray-400'}`} />
-                  <span className="font-bold text-sm text-[#1B1B5E]">Crypto (USDT)</span>
-                </label>
+                {settings?.usdt_wallet_address && (
+                  <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'crypto' ? 'border-[#1B1B5E] bg-[#1B1B5E]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
+                    <input type="radio" name="payment" value="crypto" checked={formData.paymentMethod === 'crypto'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
+                    <Wallet className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'crypto' ? 'text-[#1B1B5E]' : 'text-gray-400'}`} />
+                    <span className="font-bold text-sm text-[#1B1B5E]">Crypto (USDT)</span>
+                  </label>
+                )}
 
-                <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'paystack' ? 'border-[#0BA4DB] bg-[#0BA4DB]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
-                  <input type="radio" name="payment" value="paystack" checked={formData.paymentMethod === 'paystack'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
-                  <CreditCard className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'paystack' ? 'text-[#0BA4DB]' : 'text-gray-400'}`} />
-                  <span className="font-bold text-sm text-[#1B1B5E]">Paystack</span>
-                </label>
+                {settings?.paystack_public_key && (
+                  <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'paystack' ? 'border-[#0BA4DB] bg-[#0BA4DB]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
+                    <input type="radio" name="payment" value="paystack" checked={formData.paymentMethod === 'paystack'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
+                    <CreditCard className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'paystack' ? 'text-[#0BA4DB]' : 'text-gray-400'}`} />
+                    <span className="font-bold text-sm text-[#1B1B5E]">Paystack</span>
+                  </label>
+                )}
 
-                <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'flutterwave' ? 'border-[#F5A623] bg-[#F5A623]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
-                  <input type="radio" name="payment" value="flutterwave" checked={formData.paymentMethod === 'flutterwave'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
-                  <CreditCard className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'flutterwave' ? 'text-[#F5A623]' : 'text-gray-400'}`} />
-                  <span className="font-bold text-sm text-[#1B1B5E]">Flutterwave</span>
-                </label>
+                {settings?.flutterwave_public_key && (
+                  <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'flutterwave' ? 'border-[#F5A623] bg-[#F5A623]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
+                    <input type="radio" name="payment" value="flutterwave" checked={formData.paymentMethod === 'flutterwave'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
+                    <CreditCard className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'flutterwave' ? 'text-[#F5A623]' : 'text-gray-400'}`} />
+                    <span className="font-bold text-sm text-[#1B1B5E]">Flutterwave</span>
+                  </label>
+                )}
 
-                <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'monnify' ? 'border-[#0B5CFF] bg-[#0B5CFF]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
-                  <input type="radio" name="payment" value="monnify" checked={formData.paymentMethod === 'monnify'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
-                  <CreditCard className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'monnify' ? 'text-[#0B5CFF]' : 'text-gray-400'}`} />
-                  <span className="font-bold text-sm text-[#1B1B5E]">Monnify</span>
-                </label>
+                {settings?.monnify_api_key && settings?.monnify_contract_code && (
+                  <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'monnify' ? 'border-[#0B5CFF] bg-[#0B5CFF]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
+                    <input type="radio" name="payment" value="monnify" checked={formData.paymentMethod === 'monnify'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
+                    <CreditCard className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'monnify' ? 'text-[#0B5CFF]' : 'text-gray-400'}`} />
+                    <span className="font-bold text-sm text-[#1B1B5E]">Monnify</span>
+                  </label>
+                )}
 
-                <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'bank_transfer' ? 'border-[#2D3748] bg-[#2D3748]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
-                  <input type="radio" name="payment" value="bank_transfer" checked={formData.paymentMethod === 'bank_transfer'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
-                  <Building className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'bank_transfer' ? 'text-[#2D3748]' : 'text-gray-400'}`} />
-                  <span className="font-bold text-sm text-[#1B1B5E]">Bank Transfer</span>
-                </label>
+                {settings?.bank_transfer_details && (
+                  <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'bank_transfer' ? 'border-[#2D3748] bg-[#2D3748]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
+                    <input type="radio" name="payment" value="bank_transfer" checked={formData.paymentMethod === 'bank_transfer'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
+                    <Building className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'bank_transfer' ? 'text-[#2D3748]' : 'text-gray-400'}`} />
+                    <span className="font-bold text-sm text-[#1B1B5E]">Bank Transfer</span>
+                  </label>
+                )}
 
-                <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'opay' ? 'border-[#1DCB96] bg-[#1DCB96]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
-                  <input type="radio" name="payment" value="opay" checked={formData.paymentMethod === 'opay'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
-                  <Phone className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'opay' ? 'text-[#1DCB96]' : 'text-gray-400'}`} />
-                  <span className="font-bold text-sm text-[#1B1B5E]">OPay</span>
-                </label>
+                {settings?.opay_merchant_id && (
+                  <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'opay' ? 'border-[#1DCB96] bg-[#1DCB96]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
+                    <input type="radio" name="payment" value="opay" checked={formData.paymentMethod === 'opay'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
+                    <Phone className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'opay' ? 'text-[#1DCB96]' : 'text-gray-400'}`} />
+                    <span className="font-bold text-sm text-[#1B1B5E]">OPay</span>
+                  </label>
+                )}
 
-                <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'palmpay' ? 'border-[#6F42C1] bg-[#6F42C1]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
-                  <input type="radio" name="payment" value="palmpay" checked={formData.paymentMethod === 'palmpay'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
-                  <Phone className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'palmpay' ? 'text-[#6F42C1]' : 'text-gray-400'}`} />
-                  <span className="font-bold text-sm text-[#1B1B5E]">PalmPay</span>
-                </label>
+                {settings?.palmpay_merchant_id && (
+                  <label className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.paymentMethod === 'palmpay' ? 'border-[#6F42C1] bg-[#6F42C1]/5' : 'border-[#F5F5F7] bg-[#F5F5F7] hover:border-[#1B1B5E]/20'}`}>
+                    <input type="radio" name="payment" value="palmpay" checked={formData.paymentMethod === 'palmpay'} onChange={e => setFormData({...formData, paymentMethod: e.target.value})} className="sr-only" />
+                    <Phone className={`w-8 h-8 mb-2 ${formData.paymentMethod === 'palmpay' ? 'text-[#6F42C1]' : 'text-gray-400'}`} />
+                    <span className="font-bold text-sm text-[#1B1B5E]">PalmPay</span>
+                  </label>
+                )}
               </div>
+
+              {!formData.paymentMethod && (
+                <div className="p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-bold text-center">
+                  No payment methods are currently available. Please contact support.
+                </div>
+              )}
 
               {/* Dynamic Payment Details Section */}
               {formData.paymentMethod === 'crypto' && (
