@@ -124,7 +124,7 @@ export default function AdminSettings() {
               </select>
             </div>
           </div>
-          <p className="text-xs text-[#1B1B5E]/50 font-medium">* System automatically fetches live market rate and adds a $3 premium.</p>
+          <p className="text-xs text-[#1B1B5E]/50 font-medium">* System automatically fetches live market rate and applies a $2 discount.</p>
         </div>
 
         {/* Other Payment Gateways */}
