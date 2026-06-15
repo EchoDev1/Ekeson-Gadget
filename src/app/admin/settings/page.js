@@ -53,20 +53,29 @@ export default function AdminSettings() {
     }));
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
+  const handleSave = async () => {
     setSaving(true);
     try {
-      // Update logic for id=1
-      const { error } = await supabase.from("settings").update({
-        ...settings,
-        updated_at: new Date().toISOString()
-      }).eq("id", 1);
-      if (error) throw error;
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer Udi'
+        },
+        body: JSON.stringify(settings)
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to save settings');
+      }
+
+      cachedSettings = settings;
       alert("Settings saved successfully!");
     } catch (err) {
-      console.warn("Error saving settings:", err);
-      alert("Failed to save settings.");
+      console.error("Error saving settings:", err);
+      alert("Failed to save settings: " + (err.message || ""));
     } finally {
       setSaving(false);
     }
