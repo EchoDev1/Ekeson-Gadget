@@ -66,18 +66,19 @@ export default function Checkout() {
       let rate = 1500; // Base fallback rate
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000); // 4 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 6000); // 6 second timeout
         
-        // Using CryptoCompare since Binance is blocked by Nigerian ISPs
-        const res = await fetch("https://min-api.cryptocompare.com/data/price?fsym=USDT&tsyms=NGN", {
+        // Fetch from our internal server API that aggregates Binance P2P, OKX P2P, and Bybit P2P
+        // This avoids client-side CORS errors and ISP blocks
+        const res = await fetch("/api/usdt-rate", {
           signal: controller.signal
         });
         clearTimeout(timeoutId);
         
         if (res.ok) {
           const data = await res.json();
-          if (data && data.NGN) {
-            rate = parseFloat(data.NGN);
+          if (data && data.rate) {
+            rate = parseFloat(data.rate);
           }
         }
       } catch (e) {
