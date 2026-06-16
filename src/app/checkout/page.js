@@ -109,8 +109,8 @@ export default function Checkout() {
 
   const shippingFee = getShippingFee();
   const totalNgn = cartTotal + shippingFee;
-  // User requested a $2 discount for crypto payments
-  const totalUsdt = usdtRate ? Math.max(0, (totalNgn / usdtRate) - 2) : 0;
+  // User requested a $5 safety premium for crypto payments due to volatility
+  const totalUsdt = usdtRate ? (totalNgn / usdtRate) + 5 : 0;
 
   const handleCopy = (text, item) => {
     navigator.clipboard.writeText(text);
@@ -430,7 +430,7 @@ export default function Checkout() {
                 <div className="bg-[#1B1B5E] text-white p-6 rounded-2xl space-y-6 relative overflow-hidden mt-6">
                   <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
                   <div className="relative z-10 space-y-1">
-                    <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Amount to Send (- $2 discount applied)</p>
+                    <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Amount to Send (+ $5 safety premium included)</p>
                     <div className="text-4xl font-black tracking-tighter flex items-end gap-2">
                       {totalUsdt.toFixed(2)} <span className="text-xl text-[#00AEEF] mb-1">USDT</span>
                     </div>
