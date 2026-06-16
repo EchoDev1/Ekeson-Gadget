@@ -56,10 +56,15 @@ export default function AdminProducts() {
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
     try {
-      const { error } = await supabase.from("products").delete().eq("id", id);
-      if (!error) fetchProducts();
+      const res = await fetch('/api/admin/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', payload: { id } })
+      });
+      if (res.ok) fetchProducts();
+      else alert("Failed to delete product. Please ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel.");
     } catch (err) {
-      console.warn("Failed to delete natively:", err);
+      console.warn("Failed to delete via API:", err);
     }
   };
 
@@ -67,20 +72,32 @@ export default function AdminProducts() {
     e.preventDefault();
     try {
       if (editingProduct) {
-        const { error } = await supabase.from("products").update(formData).eq("id", editingProduct.id);
-        if (!error) {
+        const res = await fetch('/api/admin/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'update', payload: { id: editingProduct.id, ...formData } })
+        });
+        if (res.ok) {
           setIsModalOpen(false);
           fetchProducts();
+        } else {
+          alert("Failed to update product. Please ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel.");
         }
       } else {
-        const { error } = await supabase.from("products").insert([formData]);
-        if (!error) {
+        const res = await fetch('/api/admin/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'insert', payload: formData })
+        });
+        if (res.ok) {
           setIsModalOpen(false);
           fetchProducts();
+        } else {
+          alert("Failed to create product. Please ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel.");
         }
       }
     } catch (err) {
-      console.warn("Failed to submit natively:", err);
+      console.warn("Failed to submit via API:", err);
     }
   };
 
@@ -88,13 +105,18 @@ export default function AdminProducts() {
     // Optimistic UI update for "god mode" speed
     setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
     try {
-      const { error } = await supabase.from("products").update({ [field]: value }).eq("id", id);
-      if (error) {
-         console.warn("Failed to quick update", error);
+      const res = await fetch('/api/admin/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update', payload: { id, [field]: value } })
+      });
+      if (!res.ok) {
+         console.warn("Failed to quick update via API");
          fetchProducts(); // revert on fail
+         alert("Update failed. Ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel.");
       }
     } catch (err) {
-       console.warn("Failed to quick update natively:", err);
+       console.warn("Failed to quick update via API:", err);
        fetchProducts();
     }
   };
