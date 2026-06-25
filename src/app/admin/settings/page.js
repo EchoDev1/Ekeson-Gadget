@@ -23,6 +23,10 @@ export default function AdminSettings() {
     opay_merchant_id: "",
     palmpay_merchant_id: "",
     warranty_policy_text: "",
+    delivery_policy_text: "",
+    privacy_policy_text: "",
+    refund_policy_text: "",
+    terms_policy_text: "",
     is_maintenance_mode: false,
     is_checkout_locked: false,
     footer_hq_address: "Lagos/Abuja Nigeria",
@@ -450,18 +454,65 @@ export default function AdminSettings() {
             Content Management
           </h2>
 
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Warranty Policy Text</label>
-            <textarea 
-              name="warranty_policy_text"
-              value={settings.warranty_policy_text || ""}
-              onChange={handleChange}
-              rows={6}
-              className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
-              placeholder="Enter the official warranty policy..."
-            />
-            <p className="text-xs text-[#1B1B5E]/50 font-medium">This text is displayed on the public Warranty Policy page.</p>
-          </div>
+          <div className="space-y-8 mt-6 border-t border-[#1B1B5E]/5 pt-6">
+            <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3 border-b border-[#1B1B5E]/10 pb-4">
+              <FileText className="w-6 h-6 text-[#00AEEF]" />
+              Store Policies
+            </h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Warranty Policy</label>
+                  <textarea
+                    value={settings.warranty_policy_text || ""}
+                    onChange={e => setSettings({...settings, warranty_policy_text: e.target.value})}
+                    rows={6}
+                    className="w-full mt-2 px-4 py-3 bg-[#F5F5F7] border border-transparent rounded-xl text-sm focus:outline-none focus:border-[#00AEEF] focus:bg-white focus:ring-4 focus:ring-[#00AEEF]/10 transition-all resize-y"
+                    placeholder="Enter full warranty policy text..."
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Delivery & Shipping Policy</label>
+                  <textarea
+                    value={settings.delivery_policy_text || ""}
+                    onChange={e => setSettings({...settings, delivery_policy_text: e.target.value})}
+                    rows={6}
+                    className="w-full mt-2 px-4 py-3 bg-[#F5F5F7] border border-transparent rounded-xl text-sm focus:outline-none focus:border-[#00AEEF] focus:bg-white focus:ring-4 focus:ring-[#00AEEF]/10 transition-all resize-y"
+                    placeholder="Enter delivery & shipping policy text..."
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Refund & Returns Policy</label>
+                  <textarea
+                    value={settings.refund_policy_text || ""}
+                    onChange={e => setSettings({...settings, refund_policy_text: e.target.value})}
+                    rows={6}
+                    className="w-full mt-2 px-4 py-3 bg-[#F5F5F7] border border-transparent rounded-xl text-sm focus:outline-none focus:border-[#00AEEF] focus:bg-white focus:ring-4 focus:ring-[#00AEEF]/10 transition-all resize-y"
+                    placeholder="Enter refund & returns policy text..."
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Terms and Conditions</label>
+                  <textarea
+                    value={settings.terms_policy_text || ""}
+                    onChange={e => setSettings({...settings, terms_policy_text: e.target.value})}
+                    rows={6}
+                    className="w-full mt-2 px-4 py-3 bg-[#F5F5F7] border border-transparent rounded-xl text-sm focus:outline-none focus:border-[#00AEEF] focus:bg-white focus:ring-4 focus:ring-[#00AEEF]/10 transition-all resize-y"
+                    placeholder="Enter terms and conditions text..."
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Privacy Policy</label>
+                  <textarea
+                    value={settings.privacy_policy_text || ""}
+                    onChange={e => setSettings({...settings, privacy_policy_text: e.target.value})}
+                    rows={6}
+                    className="w-full mt-2 px-4 py-3 bg-[#F5F5F7] border border-transparent rounded-xl text-sm focus:outline-none focus:border-[#00AEEF] focus:bg-white focus:ring-4 focus:ring-[#00AEEF]/10 transition-all resize-y"
+                    placeholder="Enter privacy policy text..."
+                  />
+                </div>
+              </div>
+            </div>
         </div>
 
         {/* Header Configuration */}

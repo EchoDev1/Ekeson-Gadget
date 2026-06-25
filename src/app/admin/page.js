@@ -17,11 +17,13 @@ export default function AdminDashboard() {
     revenueData: [],
     categoryData: []
   });
+  const [dbStatus, setDbStatus] = useState("checking"); // 'checking', 'connected', 'error'
 
   useEffect(() => {
     // In a real scenario with proper RLS and populated database, we fetch counts:
     const fetchStats = async () => {
       try {
+        const startPing = Date.now();
         const [productsRes, ordersRes, messagesRes] = await Promise.all([
           supabase.from('products').select('*', { count: 'exact' }),
           supabase.from('orders').select('*'),
@@ -61,8 +63,10 @@ export default function AdminDashboard() {
         };
         setStats(newStats);
         cachedStats = newStats;
+        setDbStatus("connected");
       } catch (error) {
         console.warn("Error fetching stats:", error);
+        setDbStatus("error");
       }
     };
 
@@ -71,6 +75,30 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-black text-[#1B1B5E] uppercase tracking-wider">Dashboard Overview</h2>
+        
+        {/* Database Connection Status Widget */}
+        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full border border-[#1B1B5E]/10 shadow-sm">
+          <div className="text-[10px] font-black uppercase tracking-widest text-[#1B1B5E]/50 mr-2">System Status:</div>
+          {dbStatus === "checking" && (
+            <span className="flex items-center gap-2 text-xs font-bold text-yellow-500">
+              <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span> Pinging Backend...
+            </span>
+          )}
+          {dbStatus === "connected" && (
+            <span className="flex items-center gap-2 text-xs font-bold text-green-500">
+              <span className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse"></span> Database Connected
+            </span>
+          )}
+          {dbStatus === "error" && (
+            <span className="flex items-center gap-2 text-xs font-bold text-red-500">
+              <span className="w-2 h-2 rounded-full bg-red-500"></span> Connection Failed
+            </span>
+          )}
+        </div>
+      </div>
       
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
