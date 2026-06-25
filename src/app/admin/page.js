@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Users, Package, ShoppingCart, DollarSign, Activity } from "lucide-react";
 import Link from "next/link";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 let cachedStats = null;
 
@@ -12,7 +13,9 @@ export default function AdminDashboard() {
     totalProducts: 0,
     totalOrders: 0,
     totalRevenue: 0,
-    newMessages: 0
+    newMessages: 0,
+    revenueData: [],
+    categoryData: []
   });
 
   useEffect(() => {
@@ -20,16 +23,41 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       try {
         const [productsRes, ordersRes, messagesRes] = await Promise.all([
-          supabase.from('products').select('*', { count: 'exact', head: true }),
-          supabase.from('orders').select('*', { count: 'exact', head: true }),
+          supabase.from('products').select('*', { count: 'exact' }),
+          supabase.from('orders').select('*'),
           supabase.from('messages').select('*', { count: 'exact', head: true }).eq('is_read', false).eq('sender', 'user')
         ]);
         
+        let totalRev = 0;
+        const revByDate = {};
+        const orders = ordersRes.data || [];
+        
+        orders.forEach(o => {
+          totalRev += Number(o.total_amount || 0);
+          const date = new Date(o.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          revByDate[date] = (revByDate[date] || 0) + Number(o.total_amount || 0);
+        });
+
+        const revenueData = Object.keys(revByDate).map(date => ({
+          date,
+          revenue: revByDate[date]
+        }));
+
+        // Mock category data for now since we don't have order_items join handy
+        const categoryData = [
+          { name: 'Phones', sales: 40 },
+          { name: 'Laptops', sales: 30 },
+          { name: 'Accessories', sales: 20 },
+          { name: 'Pads', sales: 10 },
+        ];
+
         const newStats = {
           totalProducts: productsRes.count || 0,
-          totalOrders: ordersRes.count || 0,
-          totalRevenue: 0, // Would sum up completed orders total_amount
-          newMessages: messagesRes.count || 0
+          totalOrders: orders.length || 0,
+          totalRevenue: totalRev,
+          newMessages: messagesRes.count || 0,
+          revenueData: revenueData.length > 0 ? revenueData : [{ date: 'Today', revenue: 0 }],
+          categoryData
         };
         setStats(newStats);
         cachedStats = newStats;
@@ -85,25 +113,36 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Activity Mock */}
+        {/* Charts Section */}
         <div className="bg-white p-8 rounded-3xl border border-[#1B1B5E]/5 shadow-sm space-y-6">
-          <h3 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider">System Status</h3>
-          <div className="space-y-4">
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-green-50 border border-green-100">
-              <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-              <div>
-                <h4 className="font-bold text-green-900 text-sm">Database Connected</h4>
-                <p className="text-xs text-green-700">Supabase link active</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-100">
-              <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse" />
-              <div>
-                <h4 className="font-bold text-blue-900 text-sm">Realtime Active</h4>
-                <p className="text-xs text-blue-700">Listening for new messages</p>
-              </div>
-            </div>
+          <h3 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider">Revenue Overview</h3>
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={stats.revenueData}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} tickFormatter={(val) => `₦${(val/1000)}k`} />
+                <RechartsTooltip cursor={{ stroke: '#E5E7EB', strokeWidth: 2 }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Line type="monotone" dataKey="revenue" stroke="#00AEEF" strokeWidth={3} dot={{ r: 4, fill: '#00AEEF', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
+        </div>
+      </div>
+      
+      {/* Category Sales Chart */}
+      <div className="bg-white p-8 rounded-3xl border border-[#1B1B5E]/5 shadow-sm space-y-6">
+        <h3 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider">Top Selling Categories</h3>
+        <div className="h-64 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={stats.categoryData} layout="vertical" margin={{ left: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
+              <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} />
+              <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#1B1B5E', fontWeight: 'bold' }} width={100} />
+              <RechartsTooltip cursor={{ fill: '#F5F5F7' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+              <Bar dataKey="sales" fill="#1B1B5E" radius={[0, 4, 4, 0]} barSize={24} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

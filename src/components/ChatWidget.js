@@ -10,6 +10,7 @@ export default function ChatWidget() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [sessionId, setSessionId] = useState("");
+  const [liveScript, setLiveScript] = useState("");
   const messagesEndRef = useRef(null);
   const pathname = usePathname();
 
@@ -28,6 +29,15 @@ export default function ChatWidget() {
     setSessionId(sid);
 
     fetchMessages(sid);
+    
+    // Fetch live_chat_script from settings
+    const checkSettings = async () => {
+      const { data } = await supabase.from('settings').select('live_chat_script').eq('id', 1).single();
+      if (data?.live_chat_script) {
+        setLiveScript(data.live_chat_script);
+      }
+    };
+    checkSettings();
 
     const subscription = supabase
       .channel('public:messages')
@@ -71,6 +81,10 @@ export default function ChatWidget() {
     setNewMessage("");
     await supabase.from('messages').insert([msg]);
   };
+
+  if (liveScript) {
+    return <div dangerouslySetInnerHTML={{ __html: liveScript }} />;
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">

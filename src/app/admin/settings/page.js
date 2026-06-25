@@ -59,6 +59,7 @@ export default function AdminSettings() {
       { label: "Tablets & Pads", url: "/category/pads" },
       { label: "Accessories", url: "/category/accessories" }
     ],
+    live_chat_script: "",
   });
 
   useEffect(() => {

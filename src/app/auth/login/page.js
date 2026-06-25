@@ -9,9 +9,23 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+
   const handleLogin = async (e) => {
     e.preventDefault();
-    alert("Login implementation would trigger here.");
+    setLoading(true);
+    setError(null);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      setError(error.message);
+    } else {
+      window.location.href = '/dashboard';
+    }
+    setLoading(false);
   };
 
   return (
@@ -39,6 +53,7 @@ export default function Login() {
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+          {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100">{error}</div>}
           <div className="space-y-5">
             <div>
               <label className="text-[10px] font-black text-[#1B1B5E]/40 uppercase tracking-widest ml-1">Email Address</label>
@@ -98,10 +113,11 @@ export default function Login() {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-4 px-4 border border-transparent text-sm font-black rounded-2xl text-white bg-[#1B1B5E] hover:bg-[#00AEEF] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00AEEF] transition-all shadow-xl uppercase tracking-widest"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-3 py-4 px-8 border border-transparent rounded-2xl shadow-xl text-xs font-black uppercase tracking-[0.2em] text-white bg-[#1B1B5E] hover:bg-[#00AEEF] hover:shadow-[#00AEEF]/20 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50"
             >
-              Sign in to Account
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              {loading ? "Signing in..." : "Access Portal"}
+              {!loading && <ArrowRight className="w-4 h-4" />}
             </button>
           </div>
           

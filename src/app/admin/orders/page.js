@@ -42,12 +42,18 @@ export default function AdminOrders() {
 
   const updateOrderStatus = async (id, status) => {
     try {
-      const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-      if (!error) {
+      const res = await fetch(`/api/admin/orders/${id}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
         setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
+      } else {
+        alert("Failed to update status");
       }
     } catch (err) {
-      console.warn("Failed to update status natively:", err);
+      console.warn("Failed to update status via API:", err);
     }
   };
 

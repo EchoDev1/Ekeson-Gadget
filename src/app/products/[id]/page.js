@@ -3,7 +3,7 @@ import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ShoppingCart, Star, ShieldCheck, Truck, ArrowLeft, Heart, Share2, CheckCircle2 } from "lucide-react";
+import { ShoppingCart, Star, ShieldCheck, Truck, ArrowLeft, Heart, Share2, CheckCircle2, MessageSquare } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { supabase } from "@/lib/supabase";
 import { fallbackProducts } from "@/lib/data";
@@ -16,6 +16,14 @@ export default function ProductDetail({ params }) {
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState([]);
+  const [user, setUser] = useState(null);
+  
+  // Review form state
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewMsg, setReviewMsg] = useState("");
   
   const { addToCart } = useCart();
   const router = useRouter();
@@ -49,9 +57,49 @@ export default function ProductDetail({ params }) {
         setLoading(false);
       }
     }
+
+    async function fetchReviewsAndUser() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) setUser(session.user);
+
+      const { data: reviewsData } = await supabase
+        .from('reviews')
+        .select(`*, profiles(full_name)`)
+        .eq('product_id', productId)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: false });
+      
+      if (reviewsData) setReviews(reviewsData);
+    }
     
     fetchProduct();
+    fetchReviewsAndUser();
   }, [productId]);
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      setReviewMsg("You must be logged in to submit a review.");
+      return;
+    }
+    if (!comment.trim()) return;
+
+    setSubmittingReview(true);
+    const { error } = await supabase.from('reviews').insert([{
+      product_id: productId,
+      user_id: user.id,
+      rating,
+      comment
+    }]);
+
+    setSubmittingReview(false);
+    if (error) {
+      setReviewMsg("Failed to submit review.");
+    } else {
+      setReviewMsg("Review submitted successfully! It will appear once approved.");
+      setComment("");
+    }
+  };
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -231,6 +279,98 @@ export default function ProductDetail({ params }) {
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <div className="mt-24 border-t border-white/10 pt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            
+            {/* Reviews List */}
+            <div className="lg:col-span-2 space-y-8">
+              <h2 className="text-3xl font-black text-white uppercase tracking-wider flex items-center gap-3">
+                <MessageSquare className="w-8 h-8 text-[#00AEEF]" /> Customer Reviews
+              </h2>
+              
+              {reviews.length === 0 ? (
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
+                  <Star className="w-12 h-12 text-[#1B1B5E]/40 mx-auto mb-4" />
+                  <p className="text-gray-400 font-medium">No reviews yet. Be the first to review this product!</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {reviews.map((r, idx) => (
+                    <div key={idx} className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-10 h-10 rounded-full bg-[#1B1B5E] flex items-center justify-center font-bold text-[#00AEEF]">
+                          {r.profiles?.full_name?.charAt(0) || "U"}
+                        </div>
+                        <div>
+                          <p className="text-white font-bold">{r.profiles?.full_name || "Anonymous"}</p>
+                          <div className="flex text-[#00AEEF] mt-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={`w-3 h-3 ${i < r.rating ? 'fill-[#00AEEF]' : 'text-gray-600'}`} />
+                            ))}
+                          </div>
+                        </div>
+                        <span className="ml-auto text-xs text-gray-500">{new Date(r.created_at).toLocaleDateString()}</span>
+                      </div>
+                      <p className="text-gray-300 text-sm leading-relaxed">{r.comment}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Write a Review */}
+            <div>
+              <div className="bg-[#1B1B5E]/20 border border-[#00AEEF]/20 rounded-3xl p-8 sticky top-32">
+                <h3 className="text-xl font-black text-white uppercase tracking-wider mb-6">Write a Review</h3>
+                
+                {!user ? (
+                  <div className="text-center py-6">
+                    <p className="text-gray-400 text-sm mb-4">You must be logged in to leave a review.</p>
+                    <Link href="/auth/login" className="inline-block bg-[#00AEEF] text-white font-bold uppercase tracking-widest text-xs px-6 py-3 rounded-full hover:bg-white hover:text-[#1B1B5E] transition-colors">
+                      Log In
+                    </Link>
+                  </div>
+                ) : (
+                  <form onSubmit={submitReview} className="space-y-5">
+                    {reviewMsg && <div className="text-sm text-[#00AEEF] font-bold p-3 bg-[#00AEEF]/10 rounded-lg">{reviewMsg}</div>}
+                    <div>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Rating</label>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button type="button" key={star} onClick={() => setRating(star)} className="focus:outline-none">
+                            <Star className={`w-6 h-6 ${star <= rating ? 'fill-[#00AEEF] text-[#00AEEF]' : 'text-gray-600 hover:text-gray-400'}`} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Comment</label>
+                      <textarea
+                        required
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        rows={4}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-[#00AEEF] transition-colors resize-none"
+                        placeholder="What do you think about this product?"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={submittingReview}
+                      className="w-full bg-[#00AEEF] hover:bg-white text-white hover:text-[#1B1B5E] py-4 rounded-xl font-black uppercase tracking-[0.2em] text-xs transition-colors shadow-[0_0_20px_rgba(0,174,239,0.3)] disabled:opacity-50"
+                    >
+                      {submittingReview ? "Submitting..." : "Submit Review"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );

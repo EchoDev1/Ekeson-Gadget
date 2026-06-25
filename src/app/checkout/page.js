@@ -18,9 +18,11 @@ export default function Checkout() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [user, setUser] = useState(null);
 
   const [formData, setFormData] = useState({
     fullName: "",
+    email: "",
     phone: "",
     address: "",
     shippingZone: "inside", // 'inside', 'outside', 'african'
@@ -37,6 +39,12 @@ export default function Checkout() {
 
   const fetchData = async () => {
     try {
+      // Check auth state
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setUser(session.user);
+      }
+
       // Fetch settings for fees and wallet
       const { data: settingsData } = await supabase.from('settings').select('*').eq('id', 1).single();
       if (settingsData) {
@@ -121,11 +129,13 @@ export default function Checkout() {
     setSubmitting(true);
     try {
       const { data: order, error: orderError } = await supabase.from('orders').insert([{
+        user_id: user ? user.id : null,
         total_amount: totalNgn,
         status: 'processing',
         payment_status: 'pending',
         shipping_address: formData.address,
         contact_phone: formData.phone,
+        contact_email: formData.email,
       }]).select().single();
 
       if (orderError) throw orderError;
@@ -312,9 +322,31 @@ export default function Checkout() {
                     <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Full Name</label>
                     <input type="text" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20 font-medium" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Phone Number</label>
-                    <input type="tel" required value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20 font-medium" />
+                    <label className="text-[10px] font-black text-[#1B1B5E]/40 uppercase tracking-widest ml-1">Email Address</label>
+                    <input
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="mt-1 w-full px-4 py-3 bg-white border border-[#1B1B5E]/10 rounded-xl text-sm focus:outline-none focus:border-[#00AEEF] transition-colors shadow-sm"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-[#1B1B5E]/40 uppercase tracking-widest ml-1">Phone Number</label>
+                    <div className="relative mt-1">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Phone className="h-4 w-4 text-gray-400" />
+                      </div>
+                      <input
+                        type="tel"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-[#1B1B5E]/10 rounded-xl text-sm focus:outline-none focus:border-[#00AEEF] transition-colors shadow-sm"
+                        placeholder="+234 800 000 0000"
+                      />
+                    </div>
                   </div>
                 </div>
 
