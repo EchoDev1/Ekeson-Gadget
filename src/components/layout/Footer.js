@@ -18,7 +18,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#FFFDF5] border-t border-[#1B1B5E]/5 pt-20 pb-12 mt-auto">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-12 mb-16">
           {/* Brand */}
           <div className="space-y-8">
             <Logo className="h-8" showText={true} />
@@ -51,6 +51,17 @@ export default function Footer() {
               <li><Link href="/support" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Technical Support</Link></li>
               <li><Link href="/warranty" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Warranty Policy</Link></li>
               <li><Link href="/contact" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Contact Office</Link></li>
+            </ul>
+          </div>
+
+          {/* Policy */}
+          <div>
+            <h3 className="text-[#1B1B5E] font-black text-xs uppercase tracking-widest mb-8">Policy</h3>
+            <ul className="space-y-4">
+              <li><Link href="/delivery-shipping" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Delivery/Shipping Policy</Link></li>
+              <li><Link href="/terms" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Terms and Conditions</Link></li>
+              <li><Link href="/privacy" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Privacy Policy</Link></li>
+              <li><Link href="/refund" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Refund Policy</Link></li>
             </ul>
           </div>
 
