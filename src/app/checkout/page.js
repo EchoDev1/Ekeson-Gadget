@@ -322,6 +322,7 @@ export default function Checkout() {
                     <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Full Name</label>
                     <input type="text" required value={formData.fullName} onChange={e => setFormData({...formData, fullName: e.target.value})} className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20 font-medium" />
                   </div>
+                  <div className="space-y-2">
                     <label className="text-[10px] font-black text-[#1B1B5E]/40 uppercase tracking-widest ml-1">Email Address</label>
                     <input
                       type="email"
@@ -332,7 +333,7 @@ export default function Checkout() {
                       placeholder="john@example.com"
                     />
                   </div>
-                  <div>
+                  <div className="space-y-2 md:col-span-2">
                     <label className="text-[10px] font-black text-[#1B1B5E]/40 uppercase tracking-widest ml-1">Phone Number</label>
                     <div className="relative mt-1">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

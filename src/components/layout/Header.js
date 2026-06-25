@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { ShoppingCart, User, Menu, Search, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/ui/BrandIdentity';
 import { useCart } from '@/context/CartContext';
