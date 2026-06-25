@@ -67,6 +67,18 @@ CREATE TABLE settings (
   warranty_policy_text TEXT DEFAULT 'This is the default warranty policy. It can be changed in the admin dashboard.',
   is_maintenance_mode BOOLEAN DEFAULT false,
   is_checkout_locked BOOLEAN DEFAULT false,
+  footer_hq_address TEXT DEFAULT 'Lagos/Abuja Nigeria',
+  footer_hq_phone TEXT DEFAULT '+234 814 852 7697',
+  footer_hq_email TEXT DEFAULT 'office@ekesongroup.com',
+  footer_service_links JSONB DEFAULT '[{"label":"Order Tracking","url":"/track-order"},{"label":"Technical Support","url":"/support"},{"label":"Warranty Policy","url":"/warranty"},{"label":"Contact Office","url":"/contact"}]'::jsonb,
+  footer_policy_links JSONB DEFAULT '[{"label":"Delivery/Shipping Policy","url":"/delivery-shipping"},{"label":"Terms and Conditions","url":"/terms"},{"label":"Privacy Policy","url":"/privacy"},{"label":"Refund Policy","url":"/refund"}]'::jsonb,
+  header_links JSONB DEFAULT '[{"label":"Phones","url":"/category/phones"},{"label":"Laptops","url":"/category/laptops"},{"label":"Pads","url":"/category/pads"},{"label":"Accessories","url":"/category/accessories"},{"label":"PlayStation","url":"/category/playstation"},{"label":"Drones","url":"/category/drones"}]'::jsonb,
+  hero_title TEXT DEFAULT 'PREMIUM TECH<br/>SIMPLE ACCESS',
+  hero_subtitle TEXT DEFAULT 'Nigeria''s most trusted destination for genuine brand new and Grade-A UK used gadgets. Verified standards, transparent pricing.',
+  hero_media_url TEXT,
+  hero_media_type TEXT DEFAULT 'image',
+  footer_brand_text TEXT DEFAULT 'Nigeria''s trusted source for premium global technology. Professional service, verified specifications, and secure logistics.',
+  footer_catalog_links JSONB DEFAULT '[{"label":"Smartphones","url":"/category/phones"},{"label":"Laptops","url":"/category/laptops"},{"label":"Tablets & Pads","url":"/category/pads"},{"label":"Accessories","url":"/category/accessories"}]'::jsonb,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

@@ -1,5 +1,6 @@
 "use client";
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 import { ShoppingCart, User, Menu, Search, X } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -10,8 +11,29 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [headerLinks, setHeaderLinks] = useState([
+    { label: "Phones", url: "/category/phones" },
+    { label: "Laptops", url: "/category/laptops" },
+    { label: "Pads", url: "/category/pads" },
+    { label: "Accessories", url: "/category/accessories" },
+    { label: "PlayStation", url: "/category/playstation" },
+    { label: "Drones", url: "/category/drones" }
+  ]);
   const router = useRouter();
   const { cartCount } = useCart();
+
+  // Fetch settings safely from the client-side using useEffect
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { data } = await supabase.from('settings').select('header_links').eq('id', 1).single();
+        if (data?.header_links) {
+          setHeaderLinks(data.header_links);
+        }
+      } catch (err) {}
+    };
+    loadSettings();
+  }, []);
 
   const handleSearch = (e) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
@@ -38,13 +60,13 @@ export default function Header() {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-10">
-              {['Phones', 'Laptops', 'Pads', 'Accessories', 'PlayStation', 'Drones'].map((item) => (
+              {headerLinks.map((item, i) => (
                 <Link 
-                  key={item} 
-                  href={`/category/${item.toLowerCase()}`} 
+                  key={i} 
+                  href={item.url} 
                   className="text-[#1B1B5E]/70 hover:text-[#1B1B5E] transition-colors text-sm font-bold uppercase tracking-widest"
                 >
-                  {item}
+                  {item.label}
                 </Link>
               ))}
             </nav>
@@ -92,14 +114,14 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t border-[#1B1B5E]/10 animate-in slide-in-from-top duration-300">
             <div className="px-6 py-8 space-y-6">
-              {['Phones', 'Laptops', 'Pads', 'Accessories', 'PlayStation', 'Drones'].map((item) => (
+              {headerLinks.map((item, i) => (
                 <Link 
-                  key={item} 
-                  href={`/category/${item.toLowerCase()}`} 
+                  key={i} 
+                  href={item.url} 
                   className="block text-xl font-black text-[#1B1B5E] uppercase tracking-tighter"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  {item}
+                  {item.label}
                 </Link>
               ))}
               <div className="pt-6 border-t border-[#1B1B5E]/5 space-y-4">

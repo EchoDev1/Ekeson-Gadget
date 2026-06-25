@@ -25,6 +25,40 @@ export default function AdminSettings() {
     warranty_policy_text: "",
     is_maintenance_mode: false,
     is_checkout_locked: false,
+    footer_hq_address: "Lagos/Abuja Nigeria",
+    footer_hq_phone: "+234 814 852 7697",
+    footer_hq_email: "office@ekesongroup.com",
+    footer_service_links: [
+      { label: "Order Tracking", url: "/track-order" },
+      { label: "Technical Support", url: "/support" },
+      { label: "Warranty Policy", url: "/warranty" },
+      { label: "Contact Office", url: "/contact" }
+    ],
+    footer_policy_links: [
+      { label: "Delivery/Shipping Policy", url: "/delivery-shipping" },
+      { label: "Terms and Conditions", url: "/terms" },
+      { label: "Privacy Policy", url: "/privacy" },
+      { label: "Refund Policy", url: "/refund" }
+    ],
+    header_links: [
+      { label: "Phones", url: "/category/phones" },
+      { label: "Laptops", url: "/category/laptops" },
+      { label: "Pads", url: "/category/pads" },
+      { label: "Accessories", url: "/category/accessories" },
+      { label: "PlayStation", url: "/category/playstation" },
+      { label: "Drones", url: "/category/drones" }
+    ],
+    hero_title: "PREMIUM TECH<br/>SIMPLE ACCESS",
+    hero_subtitle: "Nigeria's most trusted destination for genuine brand new and Grade-A UK used gadgets. Verified standards, transparent pricing.",
+    hero_media_url: "",
+    hero_media_type: "image",
+    footer_brand_text: "Nigeria's trusted source for premium global technology. Professional service, verified specifications, and secure logistics.",
+    footer_catalog_links: [
+      { label: "Smartphones", url: "/category/phones" },
+      { label: "Laptops", url: "/category/laptops" },
+      { label: "Tablets & Pads", url: "/category/pads" },
+      { label: "Accessories", url: "/category/accessories" }
+    ],
   });
 
   useEffect(() => {
@@ -35,7 +69,35 @@ export default function AdminSettings() {
     try {
       const { data, error } = await supabase.from("settings").select("*").eq("id", 1).single();
       if (data) {
-        setSettings(data);
+        setSettings({
+          ...data,
+          footer_service_links: data.footer_service_links || [
+            { label: "Order Tracking", url: "/track-order" },
+            { label: "Technical Support", url: "/support" },
+            { label: "Warranty Policy", url: "/warranty" },
+            { label: "Contact Office", url: "/contact" }
+          ],
+          footer_policy_links: data.footer_policy_links || [
+            { label: "Delivery/Shipping Policy", url: "/delivery-shipping" },
+            { label: "Terms and Conditions", url: "/terms" },
+            { label: "Privacy Policy", url: "/privacy" },
+            { label: "Refund Policy", url: "/refund" }
+          ],
+          header_links: data.header_links || [
+            { label: "Phones", url: "/category/phones" },
+            { label: "Laptops", url: "/category/laptops" },
+            { label: "Pads", url: "/category/pads" },
+            { label: "Accessories", url: "/category/accessories" },
+            { label: "PlayStation", url: "/category/playstation" },
+            { label: "Drones", url: "/category/drones" }
+          ],
+          footer_catalog_links: data.footer_catalog_links || [
+            { label: "Smartphones", url: "/category/phones" },
+            { label: "Laptops", url: "/category/laptops" },
+            { label: "Tablets & Pads", url: "/category/pads" },
+            { label: "Accessories", url: "/category/accessories" }
+          ]
+        });
         cachedSettings = data;
       }
     } catch (err) {
@@ -51,6 +113,59 @@ export default function AdminSettings() {
       ...prev,
       [name]: name.includes("shipping") ? parseFloat(value) || 0 : value
     }));
+  };
+
+  const handleLinkChange = (type, index, field, value) => {
+    const newLinks = [...(settings[type] || [])];
+    newLinks[index] = { ...newLinks[index], [field]: value };
+    setSettings({ ...settings, [type]: newLinks });
+  };
+  const addLink = (type) => {
+    setSettings({ ...settings, [type]: [...(settings[type] || []), { label: "", url: "" }] });
+  };
+  const removeLink = (type, index) => {
+    const newLinks = [...(settings[type] || [])];
+    newLinks.splice(index, 1);
+    setSettings({ ...settings, [type]: newLinks });
+  };
+
+  const handleHeroImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 1200;
+        const MAX_HEIGHT = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        const dataUrl = canvas.toDataURL("image/webp", 0.8);
+        setSettings({ ...settings, hero_media_url: dataUrl, hero_media_type: "image" });
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSave = async (e) => {
@@ -345,6 +460,204 @@ export default function AdminSettings() {
               placeholder="Enter the official warranty policy..."
             />
             <p className="text-xs text-[#1B1B5E]/50 font-medium">This text is displayed on the public Warranty Policy page.</p>
+          </div>
+        </div>
+
+        {/* Header Configuration */}
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
+          <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
+            <Globe className="w-6 h-6 text-indigo-500" />
+            Header Navigation
+          </h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Navigation Links</label>
+              <button type="button" onClick={() => addLink('header_links')} className="text-xs font-bold text-[#00AEEF] hover:underline">
+                + Add Link
+              </button>
+            </div>
+            <div className="space-y-2">
+              {(settings.header_links || []).map((link, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <input type="text" value={link.label} onChange={(e) => handleLinkChange('header_links', i, 'label', e.target.value)} placeholder="Label (e.g. Phones)" className="w-1/2 px-3 py-2 bg-[#F5F5F7] rounded-lg border-transparent focus:border-[#00AEEF] outline-none text-sm" />
+                  <input type="text" value={link.url} onChange={(e) => handleLinkChange('header_links', i, 'url', e.target.value)} placeholder="URL (e.g. /category/phones)" className="w-1/2 px-3 py-2 bg-[#F5F5F7] rounded-lg border-transparent focus:border-[#00AEEF] outline-none text-sm" />
+                  <button type="button" onClick={() => removeLink('header_links', i)} className="text-red-500 font-bold p-2 text-xs">X</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Hero Configuration */}
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
+          <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
+            <FileText className="w-6 h-6 text-pink-500" />
+            Hero Section
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Hero Title (HTML supported)</label>
+              <textarea 
+                name="hero_title"
+                value={settings.hero_title || ""}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors font-mono text-sm"
+                placeholder="PREMIUM TECH<br/>SIMPLE ACCESS"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Hero Subtitle</label>
+              <textarea 
+                name="hero_subtitle"
+                value={settings.hero_subtitle || ""}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+              />
+            </div>
+            <div className="space-y-4 md:col-span-2 p-4 bg-[#F5F5F7] rounded-2xl">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest block">Hero Background Media</label>
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-1 space-y-2">
+                  <span className="text-xs font-bold text-[#1B1B5E]/60 block">1. Upload Image (Auto-compressed to Base64)</span>
+                  <input type="file" accept="image/*" onChange={handleHeroImageUpload} className="w-full text-sm" />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <span className="text-xs font-bold text-[#1B1B5E]/60 block">2. Or Paste Video URL (.mp4 / youtube)</span>
+                  <input type="text" name="hero_media_url" value={settings.hero_media_url || ""} onChange={(e) => {
+                    handleChange(e);
+                    // Infer type basic check
+                    if(e.target.value.includes('.mp4') || e.target.value.includes('youtube') || e.target.value.includes('vimeo')) {
+                      setSettings(prev => ({...prev, hero_media_type: 'video'}));
+                    }
+                  }} placeholder="https://..." className="w-full px-3 py-2 bg-white rounded-lg border-transparent outline-none text-sm" />
+                </div>
+              </div>
+              <div className="space-y-2 mt-4">
+                 <label className="text-xs font-bold text-[#1B1B5E]/60">Current Media Type:</label>
+                 <select name="hero_media_type" value={settings.hero_media_type || "image"} onChange={handleChange} className="ml-2 px-2 py-1 rounded bg-white text-sm outline-none">
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                 </select>
+              </div>
+              {settings.hero_media_url && settings.hero_media_type === 'image' && (
+                <div className="mt-4 w-32 h-32 relative rounded-lg overflow-hidden border border-gray-200">
+                   <img src={settings.hero_media_url} alt="Hero Preview" className="object-cover w-full h-full" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Configuration */}
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
+          <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
+            <MapPin className="w-6 h-6 text-blue-500" />
+            Footer Configuration
+          </h2>
+
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Brand Description</label>
+            <textarea 
+              name="footer_brand_text"
+              value={settings.footer_brand_text || ""}
+              onChange={handleChange}
+              rows={2}
+              className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors text-sm"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-[#1B1B5E]/5">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Headquarters Address</label>
+              <input 
+                type="text" 
+                name="footer_hq_address"
+                value={settings.footer_hq_address || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Headquarters Phone</label>
+              <input 
+                type="text" 
+                name="footer_hq_phone"
+                value={settings.footer_hq_phone || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Headquarters Email</label>
+              <input 
+                type="text" 
+                name="footer_hq_email"
+                value={settings.footer_hq_email || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4 border-t border-[#1B1B5E]/5">
+            {/* Catalog Links */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Catalog Links</label>
+                <button type="button" onClick={() => addLink('footer_catalog_links')} className="text-xs font-bold text-[#00AEEF] hover:underline">
+                  + Add Link
+                </button>
+              </div>
+              <div className="space-y-2">
+                {(settings.footer_catalog_links || []).map((link, i) => (
+                  <div key={i} className="flex gap-2 items-center">
+                    <input type="text" value={link.label} onChange={(e) => handleLinkChange('footer_catalog_links', i, 'label', e.target.value)} placeholder="Label" className="w-1/2 px-3 py-2 bg-[#F5F5F7] rounded-lg border-transparent focus:border-[#00AEEF] outline-none text-sm" />
+                    <input type="text" value={link.url} onChange={(e) => handleLinkChange('footer_catalog_links', i, 'url', e.target.value)} placeholder="URL" className="w-1/2 px-3 py-2 bg-[#F5F5F7] rounded-lg border-transparent focus:border-[#00AEEF] outline-none text-sm" />
+                    <button type="button" onClick={() => removeLink('footer_catalog_links', i)} className="text-red-500 font-bold p-2 text-xs">X</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Service Links */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Service Links</label>
+                <button type="button" onClick={() => addLink('footer_service_links')} className="text-xs font-bold text-[#00AEEF] hover:underline">
+                  + Add Link
+                </button>
+              </div>
+              <div className="space-y-2">
+                {(settings.footer_service_links || []).map((link, i) => (
+                  <div key={i} className="flex gap-2 items-center">
+                    <input type="text" value={link.label} onChange={(e) => handleLinkChange('footer_service_links', i, 'label', e.target.value)} placeholder="Label" className="w-1/2 px-3 py-2 bg-[#F5F5F7] rounded-lg border-transparent focus:border-[#00AEEF] outline-none text-sm" />
+                    <input type="text" value={link.url} onChange={(e) => handleLinkChange('footer_service_links', i, 'url', e.target.value)} placeholder="URL" className="w-1/2 px-3 py-2 bg-[#F5F5F7] rounded-lg border-transparent focus:border-[#00AEEF] outline-none text-sm" />
+                    <button type="button" onClick={() => removeLink('footer_service_links', i)} className="text-red-500 font-bold p-2 text-xs">X</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Policy Links */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Policy Links</label>
+                <button type="button" onClick={() => addLink('footer_policy_links')} className="text-xs font-bold text-[#00AEEF] hover:underline">
+                  + Add Link
+                </button>
+              </div>
+              <div className="space-y-2">
+                {(settings.footer_policy_links || []).map((link, i) => (
+                  <div key={i} className="flex gap-2 items-center">
+                    <input type="text" value={link.label} onChange={(e) => handleLinkChange('footer_policy_links', i, 'label', e.target.value)} placeholder="Label" className="w-1/2 px-3 py-2 bg-[#F5F5F7] rounded-lg border-transparent focus:border-[#00AEEF] outline-none text-sm" />
+                    <input type="text" value={link.url} onChange={(e) => handleLinkChange('footer_policy_links', i, 'url', e.target.value)} placeholder="URL" className="w-1/2 px-3 py-2 bg-[#F5F5F7] rounded-lg border-transparent focus:border-[#00AEEF] outline-none text-sm" />
+                    <button type="button" onClick={() => removeLink('footer_policy_links', i)} className="text-red-500 font-bold p-2 text-xs">X</button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

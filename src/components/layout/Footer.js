@@ -13,8 +13,44 @@ const InstagramIcon = ({ className }) => (
 );
 
 import { Logo } from '@/components/ui/BrandIdentity';
+import { supabase } from '@/lib/supabase';
 
-export default function Footer() {
+export default async function Footer() {
+  let settings = null;
+  try {
+    const { data } = await supabase.from("settings").select("*").eq("id", 1).single();
+    settings = data;
+  } catch (error) {
+    console.error("Error fetching footer settings:", error);
+  }
+
+  const hqAddress = settings?.footer_hq_address || "Lagos/Abuja Nigeria";
+  const hqPhone = settings?.footer_hq_phone || "+234 814 852 7697";
+  const hqEmail = settings?.footer_hq_email || "office@ekesongroup.com";
+
+  const brandText = settings?.footer_brand_text || "Nigeria's trusted source for premium global technology. Professional service, verified specifications, and secure logistics.";
+
+  const catalogLinks = settings?.footer_catalog_links || [
+    { label: "Smartphones", url: "/category/phones" },
+    { label: "Laptops", url: "/category/laptops" },
+    { label: "Tablets & Pads", url: "/category/pads" },
+    { label: "Accessories", url: "/category/accessories" }
+  ];
+
+  const serviceLinks = settings?.footer_service_links || [
+    { label: "Order Tracking", url: "/track-order" },
+    { label: "Technical Support", url: "/support" },
+    { label: "Warranty Policy", url: "/warranty" },
+    { label: "Contact Office", url: "/contact" }
+  ];
+  
+  const policyLinks = settings?.footer_policy_links || [
+    { label: "Delivery/Shipping Policy", url: "/delivery-shipping" },
+    { label: "Terms and Conditions", url: "/terms" },
+    { label: "Privacy Policy", url: "/privacy" },
+    { label: "Refund Policy", url: "/refund" }
+  ];
+
   return (
     <footer className="bg-[#FFFDF5] border-t border-[#1B1B5E]/5 pt-20 pb-12 mt-auto">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,7 +59,7 @@ export default function Footer() {
           <div className="space-y-8">
             <Logo className="h-8" showText={true} />
             <p className="text-[#1B1B5E]/50 text-sm leading-relaxed font-medium">
-              Nigeria&apos;s trusted source for premium global technology. Professional service, verified specifications, and secure logistics.
+              {brandText}
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-[#1B1B5E]/40 hover:text-[#00AEEF] transition-colors"><FacebookIcon /></a>
@@ -36,10 +72,9 @@ export default function Footer() {
           <div>
             <h3 className="text-[#1B1B5E] font-black text-xs uppercase tracking-widest mb-8">Catalog</h3>
             <ul className="space-y-4">
-              <li><Link href="/category/phones" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Smartphones</Link></li>
-              <li><Link href="/category/laptops" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Laptops</Link></li>
-              <li><Link href="/category/pads" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Tablets & Pads</Link></li>
-              <li><Link href="/category/accessories" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Accessories</Link></li>
+              {catalogLinks.map((link, i) => (
+                <li key={i}><Link href={link.url} className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">{link.label}</Link></li>
+              ))}
             </ul>
           </div>
 
@@ -47,10 +82,9 @@ export default function Footer() {
           <div>
             <h3 className="text-[#1B1B5E] font-black text-xs uppercase tracking-widest mb-8">Service</h3>
             <ul className="space-y-4">
-              <li><Link href="/track-order" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Order Tracking</Link></li>
-              <li><Link href="/support" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Technical Support</Link></li>
-              <li><Link href="/warranty" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Warranty Policy</Link></li>
-              <li><Link href="/contact" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Contact Office</Link></li>
+              {serviceLinks.map((link, i) => (
+                <li key={i}><Link href={link.url} className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">{link.label}</Link></li>
+              ))}
             </ul>
           </div>
 
@@ -58,10 +92,9 @@ export default function Footer() {
           <div>
             <h3 className="text-[#1B1B5E] font-black text-xs uppercase tracking-widest mb-8">Policy</h3>
             <ul className="space-y-4">
-              <li><Link href="/delivery-shipping" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Delivery/Shipping Policy</Link></li>
-              <li><Link href="/terms" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Terms and Conditions</Link></li>
-              <li><Link href="/privacy" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Privacy Policy</Link></li>
-              <li><Link href="/refund" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">Refund Policy</Link></li>
+              {policyLinks.map((link, i) => (
+                <li key={i}><Link href={link.url} className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors text-sm font-bold">{link.label}</Link></li>
+              ))}
             </ul>
           </div>
 
@@ -71,15 +104,15 @@ export default function Footer() {
             <ul className="space-y-6">
               <li className="flex items-start space-x-4">
                 <MapPin className="w-5 h-5 text-[#00AEEF] flex-shrink-0 mt-0.5" />
-                <a href="https://maps.google.com/?q=Lagos,Nigeria" target="_blank" rel="noopener noreferrer" className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">Lagos/Abuja Nigeria</a>
+                <a href={`https://maps.google.com/?q=${encodeURIComponent(hqAddress)}`} target="_blank" rel="noopener noreferrer" className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">{hqAddress}</a>
               </li>
               <li className="flex items-center space-x-4">
                 <Phone className="w-5 h-5 text-[#00AEEF] flex-shrink-0" />
-                <a href="tel:+2348148527697" className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">+234 814 852 7697</a>
+                <a href={`tel:${hqPhone.replace(/\s+/g, '')}`} className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">{hqPhone}</a>
               </li>
               <li className="flex items-center space-x-4">
                 <Mail className="w-5 h-5 text-[#00AEEF] flex-shrink-0" />
-                <a href="mailto:office@ekesongroup.com" className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">office@ekesongroup.com</a>
+                <a href={`mailto:${hqEmail}`} className="text-[#1B1B5E]/70 text-sm font-bold hover:text-[#00AEEF] transition-colors">{hqEmail}</a>
               </li>
             </ul>
           </div>

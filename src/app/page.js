@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { supabase } from '@/lib/supabase';
 import { ArrowRight, Laptop, Smartphone, Tablet, ChevronRight, Watch, Headphones, ShieldCheck, Package, Gamepad2, Drone } from "lucide-react";
 import { SealBadge } from "@/components/ui/BrandIdentity";
 
@@ -61,30 +62,67 @@ const CategorySection = ({ title, id, icon: Icon, image }) => (
   </section>
 );
 
-export default function Home() {
+export default async function Home() {
+  let settings = null;
+  try {
+    const { data } = await supabase.from("settings").select("*").eq("id", 1).single();
+    settings = data;
+  } catch (error) {
+    console.error("Error fetching hero settings:", error);
+  }
+
+  const heroTitle = settings?.hero_title || 'PREMIUM TECH<br/>SIMPLE ACCESS';
+  const heroSubtitle = settings?.hero_subtitle || 'Nigeria\'s most trusted destination for genuine brand new and Grade-A UK used gadgets. Verified standards, transparent pricing.';
+  const heroMediaUrl = settings?.hero_media_url;
+  const heroMediaType = settings?.hero_media_type || 'image';
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F7F3E9]">
       
-      {/* Original Hero Section Style */}
-      <section className="relative pt-12 md:pt-20 pb-24 overflow-hidden">
+      {/* Hero Section */}
+      <section className="relative pt-12 md:pt-20 pb-24 overflow-hidden min-h-[80vh] flex items-center justify-center">
+        {/* Background Media */}
+        {heroMediaUrl && (
+          <div className="absolute inset-0 z-0 opacity-20">
+            {heroMediaType === 'video' ? (
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="w-full h-full object-cover"
+                src={heroMediaUrl}
+              />
+            ) : (
+              <Image 
+                src={heroMediaUrl} 
+                alt="Hero Background" 
+                fill 
+                className="object-cover"
+                unoptimized={heroMediaUrl.startsWith('data:')}
+              />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#F7F3E9] via-transparent to-[#F7F3E9]" />
+          </div>
+        )}
+
         <div className="absolute top-2 right-2 md:top-12 md:right-12 z-20 scale-75 origin-top-right md:scale-100 opacity-60 md:opacity-100">
           <SealBadge className="w-24 h-24 md:w-32 md:h-32" />
         </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center space-y-8 md:space-y-10 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-4xl mx-auto text-center space-y-8 md:space-y-10">
             <div className="inline-flex items-center space-x-3 bg-white border border-[#1B1B5E]/5 px-4 py-2 rounded-full shadow-sm">
               <span className="text-[9px] md:text-[10px] font-black text-[#1B1B5E] uppercase tracking-[0.2em]">Authentic Technology 🇳🇬</span>
             </div>
 
-            <h1 className="text-5xl md:text-8xl font-black text-[#1B1B5E] tracking-tighter leading-[0.9] mt-6 md:mt-0">
-              PREMIUM <span className="text-[#00AEEF]">TECH</span><br />
-              SIMPLE <span className="opacity-20">ACCESS</span>
-            </h1>
+            <h1 
+              className="text-5xl md:text-8xl font-black text-[#1B1B5E] tracking-tighter leading-[0.9] mt-6 md:mt-0"
+              dangerouslySetInnerHTML={{ __html: heroTitle }}
+            />
 
             <p className="text-base md:text-xl text-[#1B1B5E]/60 max-w-2xl mx-auto font-medium leading-relaxed px-2">
-              Nigeria&apos;s most trusted destination for genuine brand new and Grade-A UK used gadgets. 
-              Verified standards, transparent pricing.
+              {heroSubtitle}
             </p>
 
             {/* Promotional Flash Banner */}
