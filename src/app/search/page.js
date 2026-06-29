@@ -155,7 +155,7 @@ function SearchContent() {
         <div className="text-center py-20 bg-white rounded-[3.5rem] border border-[#1B1B5E]/5 mb-20 shadow-sm">
           <Search className="w-16 h-16 text-[#1B1B5E]/20 mx-auto mb-6" />
           <h3 className="text-2xl font-black text-[#1B1B5E] uppercase tracking-tight mb-4">No Results Found</h3>
-          <p className="text-[#1B1B5E]/60 font-medium mb-8 max-w-md mx-auto">Try checking your spelling or use more general terms like "Apple" or "Headphones".</p>
+          <p className="text-[#1B1B5E]/60 font-medium mb-8 max-w-md mx-auto">Try checking your spelling or use more general terms like &quot;Apple&quot; or &quot;Headphones&quot;.</p>
           <Link href="/" className="inline-block bg-[#1B1B5E] text-white px-8 py-4 rounded-full font-bold text-sm tracking-widest uppercase hover:bg-[#00AEEF] transition-colors">
             Browse All Categories
           </Link>

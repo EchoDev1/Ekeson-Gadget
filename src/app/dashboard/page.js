@@ -106,7 +106,7 @@ export default function Dashboard() {
               {orders.length === 0 ? (
                 <div className="text-center py-12 bg-[#F5F5F7] rounded-2xl">
                   <Package className="w-12 h-12 text-[#1B1B5E]/20 mx-auto mb-4" />
-                  <p className="text-[#1B1B5E]/60 font-medium">You haven't placed any orders yet.</p>
+                  <p className="text-[#1B1B5E]/60 font-medium">You haven&apos;t placed any orders yet.</p>
                   <Link href="/" className="inline-block mt-4 text-[#00AEEF] font-bold text-sm hover:underline">Start Shopping</Link>
                 </div>
               ) : (

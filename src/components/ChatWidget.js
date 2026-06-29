@@ -14,10 +14,8 @@ export default function ChatWidget() {
   const messagesEndRef = useRef(null);
   const pathname = usePathname();
 
-  // Don't show chat widget on admin pages
-  if (pathname?.startsWith("/admin")) {
-    return null;
-  }
+  // We cannot return early here because it breaks Rules of Hooks!
+  // Instead, we will conditionally render the JSX at the bottom.
 
   useEffect(() => {
     // Generate or get a simple session ID for the guest user
@@ -26,10 +24,15 @@ export default function ChatWidget() {
       sid = "guest_" + Math.random().toString(36).substr(2, 9);
       localStorage.setItem("ekeson_chat_session", sid);
     }
+
     setSessionId(sid);
 
+    const fetchMessages = async (sid) => {
+      const { data } = await supabase.from('messages').select('*').eq('session_id', sid).order('created_at', { ascending: true });
+      if (data) setMessages(data);
+    };
+
     fetchMessages(sid);
-    
     // Fetch live_chat_script from settings
     const checkSettings = async () => {
       const { data } = await supabase.from('settings').select('live_chat_script').eq('id', 1).single();
@@ -63,10 +66,7 @@ export default function ChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
 
-  const fetchMessages = async (sid) => {
-    const { data } = await supabase.from('messages').select('*').eq('session_id', sid).order('created_at', { ascending: true });
-    if (data) setMessages(data);
-  };
+  // fetchMessages was moved inside useEffect to avoid hoisting and dependency issues.
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -81,6 +81,10 @@ export default function ChatWidget() {
     setNewMessage("");
     await supabase.from('messages').insert([msg]);
   };
+
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
 
   if (liveScript) {
     return <div dangerouslySetInnerHTML={{ __html: liveScript }} />;

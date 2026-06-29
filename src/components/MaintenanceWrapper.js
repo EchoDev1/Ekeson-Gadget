@@ -32,7 +32,7 @@ export default function MaintenanceWrapper({ children }) {
         <Settings className="w-16 h-16 text-[#00AEEF] animate-spin mb-6" />
         <h1 className="text-4xl font-black text-[#1B1B5E] uppercase tracking-tighter mb-4">Under Maintenance</h1>
         <p className="text-[#1B1B5E]/60 max-w-md font-medium">
-          Our store is currently undergoing scheduled maintenance to improve your shopping experience. We'll be back online shortly!
+          Our store is currently undergoing scheduled maintenance to improve your shopping experience. We&apos;ll be back online shortly!
         </p>
       </div>
     );

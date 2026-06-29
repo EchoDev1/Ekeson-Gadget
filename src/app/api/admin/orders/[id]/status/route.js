@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { Resend } from 'resend';
 
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
 const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
 
 export async function POST(request, { params }) {

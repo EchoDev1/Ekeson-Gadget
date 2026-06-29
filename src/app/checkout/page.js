@@ -29,15 +29,9 @@ export default function Checkout() {
     paymentMethod: "crypto" // 'crypto', 'paystack', 'flutterwave', 'monnify', 'bank_transfer', 'opay', 'palmpay'
   });
 
-  useEffect(() => {
-    if (cart.length === 0 && !success) {
-      router.push("/cart"); // Redirect to cart if empty
-    } else {
-      fetchData();
-    }
-  }, [cart, success]);
 
-  const fetchData = async () => {
+
+  async function fetchData() {
     try {
       // Check auth state
       const { data: { session } } = await supabase.auth.getSession();
@@ -106,6 +100,14 @@ export default function Checkout() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (cart.length === 0 && !success) {
+      router.push("/cart"); // Redirect to cart if empty
+    } else {
+      fetchData();
+    }
+  }, [cart, success, router]);
 
   const getShippingFee = () => {
     if (!settings) return 0;
@@ -487,7 +489,7 @@ export default function Checkout() {
                   </div>
                   <div className="relative z-10 flex items-start gap-3 p-4 bg-[#00AEEF]/10 rounded-xl text-sm">
                     <Info className="w-5 h-5 text-[#00AEEF] shrink-0 mt-0.5" />
-                    <p className="text-white/80 font-medium">Please send the exact USDT amount to the address above. After payment, click "I have made payment" below.</p>
+                    <p className="text-white/80 font-medium">Please send the exact USDT amount to the address above. After payment, click &quot;I have made payment&quot; below.</p>
                   </div>
                 </div>
               )}
@@ -500,7 +502,7 @@ export default function Checkout() {
                   </div>
                   <div className="flex items-start gap-3 p-4 bg-white/5 rounded-xl text-sm">
                     <Info className="w-5 h-5 text-white/60 shrink-0 mt-0.5" />
-                    <p className="text-white/80 font-medium">Please transfer exactly ₦{totalNgn.toLocaleString()} to the account above, then click "I Have Made Payment".</p>
+                    <p className="text-white/80 font-medium">Please transfer exactly ₦{totalNgn.toLocaleString()} to the account above, then click &quot;I Have Made Payment&quot;.</p>
                   </div>
                 </div>
               )}
@@ -511,7 +513,7 @@ export default function Checkout() {
                   <div className="p-4 bg-black/10 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed font-bold">
                     {settings?.opay_merchant_id || "OPay Merchant ID will be provided soon."}
                   </div>
-                  <p className="text-white/90 font-medium text-sm">Transfer ₦{totalNgn.toLocaleString()} using OPay, then click "I Have Made Payment".</p>
+                  <p className="text-white/90 font-medium text-sm">Transfer ₦{totalNgn.toLocaleString()} using OPay, then click &quot;I Have Made Payment&quot;.</p>
                 </div>
               )}
 
@@ -521,7 +523,7 @@ export default function Checkout() {
                   <div className="p-4 bg-black/10 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed font-bold">
                     {settings?.palmpay_merchant_id || "PalmPay Merchant ID will be provided soon."}
                   </div>
-                  <p className="text-white/90 font-medium text-sm">Transfer ₦{totalNgn.toLocaleString()} using PalmPay, then click "I Have Made Payment".</p>
+                  <p className="text-white/90 font-medium text-sm">Transfer ₦{totalNgn.toLocaleString()} using PalmPay, then click &quot;I Have Made Payment&quot;.</p>
                 </div>
               )}
 

@@ -19,9 +19,6 @@ export default function AdminReviews() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchReviews();
-  }, []);
 
   const updateStatus = async (id, status) => {
     await supabase.from('reviews').update({ status }).eq('id', id);
@@ -34,6 +31,10 @@ export default function AdminReviews() {
       fetchReviews();
     }
   };
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
 
   if (loading) {
     return <div>Loading reviews...</div>;

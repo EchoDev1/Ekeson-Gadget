@@ -20,11 +20,9 @@ export default function AdminProducts() {
   };
   const [formData, setFormData] = useState(initialForm);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
-  const fetchProducts = async () => {
+
+  async function fetchProducts() {
     setLoading(true);
     try {
       const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
@@ -41,6 +39,10 @@ export default function AdminProducts() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const handleOpenModal = (product = null) => {
     if (product) {

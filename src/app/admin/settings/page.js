@@ -66,11 +66,9 @@ export default function AdminSettings() {
     live_chat_script: "",
   });
 
-  useEffect(() => {
-    fetchSettings();
-  }, []);
 
-  const fetchSettings = async () => {
+
+  async function fetchSettings() {
     try {
       const { data, error } = await supabase.from("settings").select("*").eq("id", 1).single();
       if (data) {
@@ -111,6 +109,10 @@ export default function AdminSettings() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -431,7 +433,7 @@ export default function AdminSettings() {
             <div className="flex items-center justify-between bg-white p-6 rounded-2xl border border-orange-100 shadow-sm">
               <div>
                 <h4 className="font-bold text-[#1B1B5E]">Checkout Lock</h4>
-                <p className="text-xs text-[#1B1B5E]/60 max-w-sm mt-1">Allows customers to browse products, but globally disables the "Place Order" button at checkout.</p>
+                <p className="text-xs text-[#1B1B5E]/60 max-w-sm mt-1">Allows customers to browse products, but globally disables the &quot;Place Order&quot; button at checkout.</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input 

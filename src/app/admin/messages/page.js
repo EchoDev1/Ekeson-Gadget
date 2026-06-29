@@ -12,32 +12,9 @@ export default function AdminMessages() {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    fetchSessions();
 
-    const subscription = supabase
-      .channel('public:messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-        handleNewMessage(payload.new);
-      })
-      .subscribe();
 
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (activeSession) {
-      fetchMessages(activeSession);
-    }
-  }, [activeSession]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const handleNewMessage = (message) => {
+  function handleNewMessage(message) {
     // If it's for the active session, append it
     setActiveSession(currentActive => {
       if (currentActive === message.session_id) {
@@ -73,7 +50,7 @@ export default function AdminMessages() {
     }
   };
 
-  const fetchSessions = async () => {
+  async function fetchSessions() {
     // A simplified approach: get all messages, group by session in JS (for a small app)
     // Or use a database view. We'll group in JS for now.
     const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
@@ -96,7 +73,7 @@ export default function AdminMessages() {
     setLoading(false);
   };
 
-  const fetchMessages = async (sessionId) => {
+  async function fetchMessages(sessionId) {
     const { data } = await supabase.from('messages').select('*').eq('session_id', sessionId).order('created_at', { ascending: true });
     if (data) {
       setMessages(data);
@@ -123,6 +100,31 @@ export default function AdminMessages() {
     setNewMessage("");
     await supabase.from('messages').insert([msg]);
   };
+
+  useEffect(() => {
+    fetchSessions();
+
+    const subscription = supabase
+      .channel('public:messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+        handleNewMessage(payload.new);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (activeSession) {
+      fetchMessages(activeSession);
+    }
+  }, [activeSession]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   if (loading) {
     return <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" /></div>;

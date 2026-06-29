@@ -9,11 +9,9 @@ export default function AdminSupport() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
-    fetchSubmissions();
-  }, []);
 
-  const fetchSubmissions = async () => {
+
+  async function fetchSubmissions() {
     try {
       const { data, error } = await supabase
         .from("contact_submissions")
@@ -32,6 +30,10 @@ export default function AdminSupport() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchSubmissions();
+  }, []);
 
   const updateStatus = async (id, status) => {
     try {

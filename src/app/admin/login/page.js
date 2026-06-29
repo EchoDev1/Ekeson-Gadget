@@ -252,7 +252,7 @@ export default function AdminLogin() {
             <form onSubmit={handleSecretQuestion} className="space-y-5 animate-in slide-in-from-right-4">
               <div className="space-y-4">
                 <label className="block text-sm font-black text-[#1B1B5E] text-center mb-6">
-                  What's the secrete ?
+                  What&apos;s the secrete ?
                 </label>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-[#1B1B5E]/40 group-focus-within:text-[#00AEEF] transition-colors">

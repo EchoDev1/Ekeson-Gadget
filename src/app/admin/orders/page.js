@@ -28,7 +28,7 @@ export default function AdminOrders() {
     };
   }, []);
 
-  const fetchOrders = async () => {
+  async function fetchOrders() {
     setLoading(true);
     try {
       const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
@@ -39,6 +39,26 @@ export default function AdminOrders() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchOrders();
+
+    // Subscribe to new orders
+    const subscription = supabase
+      .channel("public:orders")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        (payload) => {
+          fetchOrders(); // Refresh orders on change
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, []);
 
   const updateOrderStatus = async (id, status) => {
     try {

@@ -10,11 +10,9 @@ export default function AdminCustomers() {
 
   const [blockedPhones, setBlockedPhones] = useState(new Set());
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
 
-  const fetchCustomers = async () => {
+
+  async function fetchCustomers() {
     setLoading(true);
     try {
       const [{ data: orders }, { data: blocks }] = await Promise.all([
@@ -62,6 +60,10 @@ export default function AdminCustomers() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
 
   const toggleBlockStatus = async (phone, isCurrentlyBlocked) => {
     if (isCurrentlyBlocked) {

@@ -1,0 +1,323 @@
+
+C:\Users\USER\Desktop\ekesontech\src\app\admin\customers\page.js
+  14:5  error  Error: Cannot access variable before it is declared
+
+`fetchCustomers` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  12 |
+  13 |   useEffect(() => {
+> 14 |     fetchCustomers();
+     |     ^^^^^^^^^^^^^^ `fetchCustomers` accessed before it is declared
+  15 |   }, []);
+  16 |
+  17 |   const fetchCustomers = async () => {
+
+  15 |   }, []);
+  16 |
+> 17 |   const fetchCustomers = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 18 |     setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 19 |     try {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 63 |     setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 64 |   };
+     | ^^^^^ `fetchCustomers` is declared here
+  65 |
+  66 |   const toggleBlockStatus = async (phone, isCurrentlyBlocked) => {
+  67 |     if (isCurrentlyBlocked) {  react-hooks/immutability
+
+C:\Users\USER\Desktop\ekesontech\src\app\admin\login\page.js
+  255:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\USER\Desktop\ekesontech\src\app\admin\messages\page.js
+  16:5  error    Error: Cannot access variable before it is declared
+
+`fetchSessions` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  14 |
+  15 |   useEffect(() => {
+> 16 |     fetchSessions();
+     |     ^^^^^^^^^^^^^ `fetchSessions` accessed before it is declared
+  17 |
+  18 |     const subscription = supabase
+  19 |       .channel('public:messages')
+
+   74 |   };
+   75 |
+>  76 |   const fetchSessions = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  77 |     // A simplified approach: get all messages, group by session in JS (for a small app)
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  78 |     // Or use a database view. We'll group in JS for now.
+      …
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  96 |     setLoading(false);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  97 |   };
+      | ^^^^^ `fetchSessions` is declared here
+   98 |
+   99 |   const fetchMessages = async (sessionId) => {
+  100 |     const { data } = await supabase.from('messages').select('*').eq('session_id', sessionId).order('created_at', { ascending: true });                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react-hooks/immutability
+  21:9  error    Error: Cannot access variable before it is declared
+
+`handleNewMessage` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  19 |       .channel('public:messages')
+  20 |       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+> 21 |         handleNewMessage(payload.new);
+     |         ^^^^^^^^^^^^^^^^ `handleNewMessage` accessed before it is declared
+  22 |       })
+  23 |       .subscribe();
+  24 |
+
+  38 |   }, [messages]);
+  39 |
+> 40 |   const handleNewMessage = (message) => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |     // If it's for the active session, append it
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |     setActiveSession(currentActive => {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |     }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |   };
+     | ^^^^^ `handleNewMessage` is declared here
+  75 |
+  76 |   const fetchSessions = async () => {
+  77 |     // A simplified approach: get all messages, group by session in JS (for a small app)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react-hooks/immutability
+  28:6  warning  React Hook useEffect has a missing dependency: 'handleNewMessage'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react-hooks/exhaustive-deps
+  32:7  error    Error: Cannot access variable before it is declared
+
+`fetchMessages` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  30 |   useEffect(() => {
+  31 |     if (activeSession) {
+> 32 |       fetchMessages(activeSession);
+     |       ^^^^^^^^^^^^^ `fetchMessages` accessed before it is declared
+  33 |     }
+  34 |   }, [activeSession]);
+  35 |
+
+   97 |   };
+   98 |
+>  99 |   const fetchMessages = async (sessionId) => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 100 |     const { data } = await supabase.from('messages').select('*').eq('session_id', sessionId).order('created_at', { ascending: true });
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 101 |     if (data) {
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 102 |       setMessages(data);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 103 |       markAsRead(sessionId);
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 104 |     }
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 105 |   };
+      | ^^^^^ `fetchMessages` is declared here
+  106 |
+  107 |   const markAsRead = async (sessionId) => {
+  108 |     await supabase.from('messages').update({ is_read: true }).eq('session_id', sessionId).eq('sender', 'user').eq('is_read', false);  react-hooks/immutability
+  34:6  warning  React Hook useEffect has a missing dependency: 'fetchMessages'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/exhaustive-deps
+
+C:\Users\USER\Desktop\ekesontech\src\app\admin\orders\page.js
+  12:5  error  Error: Cannot access variable before it is declared
+
+`fetchOrders` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  10 |
+  11 |   useEffect(() => {
+> 12 |     fetchOrders();
+     |     ^^^^^^^^^^^ `fetchOrders` accessed before it is declared
+  13 |
+  14 |     // Subscribe to new orders
+  15 |     const subscription = supabase
+
+  29 |   }, []);
+  30 |
+> 31 |   const fetchOrders = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 32 |     setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 33 |     try {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 40 |     setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 41 |   };
+     | ^^^^^ `fetchOrders` is declared here
+  42 |
+  43 |   const updateOrderStatus = async (id, status) => {
+  44 |     try {  react-hooks/immutability
+
+C:\Users\USER\Desktop\ekesontech\src\app\admin\products\page.js
+  24:5  error  Error: Cannot access variable before it is declared
+
+`fetchProducts` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  22 |
+  23 |   useEffect(() => {
+> 24 |     fetchProducts();
+     |     ^^^^^^^^^^^^^ `fetchProducts` accessed before it is declared
+  25 |   }, []);
+  26 |
+  27 |   const fetchProducts = async () => {
+
+  25 |   }, []);
+  26 |
+> 27 |   const fetchProducts = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 28 |     setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 29 |     try {
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 42 |     setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^
+> 43 |   };
+     | ^^^^^ `fetchProducts` is declared here
+  44 |
+  45 |   const handleOpenModal = (product = null) => {
+  46 |     if (product) {  react-hooks/immutability
+
+C:\Users\USER\Desktop\ekesontech\src\app\admin\reviews\page.js
+  23:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  21 |
+  22 |   useEffect(() => {
+> 23 |     fetchReviews();
+     |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  24 |   }, []);
+  25 |
+  26 |   const updateStatus = async (id, status) => {  react-hooks/set-state-in-effect
+
+C:\Users\USER\Desktop\ekesontech\src\app\admin\settings\page.js
+   70:5    error    Error: Cannot access variable before it is declared
+
+`fetchSettings` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  68 |
+  69 |   useEffect(() => {
+> 70 |     fetchSettings();
+     |     ^^^^^^^^^^^^^ `fetchSettings` accessed before it is declared
+  71 |   }, []);
+  72 |
+  73 |   const fetchSettings = async () => {
+
+   71 |   }, []);
+   72 |
+>  73 |   const fetchSettings = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  74 |     try {
+      | ^^^^^^^^^
+>  75 |       const { data, error } = await supabase.from("settings").select("*").eq("id", 1).single();
+      …
+      | ^^^^^^^^^
+> 112 |     }
+      | ^^^^^^^^^
+> 113 |   };
+      | ^^^^^ `fetchSettings` is declared here
+  114 |
+  115 |   const handleChange = (e) => {
+  116 |     const { name, value } = e.target;  react-hooks/immutability
+  434:135  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react/no-unescaped-entities
+  434:147  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react/no-unescaped-entities
+  598:20   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @next/next/no-img-element
+
+C:\Users\USER\Desktop\ekesontech\src\app\admin\support\page.js
+  13:5  error  Error: Cannot access variable before it is declared
+
+`fetchSubmissions` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  11 |
+  12 |   useEffect(() => {
+> 13 |     fetchSubmissions();
+     |     ^^^^^^^^^^^^^^^^ `fetchSubmissions` accessed before it is declared
+  14 |   }, []);
+  15 |
+  16 |   const fetchSubmissions = async () => {
+
+  14 |   }, []);
+  15 |
+> 16 |   const fetchSubmissions = async () => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 17 |     try {
+     | ^^^^^^^^^
+> 18 |       const { data, error } = await supabase
+     …
+     | ^^^^^^^^^
+> 33 |     }
+     | ^^^^^^^^^
+> 34 |   };
+     | ^^^^^ `fetchSubmissions` is declared here
+  35 |
+  36 |   const updateStatus = async (id, status) => {
+  37 |     try {  react-hooks/immutability
+
+C:\Users\USER\Desktop\ekesontech\src\app\checkout\page.js
+   36:7    error    Error: Cannot access variable before it is declared
+
+`fetchData` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  34 |       router.push("/cart"); // Redirect to cart if empty
+  35 |     } else {
+> 36 |       fetchData();
+     |       ^^^^^^^^^ `fetchData` accessed before it is declared
+  37 |     }
+  38 |   }, [cart, success]);
+  39 |
+
+   38 |   }, [cart, success]);
+   39 |
+>  40 |   const fetchData = async () => {
+      |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  41 |     try {
+      | ^^^^^^^^^
+>  42 |       // Check auth state
+      …
+      | ^^^^^^^^^
+> 107 |     }
+      | ^^^^^^^^^
+> 108 |   };
+      | ^^^^^ `fetchData` is declared here
+  109 |
+  110 |   const getShippingFee = () => {
+  111 |     if (!settings) return 0;  react-hooks/immutability
+   38:6    warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react-hooks/exhaustive-deps
+  490:139  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  490:159  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  503:148  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  503:168  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  514:129  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  514:149  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  524:132  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+  524:152  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/no-unescaped-entities
+
+C:\Users\USER\Desktop\ekesontech\src\context\CartContext.js
+  14:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  12 |     const savedCart = localStorage.getItem('ekeson_cart');
+  13 |     if (savedCart) {
+> 14 |       setCart(JSON.parse(savedCart));
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  15 |     }
+  16 |     setIsLoaded(true);
+  17 |   }, []);  react-hooks/set-state-in-effect
+
+✖ 26 problems (22 errors, 4 warnings)
+

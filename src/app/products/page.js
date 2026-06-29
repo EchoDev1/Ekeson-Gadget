@@ -66,15 +66,15 @@ const PortalSection = ({ title, description, image, link }) => (
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("search") || "";
+    }
+    return "";
+  });
 
   useEffect(() => {
-    // If there's a search param in the URL, grab it
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchParam = urlParams.get('search');
-    if (searchParam) {
-      setSearch(searchParam);
-    }
 
     async function fetchProducts() {
       const { data, error } = await supabase
