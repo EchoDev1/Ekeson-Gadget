@@ -11,7 +11,10 @@ export async function POST(request) {
     const settingsData = await request.json();
     
     // We use the SERVICE_ROLE_KEY to completely bypass database Row Level Security (RLS) blocks
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    if (supabaseUrl && !supabaseUrl.startsWith('http')) {
+      supabaseUrl = 'https://' + supabaseUrl;
+    }
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {

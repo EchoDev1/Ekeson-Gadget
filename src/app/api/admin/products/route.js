@@ -5,7 +5,10 @@ export async function POST(request) {
   try {
     const { action, payload } = await request.json();
     
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    if (supabaseUrl && !supabaseUrl.startsWith('http')) {
+      supabaseUrl = 'https://' + supabaseUrl;
+    }
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
     if (!supabaseUrl || !supabaseKey) {
