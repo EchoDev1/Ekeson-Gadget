@@ -43,6 +43,10 @@ export async function POST(request) {
       return NextResponse.json({ error: error.message || "Database update failed" }, { status: 500 });
     }
 
+    // Clear the Next.js cache so all frontend pages update instantly
+    const { revalidatePath } = require('next/cache');
+    revalidatePath('/', 'layout');
+
     return NextResponse.json({ success: true, message: 'Settings saved successfully' });
   } catch (error) {
     console.error("API Route Error:", error);

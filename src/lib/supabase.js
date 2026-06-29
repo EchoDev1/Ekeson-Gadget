@@ -1,15 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-if (supabaseUrl && !supabaseUrl.startsWith('http')) {
-  supabaseUrl = 'https://' + supabaseUrl;
-}
-if (!supabaseUrl) {
-  supabaseUrl = 'https://placeholder.supabase.co';
-}
-
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY !== 'your_supabase_anon_key_here'
-  ? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  : 'placeholder-key';
+// Hardcoded public credentials to bypass Vercel environment variable bugs
+const supabaseUrl = 'https://azviiiqrfqbbbjigzrwm.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF6dmlpaXFyZnFiYmJqaWd6cndtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyMjUxNDUsImV4cCI6MjA5MzgwMTE0NX0.4-U92kSwzreJh8O5wr0nfIfL81xDD3TwlS15Vt0T5cs';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
