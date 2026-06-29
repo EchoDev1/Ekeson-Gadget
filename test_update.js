@@ -14,7 +14,8 @@ async function testUpdate() {
 
     const settingsData = {
       id: 1,
-      hero_title: "Test"
+      hero_title: "Test",
+      delivery_policy_text: "a".repeat(2 * 1024 * 1024) // 2MB string
     };
 
     const { data, error } = await supabaseAdmin

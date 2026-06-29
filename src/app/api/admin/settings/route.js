@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 export async function POST(request) {
   try {
     const authHeader = request.headers.get('authorization');
@@ -11,13 +14,11 @@ export async function POST(request) {
     const settingsData = await request.json();
     
     // We use the SERVICE_ROLE_KEY to completely bypass database Row Level Security (RLS) blocks
-    let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    if (supabaseUrl && !supabaseUrl.startsWith('http')) {
-      supabaseUrl = 'https://' + supabaseUrl;
-    }
+    // Hardcode the known correct URL to prevent Vercel env var typo issues
+    const supabaseUrl = 'https://azviiiqrfqbbbjigzrwm.supabase.co';
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!supabaseServiceKey) {
       return NextResponse.json({ 
         error: 'Missing SUPABASE_SERVICE_ROLE_KEY in .env.local file. Please add it to save settings.' 
       }, { status: 500 });
