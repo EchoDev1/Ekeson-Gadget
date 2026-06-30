@@ -9,6 +9,7 @@ let cachedSettings = null;
 export default function AdminSettings() {
   const [loading, setLoading] = useState(!cachedSettings);
   const [saving, setSaving] = useState(false);
+  const [liveApiRate, setLiveApiRate] = useState(null);
   const [settings, setSettings] = useState(cachedSettings || {
     usdt_wallet_address: "",
     usdt_network: "TRC20",
@@ -113,6 +114,14 @@ export default function AdminSettings() {
 
   useEffect(() => {
     fetchSettings();
+    
+    // Fetch live API rate to display as reference
+    fetch("/api/usdt-rate")
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.rate) setLiveApiRate(data.rate);
+      })
+      .catch(err => console.warn("Could not fetch live rate reference"));
   }, []);
 
   const handleChange = (e) => {
@@ -252,7 +261,10 @@ export default function AdminSettings() {
                   Manual Exchange Rate (USDT/NGN)
                   <span className="bg-[#1B1B5E]/5 text-[#1B1B5E]/60 text-[10px] px-2 py-0.5 rounded-full normal-case">Optional Override</span>
                 </label>
-                <p className="text-[10px] text-[#1B1B5E]/50 mt-1 mb-2">If set, this perfectly accurate rate will override the live market API (e.g. 1392).</p>
+                <p className="text-[10px] text-[#1B1B5E]/50 mt-1 mb-2">
+                  If set, this perfectly accurate rate will override the live market API. 
+                  {liveApiRate ? <span className="font-bold text-[#00AEEF]"> Currently live API says ₦{liveApiRate}.</span> : ""}
+                </p>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <span className="text-[#1B1B5E]/40 font-medium">₦</span>
@@ -260,9 +272,7 @@ export default function AdminSettings() {
                   <input 
                     type="number" 
                     name="usdt_rate"
-                    value={settings.usdt_rate || ""}
-                    onChange={handleInputChange}
-                    className="w-full pl-8 pr-4 py-3 bg-white border-2 border-[#1B1B5E]/10 rounded-xl outline-none focus:border-[#00AEEF] transition-all font-medium text-[#1B1B5E]"
+                    onChange={handleChange}
                     placeholder="1392.00"
                   />
                 </div>
