@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  // We use KuCoin as the primary highly-updated rate, and CoinGecko as the fallback.
-  
-  try {
   // Note: KuCoin and CoinGecko APIs track the official CBN rate which is currently out of sync 
   // with the Nigerian parallel market. They have been disabled to prevent incorrect pricing.
 
