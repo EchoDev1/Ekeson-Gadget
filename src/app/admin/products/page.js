@@ -63,8 +63,12 @@ export default function AdminProducts() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'delete', payload: { id } })
       });
-      if (res.ok) fetchProducts();
-      else alert("Failed to delete product. Please ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel.");
+      if (res.ok) {
+        fetchProducts();
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(`Failed to delete product. Backend error: ${errorData.error || 'Unknown error'}. Please check Vercel ENV vars.`);
+      }
     } catch (err) {
       console.warn("Failed to delete via API:", err);
     }
@@ -83,7 +87,8 @@ export default function AdminProducts() {
           setIsModalOpen(false);
           fetchProducts();
         } else {
-          alert("Failed to update product. Please ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel.");
+          const errorData = await res.json().catch(() => ({}));
+          alert(`Failed to update product. Backend error: ${errorData.error || 'Unknown error'}. Please check Vercel ENV vars.`);
         }
       } else {
         const res = await fetch('/api/admin/products', {
@@ -95,7 +100,8 @@ export default function AdminProducts() {
           setIsModalOpen(false);
           fetchProducts();
         } else {
-          alert("Failed to create product. Please ensure SUPABASE_SERVICE_ROLE_KEY is set in Vercel.");
+          const errorData = await res.json().catch(() => ({}));
+          alert(`Failed to create product. Backend error: ${errorData.error || 'Unknown error'}. Please check Vercel ENV vars.`);
         }
       }
     } catch (err) {

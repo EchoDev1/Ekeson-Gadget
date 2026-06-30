@@ -8,7 +8,7 @@ export async function POST(request) {
   try {
     const { action, payload } = await request.json();
     
-    let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://azviiiqrfqbbbjigzrwm.supabase.co';
     if (supabaseUrl && !supabaseUrl.startsWith('http')) {
       supabaseUrl = 'https://' + supabaseUrl;
     }
