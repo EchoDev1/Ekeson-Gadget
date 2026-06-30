@@ -56,6 +56,7 @@ CREATE TABLE settings (
   usdt_network TEXT DEFAULT 'TRC20',
   shipping_fee_inside_lagos_abuja DECIMAL(12, 2) DEFAULT 0.00,
   shipping_fee_outside_lagos_abuja DECIMAL(12, 2) DEFAULT 0.00,
+  usdt_rate DECIMAL(12, 2),
   shipping_fee_african_countries DECIMAL(12, 2) DEFAULT 0.00,
   paystack_public_key TEXT,
   flutterwave_public_key TEXT,

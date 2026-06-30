@@ -12,6 +12,7 @@ export default function AdminSettings() {
   const [settings, setSettings] = useState(cachedSettings || {
     usdt_wallet_address: "",
     usdt_network: "TRC20",
+    usdt_rate: "",
     shipping_fee_inside_lagos_abuja: 0,
     shipping_fee_outside_lagos_abuja: 0,
     shipping_fee_african_countries: 0,
@@ -243,9 +244,30 @@ export default function AdminSettings() {
                 <option value="TRC20">TRC20 (Tron)</option>
                 <option value="ERC20">ERC20 (Ethereum)</option>
                 <option value="BEP20">BEP20 (Binance Smart Chain)</option>
-              </select>
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest flex items-center gap-2">
+                  Manual Exchange Rate (USDT/NGN)
+                  <span className="bg-[#1B1B5E]/5 text-[#1B1B5E]/60 text-[10px] px-2 py-0.5 rounded-full normal-case">Optional Override</span>
+                </label>
+                <p className="text-[10px] text-[#1B1B5E]/50 mt-1 mb-2">If set, this perfectly accurate rate will override the live market API (e.g. 1392).</p>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <span className="text-[#1B1B5E]/40 font-medium">₦</span>
+                  </div>
+                  <input 
+                    type="number" 
+                    name="usdt_rate"
+                    value={settings.usdt_rate || ""}
+                    onChange={handleInputChange}
+                    className="w-full pl-8 pr-4 py-3 bg-white border-2 border-[#1B1B5E]/10 rounded-xl outline-none focus:border-[#00AEEF] transition-all font-medium text-[#1B1B5E]"
+                    placeholder="1392.00"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
           <p className="text-xs text-[#1B1B5E]/50 font-medium">* System automatically fetches live market rate and adds a $5 safety premium.</p>
         </div>
 

@@ -88,7 +88,7 @@ export default function Checkout() {
       }
       
       // Allow admin to override the live market rate via Supabase settings
-      if (settingsData?.usdt_rate) {
+      if (settingsData?.usdt_rate && !isNaN(parseFloat(settingsData.usdt_rate))) {
         rate = parseFloat(settingsData.usdt_rate);
       }
       
