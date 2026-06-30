@@ -62,9 +62,15 @@ export default async function Footer() {
               {brandText}
             </p>
             <div className="flex space-x-6">
-              <a href="#" className="text-[#1B1B5E]/40 hover:text-[#00AEEF] transition-colors"><FacebookIcon /></a>
-              <a href="#" className="text-[#1B1B5E]/40 hover:text-[#00AEEF] transition-colors"><TwitterIcon /></a>
-              <a href="#" className="text-[#1B1B5E]/40 hover:text-[#00AEEF] transition-colors"><InstagramIcon /></a>
+              {settings?.social_facebook && (
+                <a href={settings.social_facebook} target="_blank" rel="noopener noreferrer" className="text-[#1B1B5E]/40 hover:text-[#00AEEF] transition-colors"><FacebookIcon /></a>
+              )}
+              {settings?.social_twitter && (
+                <a href={settings.social_twitter} target="_blank" rel="noopener noreferrer" className="text-[#1B1B5E]/40 hover:text-[#00AEEF] transition-colors"><TwitterIcon /></a>
+              )}
+              {settings?.social_instagram && (
+                <a href={settings.social_instagram} target="_blank" rel="noopener noreferrer" className="text-[#1B1B5E]/40 hover:text-[#00AEEF] transition-colors"><InstagramIcon /></a>
+              )}
             </div>
           </div>
 

@@ -31,6 +31,9 @@ export default function AdminSettings() {
     terms_policy_text: "",
     is_maintenance_mode: false,
     is_checkout_locked: false,
+    social_facebook: "",
+    social_instagram: "",
+    social_twitter: "",
     footer_hq_address: "Lagos/Abuja Nigeria",
     footer_hq_phone: "+234 814 852 7697",
     footer_hq_email: "office@ekesongroup.com",
@@ -574,6 +577,60 @@ export default function AdminSettings() {
           </div>
         </div>
 
+        {/* --- Social Media Links Section --- */}
+        <div className="bg-[#FFFDF5] rounded-3xl p-6 sm:p-8 md:p-10 border border-[#1B1B5E]/10 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#00AEEF]/5 to-transparent rounded-bl-full -z-10 group-hover:scale-110 transition-transform duration-700" />
+          
+          <div className="flex items-start gap-4 sm:gap-6 mb-8 md:mb-10">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#00AEEF] to-[#00AEEF]/80 flex items-center justify-center shadow-lg shadow-[#00AEEF]/20 shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black text-[#1B1B5E] mb-2 tracking-tight">Social Media Portals</h2>
+              <p className="text-sm text-[#1B1B5E]/60 font-medium">Configure direct links to your official social media pages.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6">
+            <div>
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest mb-3 block">Facebook URL</label>
+              <input 
+                type="url" 
+                name="social_facebook"
+                value={settings.social_facebook || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-white rounded-xl border border-[#1B1B5E]/10 focus:border-[#00AEEF] outline-none transition-colors font-medium text-[#1B1B5E]"
+                placeholder="https://facebook.com/ekesongadget"
+              />
+            </div>
+            
+            <div>
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest mb-3 block">Instagram URL</label>
+              <input 
+                type="url" 
+                name="social_instagram"
+                value={settings.social_instagram || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-white rounded-xl border border-[#1B1B5E]/10 focus:border-[#00AEEF] outline-none transition-colors font-medium text-[#1B1B5E]"
+                placeholder="https://instagram.com/ekesongadget"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest mb-3 block">Twitter / X URL</label>
+              <input 
+                type="url" 
+                name="social_twitter"
+                value={settings.social_twitter || ""}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-white rounded-xl border border-[#1B1B5E]/10 focus:border-[#00AEEF] outline-none transition-colors font-medium text-[#1B1B5E]"
+                placeholder="https://twitter.com/ekesongadget"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* --- Legal Pages Section --- */}
         {/* Hero Configuration */}
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
           <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
