@@ -1,10 +1,11 @@
-async function getBinanceSpot() {
+async function testYadio() {
+  const url = 'https://corsproxy.io/?' + encodeURIComponent('https://api.yadio.io/exrates/NGN');
   try {
-    const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=USDTNGN');
+    const res = await fetch(url);
     const data = await res.json();
-    console.log("Binance Spot NGN:", data);
-  } catch (err) {
-    console.error("Fetch error:", err);
+    console.log("Yadio NGN:", data);
+  } catch(e) {
+    console.log("Failed", e);
   }
 }
-getBinanceSpot();
+testYadio();
