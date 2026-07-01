@@ -10,21 +10,21 @@ export default function ProductCard({ product }) {
 
   return (
     <div className="group bg-white rounded-[2rem] overflow-hidden border border-[#1B1B5E]/5 hover:border-[#00AEEF]/20 transition-all duration-500 hover:shadow-[0_20px_50px_-20px_rgba(27,27,94,0.15)] flex flex-col p-2">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[1.8rem] bg-[#F8F9FA]">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-[1.8rem] bg-[#F8F9FA] flex items-center justify-center p-4">
         <Image
           src={product.image || 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80'}
           alt={product.name}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+          className="object-contain group-hover:scale-110 transition-transform duration-700 ease-in-out p-4"
         />
-        {product.isNew && (
-          <div className="absolute top-4 left-4 bg-[#1B1B5E] text-white text-[10px] font-black px-3 py-1.5 rounded-full tracking-widest uppercase">
-            NEW
-          </div>
-        )}
       </div>
 
       <div className="p-6 flex flex-col flex-1">
+        {product.isNew && (
+          <div className="mb-3 inline-block self-start bg-[#1B1B5E]/5 text-[#1B1B5E] text-[10px] font-black px-3 py-1 rounded-md tracking-widest uppercase border border-[#1B1B5E]/10">
+            NEW / SEALED
+          </div>
+        )}
         <div className="flex justify-between items-start mb-3">
           <Link href={`/products/${product.id}`} className="block flex-1 pr-2">
             <h3 className="font-black text-[#1B1B5E] hover:text-[#00AEEF] transition-colors line-clamp-1 text-base uppercase tracking-tight">

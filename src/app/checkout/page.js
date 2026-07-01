@@ -19,6 +19,7 @@ export default function Checkout() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -37,6 +38,10 @@ export default function Checkout() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setUser(session.user);
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+        if (profile?.role === 'admin') {
+          setIsAdmin(true);
+        }
       }
 
       // Fetch settings for fees and wallet
@@ -110,6 +115,7 @@ export default function Checkout() {
   }, [cart, success, router]);
 
   const getShippingFee = () => {
+    if (isAdmin) return 0; // Admin shipping fee bypass
     if (!settings) return 0;
     if (formData.shippingZone === "inside") return settings.shipping_fee_inside_lagos_abuja || 0;
     if (formData.shippingZone === "outside") return settings.shipping_fee_outside_lagos_abuja || 0;
@@ -119,8 +125,7 @@ export default function Checkout() {
 
   const shippingFee = getShippingFee();
   const totalNgn = cartTotal + shippingFee;
-  // User requested a $5 safety premium for crypto payments due to volatility
-  const totalUsdt = usdtRate ? (totalNgn / usdtRate) + 5 : 0;
+  const totalUsdt = usdtRate ? (totalNgn / usdtRate) : 0;
 
   const handleCopy = (text, item) => {
     navigator.clipboard.writeText(text);
@@ -465,11 +470,11 @@ export default function Checkout() {
                 <div className="bg-[#1B1B5E] text-white p-6 rounded-2xl space-y-6 relative overflow-hidden mt-6">
                   <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl"></div>
                   <div className="relative z-10 space-y-1">
-                    <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Amount to Send (+ $5 safety premium included)</p>
+                    <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Amount to Send</p>
                     <div className="text-4xl font-black tracking-tighter flex items-end gap-2">
                       {totalUsdt.toFixed(2)} <span className="text-xl text-[#00AEEF] mb-1">USDT</span>
                     </div>
-                    <p className="text-white/40 text-xs mt-2">Rate: 1 USDT = ₦{usdtRate?.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+                    <p className="text-white/40 text-xs mt-2">Rate: 1 USDT multiply = ₦{usdtRate?.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
                   </div>
                   <div className="relative z-10 p-4 bg-white/10 rounded-xl border border-white/10 flex flex-col gap-2">
                     <div className="flex justify-between items-center text-sm font-bold">

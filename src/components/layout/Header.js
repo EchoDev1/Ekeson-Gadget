@@ -19,6 +19,9 @@ export default function Header() {
     { label: "PlayStation", url: "/category/playstation" },
     { label: "Drones", url: "/category/drones" }
   ]);
+  const [session, setSession] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [profile, setProfile] = useState(null);
   const router = useRouter();
   const { cartCount } = useCart();
 
@@ -33,6 +36,30 @@ export default function Header() {
       } catch (err) {}
     };
     loadSettings();
+
+    // Check Auth Session
+    const checkUser = async (currentSession) => {
+      if (!currentSession?.user?.id) {
+        setSession(null);
+        setProfile(null);
+        setIsAdmin(false);
+        return;
+      }
+      setSession(currentSession);
+      try {
+        const { data } = await supabase.from('profiles').select('full_name, role').eq('id', currentSession.user.id).single();
+        setProfile(data);
+        setIsAdmin(data?.role === 'admin');
+      } catch(err) {}
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => checkUser(session));
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      checkUser(session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handleSearch = (e) => {
@@ -87,9 +114,34 @@ export default function Header() {
                   </span>
                 )}
               </Link>
-              <Link href="/auth/login" className="text-[#1B1B5E] font-bold text-sm border-2 border-[#1B1B5E] px-5 py-2 rounded-full hover:bg-[#1B1B5E] hover:text-white transition-all">
-                LOGIN
-              </Link>
+              
+              {session ? (
+                <div className="flex items-center gap-4">
+                  {isAdmin && (
+                    <Link href="/admin" className="bg-[#1B1B5E] text-[#00AEEF] text-[10px] font-black px-2 py-1 rounded tracking-widest uppercase hover:bg-[#00AEEF] hover:text-white transition-colors">
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#1B1B5E]">
+                    <div className="w-8 h-8 rounded-full bg-[#1B1B5E] text-white flex items-center justify-center font-black">
+                      {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "U"}
+                    </div>
+                    <span className="hidden lg:inline">{profile?.full_name?.split(' ')[0] || 'My Account'}</span>
+                  </div>
+                  <button onClick={() => supabase.auth.signOut()} className="text-[10px] font-black text-[#1B1B5E]/40 hover:text-red-500 uppercase tracking-widest transition-colors">
+                    Log Out
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Link href="/login" className="text-[#1B1B5E] font-bold text-sm hover:text-[#00AEEF] transition-colors">
+                    LOGIN
+                  </Link>
+                  <Link href="/signup" className="text-[#1B1B5E] font-bold text-sm border-2 border-[#1B1B5E] px-4 py-1.5 rounded-full hover:bg-[#1B1B5E] hover:text-white transition-all">
+                    SIGN UP
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -125,8 +177,24 @@ export default function Header() {
                 </Link>
               ))}
               <div className="pt-6 border-t border-[#1B1B5E]/5 space-y-4">
-                <Link href="/auth/login" className="block w-full text-center py-4 bg-[#1B1B5E] text-white rounded-xl font-bold">LOGIN</Link>
-                <Link href="/auth/register" className="block w-full text-center py-4 border-2 border-[#1B1B5E] text-[#1B1B5E] rounded-xl font-bold">SIGN UP</Link>
+                {session ? (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-[#1B1B5E]">{profile?.full_name?.split(' ')[0] || 'My Account'}</span>
+                      {isAdmin && (
+                        <Link href="/admin" className="bg-[#1B1B5E] text-[#00AEEF] text-[10px] font-black px-2 py-1 rounded tracking-widest uppercase">
+                          Admin
+                        </Link>
+                      )}
+                    </div>
+                    <button onClick={() => supabase.auth.signOut()} className="block w-full text-center py-4 border-2 border-red-500/20 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-colors">LOG OUT</button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" className="block w-full text-center py-4 bg-[#1B1B5E] text-white rounded-xl font-bold">LOGIN</Link>
+                    <Link href="/signup" className="block w-full text-center py-4 border-2 border-[#1B1B5E] text-[#1B1B5E] rounded-xl font-bold">SIGN UP</Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

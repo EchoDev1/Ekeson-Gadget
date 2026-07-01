@@ -42,21 +42,20 @@ const ProductCard = ({ product, isNew }) => {
       className="group bg-white rounded-[3.5rem] border border-[#1B1B5E]/5 p-5 transition-all duration-700 hover:shadow-3xl hover:translate-y-[-8px] flex flex-col justify-between"
     >
       <div>
-        <div className="relative aspect-square rounded-[2.5rem] overflow-hidden mb-6 bg-[#F7F3E9]/50">
+        <div className="relative aspect-square rounded-[2.5rem] overflow-hidden mb-4 bg-[#F7F3E9]/50 p-4">
           <Image 
             src={product.image_url || "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&q=80"} 
             alt={product.name}
             fill
-            className="object-cover transition-transform duration-1000 group-hover:scale-110"
+            className="object-contain transition-transform duration-1000 group-hover:scale-110 p-4"
             sizes="(max-width: 768px) 50vw, 25vw"
           />
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-black/5 shadow-sm">
-            <span className="text-[8px] font-black uppercase tracking-widest text-[#1B1B5E]">
-              {isNew ? "Sealed" : "Grade A++"}
-            </span>
-          </div>
         </div>
         <div className="px-2 space-y-2">
+          <div className="inline-block bg-[#1B1B5E]/5 text-[#1B1B5E] text-[9px] font-black px-2 py-1 rounded tracking-widest uppercase border border-[#1B1B5E]/10 mb-1">
+            {isNew ? "Sealed / New" : "Grade A+++"}
+          </div>
+          <br/>
           <span className="text-[9px] font-black text-[#00AEEF] uppercase tracking-widest">{product.brand || "Premium"}</span>
           <h3 className="text-xl font-black text-[#1B1B5E] tracking-tight uppercase leading-tight group-hover:text-[#00AEEF] transition-colors">{product.name}</h3>
         </div>

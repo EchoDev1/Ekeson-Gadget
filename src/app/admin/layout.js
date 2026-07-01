@@ -18,38 +18,17 @@ import {
 } from "lucide-react";
 
 export default function AdminLayout({ children }) {
-  const [isAdmin, setIsAdmin] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('admin_mock_logged_in') === 'true' && sessionStorage.getItem('admin_secret_verified') === 'true';
-    }
-    return false;
-  });
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      if (sessionStorage.getItem('admin_mock_logged_in') === 'true' && sessionStorage.getItem('admin_secret_verified') === 'true') {
-        return false;
-      }
-    }
-    return true;
-  });
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Don't check on the login page itself
+      // Don't check on the old login page if it still exists
       if (pathname === '/admin/login') {
-        setLoading(false);
-        return;
-      }
-
-      if (sessionStorage.getItem('admin_mock_logged_in') === 'true') {
-        const isVerified = sessionStorage.getItem('admin_secret_verified') === 'true';
-        if (!isVerified) {
-          router.push("/admin/login");
-          return;
-        }
-        setIsAdmin(true);
+        router.replace('/login'); // Redirect to new unified login
         setLoading(false);
         return;
       }
@@ -58,28 +37,24 @@ export default function AdminLayout({ children }) {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-          router.push("/admin/login");
+          router.push("/login");
           return;
         }
 
-        const { data: profile } = await supabase
+        const { data: profileData } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, full_name')
           .eq('id', session.user.id)
           .single();
 
-        if (profile?.role === 'admin') {
-          const isVerified = sessionStorage.getItem('admin_secret_verified') === 'true';
-          if (!isVerified) {
-            router.push("/admin/login");
-            return;
-          }
+        if (profileData?.role === 'admin') {
           setIsAdmin(true);
+          setProfile(profileData);
         } else {
-          router.push("/admin/login");
+          router.push("/"); // Normal users get booted to homepage
         }
       } catch (err) {
-        router.push("/admin/login");
+        router.push("/login");
       }
       setLoading(false);
     };
@@ -88,12 +63,10 @@ export default function AdminLayout({ children }) {
   }, [pathname, router]);
 
   const handleLogout = async () => {
-    sessionStorage.removeItem('admin_secret_verified');
-    sessionStorage.removeItem('admin_mock_logged_in');
     try {
       await supabase.auth.signOut();
     } catch (err) {}
-    router.push("/admin/login");
+    router.push("/");
   };
 
   if (loading) {
@@ -175,11 +148,11 @@ export default function AdminLayout({ children }) {
           </h2>
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end">
-              <span className="text-sm font-bold text-[#1B1B5E]">Admin User</span>
+              <span className="text-sm font-bold text-[#1B1B5E]">{profile?.full_name || "Admin User"}</span>
               <span className="text-[10px] font-black text-[#00AEEF] uppercase tracking-widest">Superuser</span>
             </div>
             <div className="w-10 h-10 rounded-full bg-[#1B1B5E] text-white flex items-center justify-center font-black">
-              A
+              {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "A"}
             </div>
           </div>
         </header>
