@@ -8,11 +8,15 @@ export async function POST(request) {
   try {
     const { action, payload } = await request.json();
     
-    let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://azviiiqrfqbbbjigzrwm.supabase.co';
-    if (supabaseUrl && !supabaseUrl.startsWith('http')) {
-      supabaseUrl = 'https://' + supabaseUrl;
+    // Hardcode the URL to prevent Vercel ENV parsing errors (Invalid URL path)
+    const supabaseUrl = 'https://azviiiqrfqbbbjigzrwm.supabase.co';
+    
+    // We MUST use the service role key to bypass RLS for admin operations
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!supabaseKey) {
+      return NextResponse.json({ error: 'Missing SUPABASE_SERVICE_ROLE_KEY in Vercel Environment Variables. You must add it to add/edit products.' }, { status: 500 });
     }
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     
     if (!supabaseUrl || !supabaseKey) {
       return NextResponse.json({ error: 'Missing Database Configuration' }, { status: 500 });
