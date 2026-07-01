@@ -135,27 +135,21 @@ export default function Checkout() {
   const processManualOrder = async () => {
     setSubmitting(true);
     try {
-      const { data: order, error: orderError } = await supabase.from('orders').insert([{
-        user_id: user ? user.id : null,
-        total_amount: totalNgn,
-        status: 'processing',
-        payment_status: 'pending',
-        shipping_address: formData.address,
-        contact_phone: formData.phone,
-        contact_email: formData.email,
-      }]).select().single();
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user ? user.id : null,
+          totalNgn,
+          formData,
+          cart
+        })
+      });
 
-      if (orderError) throw orderError;
-
-      const orderItems = cart.map(item => ({
-        order_id: order.id,
-        product_id: item.id,
-        quantity: item.quantity,
-        unit_price: item.price
-      }));
-
-      const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
-      if (itemsError) throw itemsError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit order');
+      }
 
       clearCart();
       setSuccess(true);
