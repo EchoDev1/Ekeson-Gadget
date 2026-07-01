@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { Mail, Lock, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -11,6 +11,7 @@ export default function Login() {
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -79,13 +80,20 @@ export default function Login() {
                   <Lock className="h-5 w-5" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-12 bg-[#F8F9FA] border border-[#1B1B5E]/5 rounded-2xl py-4 text-[#1B1B5E] placeholder-gray-400 focus:outline-none focus:border-[#00AEEF] focus:ring-1 focus:ring-[#00AEEF] transition-all text-sm"
+                  className="block w-full pl-12 pr-12 bg-[#F8F9FA] border border-[#1B1B5E]/5 rounded-2xl py-4 text-[#1B1B5E] placeholder-gray-400 focus:outline-none focus:border-[#00AEEF] focus:ring-1 focus:ring-[#00AEEF] transition-all text-sm"
                   placeholder="••••••••"
                 />
+                <button 
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#1B1B5E]/40 hover:text-[#1B1B5E] transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
             </div>
           </div>

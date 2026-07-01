@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Logo } from '@/components/ui/BrandIdentity';
-import { Loader2, Mail, Lock, User, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Loader2, Mail, Lock, User, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState('');
@@ -14,6 +14,7 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleSignup = async (e) => {
@@ -113,14 +114,21 @@ export default function SignupPage() {
                 <Lock className="w-5 h-5 text-[#1B1B5E]/40" />
               </div>
               <input 
-                type="password" 
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full pl-11 pr-4 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20 font-medium text-[#1B1B5E] transition-all"
+                className="w-full pl-11 pr-12 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20 font-medium text-[#1B1B5E] transition-all"
                 placeholder="Min. 6 characters"
               />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#1B1B5E]/40 hover:text-[#1B1B5E] transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
           </div>
 

@@ -182,17 +182,17 @@ export default function Header() {
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-[#1B1B5E]">{profile?.full_name?.split(' ')[0] || 'My Account'}</span>
                       {isAdmin && (
-                        <Link href="/admin" className="bg-[#1B1B5E] text-[#00AEEF] text-[10px] font-black px-2 py-1 rounded tracking-widest uppercase">
+                        <Link href="/admin" className="bg-[#1B1B5E] text-[#00AEEF] text-[10px] font-black px-2 py-1 rounded tracking-widest uppercase" onClick={() => setIsMenuOpen(false)}>
                           Admin
                         </Link>
                       )}
                     </div>
-                    <button onClick={() => supabase.auth.signOut()} className="block w-full text-center py-4 border-2 border-red-500/20 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-colors">LOG OUT</button>
+                    <button onClick={() => { supabase.auth.signOut(); setIsMenuOpen(false); }} className="block w-full text-center py-4 border-2 border-red-500/20 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-colors">LOG OUT</button>
                   </>
                 ) : (
                   <>
-                    <Link href="/login" className="block w-full text-center py-4 bg-[#1B1B5E] text-white rounded-xl font-bold">LOGIN</Link>
-                    <Link href="/signup" className="block w-full text-center py-4 border-2 border-[#1B1B5E] text-[#1B1B5E] rounded-xl font-bold">SIGN UP</Link>
+                    <Link href="/login" className="block w-full text-center py-4 bg-[#1B1B5E] text-white rounded-xl font-bold" onClick={() => setIsMenuOpen(false)}>LOGIN</Link>
+                    <Link href="/signup" className="block w-full text-center py-4 border-2 border-[#1B1B5E] text-[#1B1B5E] rounded-xl font-bold" onClick={() => setIsMenuOpen(false)}>SIGN UP</Link>
                   </>
                 )}
               </div>
