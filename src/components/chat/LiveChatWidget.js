@@ -30,8 +30,9 @@ export default function LiveChatWidget() {
     fetchMessages(sid);
 
     // Subscribe to new messages for this session
+    const channelName = `live_chat_widget_${Date.now()}`;
     const subscription = supabase
-      .channel('public:messages')
+      .channel(channelName)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
         if (payload.eventType === 'INSERT') {
           if (payload.new.session_id === sid) {

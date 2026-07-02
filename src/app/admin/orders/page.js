@@ -27,8 +27,9 @@ export default function AdminOrders() {
     fetchOrders();
 
     // Subscribe to new orders and changes
+    const channelName = `admin_orders_page_${Date.now()}`;
     const subscription = supabase
-      .channel('public:orders')
+      .channel(channelName)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
         if (payload.eventType === 'INSERT') {
           setOrders(prev => [payload.new, ...prev]);

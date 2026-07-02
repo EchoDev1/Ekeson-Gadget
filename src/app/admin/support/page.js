@@ -40,8 +40,9 @@ export default function AdminSupport() {
   useEffect(() => {
     if (activeTicket?.isAuth) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      const channelName = `admin_support_messages_${activeTicket.id}_${Date.now()}`;
       const subscription = supabase
-        .channel(`public:support_ticket_messages:ticket_id=eq.${activeTicket.id}`)
+        .channel(channelName)
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_ticket_messages', filter: `ticket_id=eq.${activeTicket.id}` }, payload => {
           setMessages(prev => [...prev, payload.new]);
         })

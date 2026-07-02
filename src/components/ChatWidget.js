@@ -42,8 +42,9 @@ export default function ChatWidget() {
     };
     checkSettings();
 
+    const channelName = `chat_widget_${Date.now()}`;
     const subscription = supabase
-      .channel('public:messages')
+      .channel(channelName)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
         if (payload.new.session_id === sid) {
           setMessages(prev => [...prev, payload.new]);

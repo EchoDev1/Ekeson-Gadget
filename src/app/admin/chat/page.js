@@ -43,8 +43,9 @@ export default function AdminChatRoom() {
   useEffect(() => {
     fetchChats();
 
+    const channelName = `admin_chat_messages_${Date.now()}`;
     const subscription = supabase
-      .channel('public:messages')
+      .channel(channelName)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
         fetchChats(); // Refresh sidebar
         

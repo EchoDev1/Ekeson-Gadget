@@ -104,8 +104,9 @@ export default function AdminMessages() {
   useEffect(() => {
     fetchSessions();
 
+    const channelName = `admin_messages_page_${Date.now()}`;
     const subscription = supabase
-      .channel('public:messages')
+      .channel(channelName)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
         handleNewMessage(payload.new);
       })
