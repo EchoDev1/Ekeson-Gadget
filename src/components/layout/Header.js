@@ -1,8 +1,8 @@
 "use client";
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { ShoppingCart, User, Menu, Search, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { ShoppingCart, User, Menu, Search, X, ChevronDown, Package, Heart, MapPin, CreditCard, Gift, Bell, HeadphonesIcon, Settings, ScrollText, LogOut } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/ui/BrandIdentity';
 import { useCart } from '@/context/CartContext';
@@ -10,6 +10,9 @@ import { useCart } from '@/context/CartContext';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef(null);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [headerLinks, setHeaderLinks] = useState([
     { label: "Phones", url: "/category/phones" },
@@ -24,6 +27,16 @@ export default function Header() {
   const [profile, setProfile] = useState(null);
   const router = useRouter();
   const { cartCount } = useCart();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Fetch settings safely from the client-side using useEffect
   useEffect(() => {
@@ -82,6 +95,19 @@ export default function Header() {
     setIsSearchOpen(false);
   };
 
+  const accountLinks = [
+    { label: "My Profile", url: "/account/profile", icon: User },
+    { label: "My Orders", url: "/account/orders", icon: Package },
+    { label: "Wishlist", url: "/account/wishlist", icon: Heart },
+    { label: "Addresses", url: "/account/addresses", icon: MapPin },
+    { label: "Payment Methods", url: "/account/payments", icon: CreditCard },
+    { label: "Coupons & Rewards", url: "/account/rewards", icon: Gift },
+    { label: "Notifications", url: "/account/notifications", icon: Bell },
+    { label: "Customer Support", url: "/account/support", icon: HeadphonesIcon },
+    { label: "Settings", url: "/account/settings", icon: Settings },
+    { label: "Policies", url: "/account/policies", icon: ScrollText },
+  ];
+
   return (
     <>
       <header className="sticky top-0 z-50 bg-[#FFFDF5]/90 backdrop-blur-md border-b border-[#1B1B5E]/5">
@@ -123,21 +149,64 @@ export default function Header() {
               </Link>
               
               {session ? (
-                <div className="flex items-center gap-4">
-                  {isAdmin && (
-                    <Link href="/admin" className="bg-[#1B1B5E] text-[#00AEEF] text-[10px] font-black px-2 py-1 rounded tracking-widest uppercase hover:bg-[#00AEEF] hover:text-white transition-colors">
-                      Admin Dashboard
-                    </Link>
-                  )}
-                  <div className="flex items-center gap-2 text-sm font-bold text-[#1B1B5E]">
+                <div className="relative" ref={accountMenuRef}>
+                  <button 
+                    onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+                    className="flex items-center gap-2 text-sm font-bold text-[#1B1B5E] hover:opacity-80 transition-opacity focus:outline-none"
+                  >
                     <div className="w-8 h-8 rounded-full bg-[#1B1B5E] text-white flex items-center justify-center font-black">
                       {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "U"}
                     </div>
                     <span className="hidden lg:inline">{profile?.full_name?.split(' ')[0] || 'My Account'}</span>
-                  </div>
-                  <button onClick={() => supabase.auth.signOut()} className="text-[10px] font-black text-[#1B1B5E]/40 hover:text-red-500 uppercase tracking-widest transition-colors">
-                    Log Out
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isAccountMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
+
+                  {/* Dropdown Menu */}
+                  {isAccountMenuOpen && (
+                    <div className="absolute right-0 mt-4 w-64 bg-white rounded-3xl shadow-2xl border border-[#1B1B5E]/5 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                      <div className="p-4 bg-[#F5F5F7]/50 border-b border-[#1B1B5E]/5 flex items-center justify-between">
+                        <div>
+                          <p className="font-black text-[#1B1B5E] truncate max-w-[150px]">{profile?.full_name || 'My Account'}</p>
+                          <p className="text-[10px] font-bold text-[#1B1B5E]/50 uppercase tracking-widest mt-0.5 truncate max-w-[150px]">{session.user.email}</p>
+                        </div>
+                        {isAdmin && (
+                          <Link href="/admin" className="bg-[#1B1B5E] text-[#00AEEF] text-[9px] font-black px-2 py-1 rounded tracking-widest uppercase hover:bg-[#00AEEF] hover:text-white transition-colors">
+                            Admin
+                          </Link>
+                        )}
+                      </div>
+                      
+                      <div className="py-2 max-h-[350px] overflow-y-auto">
+                        {accountLinks.map((link, idx) => {
+                          const Icon = link.icon;
+                          return (
+                            <Link 
+                              key={idx} 
+                              href={link.url}
+                              onClick={() => setIsAccountMenuOpen(false)}
+                              className="flex items-center gap-3 px-5 py-3 text-sm font-bold text-[#1B1B5E]/70 hover:text-[#00AEEF] hover:bg-[#F5F5F7] transition-all"
+                            >
+                              <Icon className="w-4 h-4" />
+                              {link.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+
+                      <div className="p-2 border-t border-[#1B1B5E]/5 bg-[#F5F5F7]/30">
+                        <button 
+                          onClick={() => {
+                            setIsAccountMenuOpen(false);
+                            supabase.auth.signOut();
+                          }}
+                          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-xs font-black text-red-500 hover:bg-red-50 rounded-xl transition-colors uppercase tracking-widest"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          Log Out
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
@@ -171,7 +240,7 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-[#1B1B5E]/10 animate-in slide-in-from-top duration-300">
+          <div className="md:hidden bg-white border-t border-[#1B1B5E]/10 animate-in slide-in-from-top duration-300 h-[calc(100vh-80px)] overflow-y-auto">
             <div className="px-6 py-8 space-y-6">
               {headerLinks.map((item, i) => (
                 <Link 
@@ -183,18 +252,45 @@ export default function Header() {
                   {item.label}
                 </Link>
               ))}
+              
               <div className="pt-6 border-t border-[#1B1B5E]/5 space-y-4">
                 {session ? (
                   <>
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-[#1B1B5E]">{profile?.full_name?.split(' ')[0] || 'My Account'}</span>
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#1B1B5E] text-white flex items-center justify-center font-black">
+                          {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "U"}
+                        </div>
+                        <div>
+                          <p className="font-black text-[#1B1B5E] truncate max-w-[150px]">{profile?.full_name || 'My Account'}</p>
+                          <p className="text-[10px] font-bold text-[#1B1B5E]/50 uppercase tracking-widest truncate max-w-[150px]">{session.user.email}</p>
+                        </div>
+                      </div>
                       {isAdmin && (
                         <Link href="/admin" className="bg-[#1B1B5E] text-[#00AEEF] text-[10px] font-black px-2 py-1 rounded tracking-widest uppercase" onClick={() => setIsMenuOpen(false)}>
                           Admin
                         </Link>
                       )}
                     </div>
-                    <button onClick={() => { supabase.auth.signOut(); setIsMenuOpen(false); }} className="block w-full text-center py-4 border-2 border-red-500/20 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-colors">LOG OUT</button>
+                    
+                    <div className="grid grid-cols-2 gap-3 mb-6">
+                      {accountLinks.map((link, idx) => {
+                        const Icon = link.icon;
+                        return (
+                          <Link 
+                            key={idx} 
+                            href={link.url}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-[#F5F5F7] text-[#1B1B5E] hover:bg-[#00AEEF] hover:text-white transition-all text-center shadow-sm"
+                          >
+                            <Icon className="w-5 h-5" />
+                            <span className="text-[10px] font-black uppercase tracking-widest leading-tight">{link.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+
+                    <button onClick={() => { supabase.auth.signOut(); setIsMenuOpen(false); }} className="block w-full text-center py-4 border-2 border-red-500/20 text-red-500 rounded-xl font-bold hover:bg-red-50 transition-colors uppercase tracking-widest text-xs">Log Out</button>
                   </>
                 ) : (
                   <>
