@@ -232,6 +232,31 @@ export default function Checkout() {
     });
   };
 
+  const handleMonnify = (order) => {
+    if (!settings?.monnify_api_key || !settings?.monnify_contract_code) return alert("Monnify is not configured.");
+    window.MonnifySDK.initialize({
+      amount: totalNgn,
+      currency: "NGN",
+      reference: order.id,
+      customerFullName: formData.fullName,
+      customerEmail: formData.email || "customer@ekesontech.com",
+      apiKey: settings.monnify_api_key,
+      contractCode: settings.monnify_contract_code,
+      paymentDescription: "Payment for Order " + order.id.substring(0,8),
+      onComplete: async function(response) {
+        await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id);
+        clearCart();
+        setSuccess(true);
+        window.scrollTo(0, 0);
+      },
+      onClose: function(data) {
+        alert('Payment window closed. You can complete this payment later from your account.');
+        clearCart();
+        router.push('/account/orders');
+      }
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -260,6 +285,9 @@ export default function Checkout() {
       } else if (formData.paymentMethod === 'flutterwave') {
         setSubmitting(false);
         handleFlutterwave(order);
+      } else if (formData.paymentMethod === 'monnify') {
+        setSubmitting(false);
+        handleMonnify(order);
       } else {
         // Manual methods (crypto, bank_transfer, etc)
         // Order is already created with pending status.
