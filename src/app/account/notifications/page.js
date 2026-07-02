@@ -3,6 +3,21 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Bell, Loader2, CheckCircle } from "lucide-react";
 
+const NotificationToggle = ({ id, title, desc, icon, active, onToggle }) => (
+  <div className="flex items-center justify-between p-4 bg-[#F5F5F7] rounded-2xl border border-[#1B1B5E]/5 hover:bg-white hover:border-[#1B1B5E]/10 transition-colors cursor-pointer" onClick={() => onToggle(id)}>
+    <div className="flex items-center gap-4">
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl bg-white shadow-sm border border-[#1B1B5E]/5`}>{icon}</div>
+      <div>
+        <h3 className="font-bold text-[#1B1B5E]">{title}</h3>
+        <p className="text-xs font-medium text-[#1B1B5E]/50 mt-0.5">{desc}</p>
+      </div>
+    </div>
+    <div className={`w-12 h-6 rounded-full transition-colors relative ${active ? 'bg-[#00AEEF]' : 'bg-gray-300'}`}>
+      <div className={`absolute top-1 bg-white w-4 h-4 rounded-full transition-transform ${active ? 'translate-x-7' : 'translate-x-1'}`}></div>
+    </div>
+  </div>
+);
+
 export default function NotificationsPage() {
   const [preferences, setPreferences] = useState({
     email_orders: true,
@@ -42,21 +57,6 @@ export default function NotificationsPage() {
 
   if (loading) return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" /></div>;
 
-  const NotificationToggle = ({ id, title, desc, icon }) => (
-    <div className="flex items-center justify-between p-4 bg-[#F5F5F7] rounded-2xl border border-[#1B1B5E]/5 hover:bg-white hover:border-[#1B1B5E]/10 transition-colors cursor-pointer" onClick={() => togglePref(id)}>
-      <div className="flex items-center gap-4">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl bg-white shadow-sm border border-[#1B1B5E]/5`}>{icon}</div>
-        <div>
-          <h3 className="font-bold text-[#1B1B5E]">{title}</h3>
-          <p className="text-xs font-medium text-[#1B1B5E]/50 mt-0.5">{desc}</p>
-        </div>
-      </div>
-      <div className={`w-12 h-6 rounded-full transition-colors relative ${preferences[id] ? 'bg-[#00AEEF]' : 'bg-gray-300'}`}>
-        <div className={`absolute top-1 bg-white w-4 h-4 rounded-full transition-transform ${preferences[id] ? 'translate-x-7' : 'translate-x-1'}`}></div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-[#1B1B5E]/5">
@@ -75,18 +75,24 @@ export default function NotificationsPage() {
             title="Order Updates"
             desc="Get emails about your order status, shipping, and delivery."
             icon="📦"
+            active={preferences.email_orders}
+            onToggle={togglePref}
           />
           <NotificationToggle 
             id="email_promos"
             title="Promotions & Offers"
             desc="Receive exclusive discounts and flash sale alerts via email."
             icon="🎉"
+            active={preferences.email_promos}
+            onToggle={togglePref}
           />
           <NotificationToggle 
             id="sms_alerts"
             title="SMS Alerts"
             desc="Get urgent delivery updates directly to your phone via SMS."
             icon="📱"
+            active={preferences.sms_alerts}
+            onToggle={togglePref}
           />
         </div>
       </div>

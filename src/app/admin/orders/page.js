@@ -8,20 +8,33 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  async function fetchOrders() {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (data) setOrders(data);
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+  }
+
   useEffect(() => {
     fetchOrders();
 
     // Subscribe to new orders and changes
     const subscription = supabase
       .channel('public:orders')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
-        setOrders(prev => [payload.new, ...prev]);
-        if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
-          new Notification("New Order Received!", { body: `Order ID: ${payload.new.id}` });
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+        if (payload.eventType === 'INSERT') {
+          setOrders(prev => [payload.new, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          setOrders(prev => prev.map(order => order.id === payload.new.id ? payload.new : order));
         }
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
-         fetchOrders();
       })
       .subscribe();
 
@@ -29,18 +42,6 @@ export default function AdminOrders() {
       supabase.removeChannel(subscription);
     };
   }, []);
-
-  async function fetchOrders() {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
-      if (data) setOrders(data);
-      if (error) console.warn("Error fetching orders:", error);
-    } catch (err) {
-      console.warn("Failed to fetch orders natively:", err);
-    }
-    setLoading(false);
-  }
 
   const updateOrderStatus = async (id, status) => {
     try {

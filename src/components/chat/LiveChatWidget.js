@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
-import { MessageCircle, X, Send, User, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, User, Loader2, Check, CheckCheck } from "lucide-react";
 
 export default function LiveChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +10,13 @@ export default function LiveChatWidget() {
   const [newMessage, setNewMessage] = useState("");
   const [unreadAdmin, setUnreadAdmin] = useState(0);
   const messagesEndRef = useRef(null);
+
+  const fetchMessages = async (sid) => {
+    const { data } = await supabase.from('messages').select('*').eq('session_id', sid).order('created_at', { ascending: true });
+    if (data) {
+      setMessages(data);
+    }
+  };
 
   useEffect(() => {
     // Check for existing session or create one
@@ -25,14 +32,27 @@ export default function LiveChatWidget() {
     // Subscribe to new messages for this session
     const subscription = supabase
       .channel('public:messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-        if (payload.new.session_id === sid) {
-          setMessages(prev => [...prev, payload.new]);
-          if (payload.new.sender === 'admin' && !isOpen) {
-            setUnreadAdmin(prev => prev + 1);
-            if (typeof window !== 'undefined' && "Notification" in window && Notification.permission === "granted") {
-              new Notification("New Support Message", { body: payload.new.text });
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+        if (payload.eventType === 'INSERT') {
+          if (payload.new.session_id === sid) {
+            // Check if we already have this message from optimistic update
+            setMessages(prev => {
+              if (prev.some(m => m.id === payload.new.id || (m.temp_id && m.text === payload.new.text))) {
+                return prev.map(m => (m.temp_id && m.text === payload.new.text) ? payload.new : m);
+              }
+              return [...prev, payload.new];
+            });
+
+            if (payload.new.sender === 'admin' && !isOpen) {
+              setUnreadAdmin(prev => prev + 1);
+              if (typeof window !== 'undefined' && "Notification" in window && Notification.permission === "granted") {
+                new Notification("New Support Message", { body: payload.new.text });
+              }
             }
+          }
+        } else if (payload.eventType === 'UPDATE') {
+          if (payload.new.session_id === sid) {
+            setMessages(prev => prev.map(m => m.id === payload.new.id ? payload.new : m));
           }
         }
       })
@@ -42,13 +62,6 @@ export default function LiveChatWidget() {
       supabase.removeChannel(subscription);
     };
   }, [isOpen]);
-
-  const fetchMessages = async (sid) => {
-    const { data } = await supabase.from('messages').select('*').eq('session_id', sid).order('created_at', { ascending: true });
-    if (data) {
-      setMessages(data);
-    }
-  };
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -76,6 +89,9 @@ export default function LiveChatWidget() {
     };
 
     setNewMessage("");
+    // Optimistic update
+    setMessages(prev => [...prev, { ...msg, temp_id: Date.now(), created_at: new Date().toISOString() }]);
+
     await supabase.from('messages').insert([msg]);
   };
 
@@ -119,7 +135,7 @@ export default function LiveChatWidget() {
                   <MessageCircle className="w-8 h-8 text-[#00AEEF]/50" />
                 </div>
                 <p className="text-sm font-bold text-[#1B1B5E] uppercase tracking-widest">How can we help?</p>
-                <p className="text-xs text-[#1B1B5E]/50 mt-1 font-medium">Send us a message and we'll reply shortly.</p>
+                <p className="text-xs text-[#1B1B5E]/50 mt-1 font-medium">Send us a message and we&apos;ll reply shortly.</p>
               </div>
             )}
             
@@ -132,7 +148,13 @@ export default function LiveChatWidget() {
                       ? 'bg-[#1B1B5E] text-white rounded-br-sm' 
                       : 'bg-white border border-[#1B1B5E]/10 text-[#1B1B5E] rounded-bl-sm shadow-sm'
                   }`}>
-                    {msg.text}
+                    <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
+                    <div className={`flex items-center gap-1 mt-1 text-[10px] font-bold ${isUser ? 'text-white/50 justify-end' : 'text-[#1B1B5E]/40'}`}>
+                      {new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      {isUser && (
+                        msg.is_read ? <CheckCheck className="w-3 h-3 text-[#00AEEF] ml-1" /> : <Check className="w-3 h-3 ml-1" />
+                      )}
+                    </div>
                   </div>
                 </div>
               );

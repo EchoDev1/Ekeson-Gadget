@@ -10,10 +10,6 @@ export default function AddressesPage() {
   const [formData, setFormData] = useState({ id: null, full_name: "", phone: "", address: "", state: "", is_default: false });
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchAddresses();
-  }, []);
-
   const fetchAddresses = async () => {
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();
@@ -23,6 +19,10 @@ export default function AddressesPage() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchAddresses();
+  }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();

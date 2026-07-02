@@ -10,10 +10,6 @@ export default function PaymentsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({ accountName: "", accountNumber: "", bankName: "" });
 
-  useEffect(() => {
-    fetchBankDetails();
-  }, []);
-
   const fetchBankDetails = async () => {
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();
@@ -25,6 +21,10 @@ export default function PaymentsPage() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchBankDetails();
+  }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();

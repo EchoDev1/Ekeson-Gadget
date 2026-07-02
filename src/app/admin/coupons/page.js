@@ -16,16 +16,16 @@ export default function AdminCoupons() {
     is_active: true
   });
 
-  useEffect(() => {
-    fetchCoupons();
-  }, []);
-
   const fetchCoupons = async () => {
     setLoading(true);
     const { data } = await supabase.from('coupons').select('*').order('created_at', { ascending: false });
     if (data) setCoupons(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchCoupons();
+  }, []);
 
   const handleGenerateCode = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

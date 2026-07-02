@@ -11,10 +11,6 @@ export default function WishlistPage() {
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
 
-  useEffect(() => {
-    fetchWishlist();
-  }, []);
-
   const fetchWishlist = async () => {
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();

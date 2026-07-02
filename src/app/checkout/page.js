@@ -66,7 +66,7 @@ export default function Checkout() {
         });
       }
 
-      let rate = 1500;
+      let rate = 1389;
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
@@ -84,7 +84,7 @@ export default function Checkout() {
       
       setUsdtRate(rate);
     } catch (err) {
-      setUsdtRate(1500);
+      setUsdtRate(1389);
     } finally {
       setLoading(false);
     }

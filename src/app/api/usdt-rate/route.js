@@ -19,5 +19,5 @@ export async function GET() {
   }
 
   // Fallback to a current accurate black market / P2P rate if the API fails
-  return NextResponse.json({ rate: 1530, source: 'P2P Baseline Fallback' });
+  return NextResponse.json({ rate: 1389, source: 'P2P Baseline Fallback' });
 }

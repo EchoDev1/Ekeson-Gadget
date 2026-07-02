@@ -5,45 +5,98 @@ import { Send, User, Bot, MoreVertical, Search, CheckCheck } from "lucide-react"
 
 export default function AdminChatRoom() {
   const [messages, setMessages] = useState([]);
-  const [chats, setChats] = useState([]); // Clear dummy chats
+  const [chats, setChats] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [activeSession, setActiveSession] = useState(null);
+
+  const markAsRead = async (sid) => {
+    await supabase.from('messages').update({ is_read: true }).eq('session_id', sid).eq('sender', 'user').eq('is_read', false);
+  };
+
+  const fetchChats = async () => {
+    // Group messages by session_id to build chat list
+    const { data } = await supabase.from('messages').select('*').order('created_at', { ascending: false });
+    if (!data) return;
+    
+    const sessionMap = {};
+    data.forEach(msg => {
+      if (!sessionMap[msg.session_id]) {
+        sessionMap[msg.session_id] = {
+          id: msg.session_id,
+          name: "Guest_" + msg.session_id.substring(5, 9),
+          lastMessage: msg.text,
+          time: new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: msg.created_at,
+          unread: 0,
+          active: msg.session_id === activeSession
+        };
+      }
+      if (msg.sender === 'user' && !msg.is_read) {
+        sessionMap[msg.session_id].unread += 1;
+      }
+    });
+    
+    const sortedChats = Object.values(sessionMap).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    setChats(sortedChats);
+  };
 
   useEffect(() => {
-    // Listen for incoming live chat messages swiftly using Supabase Broadcast
-    const channel = supabase.channel('public:live-chat');
-    
-    channel.on('broadcast', { event: 'message' }, (payload) => {
-      setMessages(prev => [...prev, payload.payload]);
-    }).subscribe();
+    fetchChats();
+
+    const subscription = supabase
+      .channel('public:messages')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+        fetchChats(); // Refresh sidebar
+        
+        // If it's the active chat, append message or update it
+        setMessages(prev => {
+          if (payload.new && payload.new.session_id === activeSession) {
+            if (payload.eventType === 'INSERT') {
+              // Optimistically mark as read since admin is viewing it
+              if (payload.new.sender === 'user') {
+                markAsRead(payload.new.session_id);
+              }
+              return [...prev, payload.new];
+            } else if (payload.eventType === 'UPDATE') {
+              return prev.map(m => m.id === payload.new.id ? payload.new : m);
+            }
+          }
+          return prev;
+        });
+      })
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(subscription);
     };
-  }, []);
+  }, [activeSession]);
+
+  const selectChat = async (sid) => {
+    setActiveSession(sid);
+    setChats(prev => prev.map(c => ({ ...c, active: c.id === sid, unread: c.id === sid ? 0 : c.unread })));
+    
+    const { data } = await supabase.from('messages').select('*').eq('session_id', sid).order('created_at', { ascending: true });
+    if (data) setMessages(data);
+    
+    markAsRead(sid);
+  };
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !activeSession) return;
     
     const msg = {
-      id: Date.now(),
+      session_id: activeSession,
       sender: 'admin',
-      name: 'Support',
-      text: newMessage,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      read: false
+      text: newMessage.trim(),
+      is_read: false
     };
 
-    // Optimistically update UI instantly for swift responsiveness
-    setMessages(prev => [...prev, msg]);
     setNewMessage("");
+    // Optimistic update
+    setMessages(prev => [...prev, { ...msg, id: Date.now(), created_at: new Date().toISOString() }]);
 
-    // Broadcast instantly to customer
-    await supabase.channel('public:live-chat').send({
-      type: 'broadcast',
-      event: 'message',
-      payload: msg
-    });
+    await supabase.from('messages').insert([msg]);
   };
 
   return (
@@ -69,7 +122,7 @@ export default function AdminChatRoom() {
             </div>
           ) : (
             chats.map((chat) => (
-              <div key={chat.id} className={`p-4 border-b border-[#00AEEF]/5 cursor-pointer transition-all ${chat.active ? 'bg-[#1B1B5E]/40 border-l-4 border-l-[#00AEEF]' : 'hover:bg-white/5'}`}>
+              <div key={chat.id} onClick={() => selectChat(chat.id)} className={`p-4 border-b border-[#00AEEF]/5 cursor-pointer transition-all ${chat.active ? 'bg-[#1B1B5E]/40 border-l-4 border-l-[#00AEEF]' : 'hover:bg-white/5'}`}>
                 <div className="flex justify-between items-start mb-1">
                   <h3 className={`text-sm font-bold ${chat.active ? 'text-white' : 'text-gray-400'}`}>{chat.name}</h3>
                   <span className="text-[10px] text-gray-500 font-medium uppercase">{chat.time}</span>
@@ -92,7 +145,7 @@ export default function AdminChatRoom() {
       <div className="flex-1 flex flex-col bg-[#050510]/30">
         {/* Chat Header */}
         <div className="h-20 border-b border-[#00AEEF]/10 flex items-center justify-between px-6 bg-[#0A0A20]">
-          {chats.length > 0 ? (
+          {activeSession ? (
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 rounded-xl bg-[#1B1B5E] border border-[#00AEEF]/20 flex items-center justify-center text-[#00AEEF]">
                 <User className="w-5 h-5" />
@@ -126,16 +179,18 @@ export default function AdminChatRoom() {
             <span className="text-[10px] text-gray-500 bg-[#1B1B5E]/30 px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-[#00AEEF]/10">Today</span>
           </div>
           
-          {messages.map((msg) => (
-            <div key={msg.id} className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`flex ${msg.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[75%] flex flex-col ${msg.sender === 'admin' ? 'items-end' : 'items-start'}`}>
                 <div className={`px-5 py-3.5 rounded-2xl shadow-xl ${msg.sender === 'admin' ? 'bg-[#00AEEF] text-white rounded-tr-none' : 'bg-[#1B1B5E] text-gray-200 rounded-tl-none border border-[#00AEEF]/10'}`}>
-                  <p className="text-sm leading-relaxed font-medium">{msg.text}</p>
+                  <p className="text-sm leading-relaxed font-medium whitespace-pre-wrap">{msg.text}</p>
                 </div>
                 <div className="flex items-center mt-2 space-x-2">
-                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{msg.time}</span>
+                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                    {msg.created_at ? new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ""}
+                  </span>
                   {msg.sender === 'admin' && (
-                    <CheckCheck className={`w-3.5 h-3.5 ${msg.read ? 'text-[#00AEEF]' : 'text-gray-500'}`} />
+                    <CheckCheck className={`w-3.5 h-3.5 ${msg.is_read ? 'text-[#00AEEF]' : 'text-gray-500'}`} />
                   )}
                 </div>
               </div>
@@ -147,16 +202,16 @@ export default function AdminChatRoom() {
         <div className="p-6 bg-[#0A0A20] border-t border-[#00AEEF]/10">
           <form onSubmit={handleSend} className="relative flex items-center">
             <input
-              type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your reply to customer..."
-              className="w-full bg-[#1B1B5E]/30 border border-[#00AEEF]/10 rounded-2xl pl-6 pr-14 py-4 text-sm text-white focus:outline-none focus:border-[#00AEEF] transition-all"
+              disabled={!activeSession}
+              placeholder={activeSession ? "Type your response..." : "Select a chat first..."}
+              className="w-full bg-[#1B1B5E]/30 border border-[#00AEEF]/10 rounded-2xl pl-6 pr-16 py-4 text-white focus:outline-none focus:border-[#00AEEF] transition-all placeholder:text-gray-600 disabled:opacity-50"
             />
             <button 
-              type="submit" 
-              disabled={!newMessage.trim()}
-              className="absolute right-3 p-3 bg-[#00AEEF] hover:bg-[#0090c8] disabled:bg-gray-700 text-white rounded-xl transition-all shadow-[0_0_15px_rgba(0,174,239,0.2)]"
+              type="submit"
+              disabled={!activeSession || !newMessage.trim()}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#00AEEF] hover:bg-white hover:text-[#00AEEF] text-white rounded-xl flex items-center justify-center transition-all disabled:opacity-50"
             >
               <Send className="w-5 h-5" />
             </button>

@@ -1,12 +1,39 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Settings, Loader2, ShieldAlert, Key } from "lucide-react";
+import { Settings, Loader2, ShieldAlert, Key, Bell, Shield, Smartphone } from "lucide-react";
+
+const NotificationToggle = ({ id, title, desc, icon, active, onToggle }) => (
+  <div className="flex items-center justify-between p-4 bg-[#F5F5F7] rounded-2xl border border-[#1B1B5E]/5 hover:bg-white hover:border-[#1B1B5E]/10 transition-colors cursor-pointer" onClick={() => onToggle(id)}>
+    <div className="flex items-center gap-4">
+      <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-xl">
+        {icon}
+      </div>
+      <div>
+        <h3 className="font-bold text-[#1B1B5E]">{title}</h3>
+        <p className="text-xs text-[#1B1B5E]/60">{desc}</p>
+      </div>
+    </div>
+    <div className={`w-12 h-6 rounded-full transition-colors relative ${active ? 'bg-[#00AEEF]' : 'bg-gray-300'}`}>
+      <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform ${active ? 'translate-x-6' : ''}`} />
+    </div>
+  </div>
+);
 
 export default function SettingsPage() {
   const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({ password: "", confirmPassword: "" });
+  const [prefs, setPrefs] = useState({ order_updates: true, email_promos: false, sms_alerts: false });
+
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  const togglePref = (id) => {
+    setPrefs(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
@@ -33,6 +60,8 @@ export default function SettingsPage() {
     setSubmitting(false);
   };
 
+  if (loading) return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" /></div>;
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-[#1B1B5E]/5">
@@ -43,6 +72,16 @@ export default function SettingsPage() {
 
         <div className="max-w-xl space-y-8">
           
+          {/* Notification Preferences */}
+          <div className="space-y-4">
+            <h3 className="font-bold text-[#1B1B5E] uppercase tracking-widest text-xs flex items-center gap-2 mb-4">
+              <Bell className="w-4 h-4 text-[#00AEEF]" /> Notifications
+            </h3>
+            <NotificationToggle id="order_updates" title="Order Updates" desc="Get notified when your order status changes." icon="📦" active={prefs.order_updates} onToggle={togglePref} />
+            <NotificationToggle id="email_promos" title="Promotions & Offers" desc="Receive exclusive discounts and flash sale alerts via email." icon="🎉" active={prefs.email_promos} onToggle={togglePref} />
+            <NotificationToggle id="sms_alerts" title="SMS Alerts" desc="Get urgent delivery updates directly to your phone via SMS." icon="📱" active={prefs.sms_alerts} onToggle={togglePref} />
+          </div>
+
           {/* Password Update */}
           <div className="bg-[#F5F5F7] p-6 rounded-2xl border border-[#1B1B5E]/5">
             <h3 className="font-bold text-[#1B1B5E] uppercase tracking-widest text-xs flex items-center gap-2 mb-4">

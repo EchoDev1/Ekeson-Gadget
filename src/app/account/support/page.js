@@ -14,10 +14,6 @@ export default function SupportPage() {
   const [formData, setFormData] = useState({ subject: "", message: "" });
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    fetchTickets();
-  }, []);
-
   const fetchTickets = async () => {
     setLoading(true);
     const { data: { session } } = await supabase.auth.getSession();
@@ -27,6 +23,10 @@ export default function SupportPage() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchTickets();
+  }, []);
 
   const fetchMessages = async (ticketId) => {
     const { data } = await supabase.from('support_ticket_messages').select('*').eq('ticket_id', ticketId).order('created_at', { ascending: true });
@@ -64,6 +64,13 @@ export default function SupportPage() {
       message: formData.message,
       status: 'open'
     }]).select().single();
+
+    if (error) {
+      console.error(error);
+      alert("Error creating ticket: " + error.message);
+      setSubmitting(false);
+      return;
+    }
 
     if (data) {
       // Create first message

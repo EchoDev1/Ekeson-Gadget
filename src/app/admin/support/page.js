@@ -11,10 +11,6 @@ export default function AdminSupport() {
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    fetchTickets();
-  }, []);
-
   async function fetchTickets() {
     setLoading(true);
     // Fetch auth'd support tickets
