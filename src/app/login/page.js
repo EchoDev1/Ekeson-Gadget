@@ -33,12 +33,17 @@ export default function LoginPage() {
 
       if (signInError) throw signInError;
 
-      // Check if user is admin to redirect properly
+      // Check if user is admin and account status
       const { data: profile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, status')
         .eq('id', data.user.id)
         .single();
+
+      if (profile?.status === 'blocked' || profile?.status === 'suspended') {
+        await supabase.auth.signOut();
+        throw new Error("Your account has been restricted. Please contact support.");
+      }
 
       if (profile?.role === 'admin') {
         // Set secure mock token if they are admin (so old admin layout code doesn't break)

@@ -47,7 +47,14 @@ export default function Header() {
       }
       setSession(currentSession);
       try {
-        const { data } = await supabase.from('profiles').select('full_name, role').eq('id', currentSession.user.id).single();
+        const { data } = await supabase.from('profiles').select('full_name, role, status').eq('id', currentSession.user.id).single();
+        
+        if (data?.status === 'blocked' || data?.status === 'suspended') {
+          await supabase.auth.signOut();
+          window.location.href = '/login';
+          return;
+        }
+        
         setProfile(data);
         setIsAdmin(data?.role === 'admin');
       } catch(err) {}
