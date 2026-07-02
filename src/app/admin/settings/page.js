@@ -270,13 +270,15 @@ export default function AdminSettings() {
                 </p>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <span className="text-[#1B1B5E]/40 font-medium">₦</span>
+                    <span className="text-[#1B1B5E]/40 font-bold">₦</span>
                   </div>
                   <input 
                     type="number" 
                     name="usdt_rate"
+                    value={settings.usdt_rate || ""}
                     onChange={handleChange}
-                    placeholder="1392.00"
+                    className="w-full pl-10 pr-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors font-bold text-[#1B1B5E]"
+                    placeholder="e.g. 1389"
                   />
                 </div>
               </div>
