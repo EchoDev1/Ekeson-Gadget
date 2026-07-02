@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { ArrowLeft, Mail, Lock, User, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
+  const turnstileRef = useRef(null);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -33,6 +34,8 @@ export default function RegisterPage() {
 
     if (authError) {
       setError(authError.message);
+      if (turnstileRef.current) turnstileRef.current.reset();
+      setCaptchaToken(null);
     } else {
       // Handle success (e.g., redirect or show check email msg)
       alert("Registration successful! Please check your email for verification.");
@@ -131,6 +134,7 @@ export default function RegisterPage() {
             {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
               <div className="flex justify-center py-2">
                 <Turnstile 
+                  ref={turnstileRef}
                   siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} 
                   onSuccess={(token) => setCaptchaToken(token)}
                 />

@@ -2,8 +2,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Mail, Lock, ArrowRight, CheckCircle2, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/lib/supabase";
+import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,9 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const turnstileRef = useRef(null);
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -20,9 +24,14 @@ export default function Login() {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
+      options: {
+        captchaToken,
+      }
     });
     if (error) {
       setError(error.message);
+      if (turnstileRef.current) turnstileRef.current.reset();
+      setCaptchaToken(null);
     } else {
       window.location.href = '/dashboard';
     }
@@ -118,10 +127,20 @@ export default function Login() {
             </div>
           </div>
 
+          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+            <div className="flex justify-center py-2">
+              <Turnstile 
+                ref={turnstileRef}
+                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} 
+                onSuccess={(token) => setCaptchaToken(token)}
+              />
+            </div>
+          )}
+
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken)}
               className="w-full flex items-center justify-center gap-3 py-4 px-8 border border-transparent rounded-2xl shadow-xl text-xs font-black uppercase tracking-[0.2em] text-white bg-[#1B1B5E] hover:bg-[#00AEEF] hover:shadow-[#00AEEF]/20 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50"
             >
               {loading ? "Signing in..." : "Access Portal"}

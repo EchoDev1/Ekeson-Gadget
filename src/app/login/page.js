@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
+  const turnstileRef = useRef(null);
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -55,6 +56,8 @@ export default function LoginPage() {
       }
     } catch (err) {
       setError(err.message || "Failed to sign in. Please check your credentials.");
+      if (turnstileRef.current) turnstileRef.current.reset();
+      setCaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -124,6 +127,7 @@ export default function LoginPage() {
           {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
             <div className="flex justify-center py-2">
               <Turnstile 
+                ref={turnstileRef}
                 siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} 
                 onSuccess={(token) => setCaptchaToken(token)}
               />
