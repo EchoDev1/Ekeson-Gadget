@@ -463,6 +463,46 @@ export default function Checkout() {
                   </div>
                 </div>
               )}
+
+              {formData.paymentMethod === 'bank_transfer' && (
+                <div className="bg-[#2D3748] text-white p-6 rounded-2xl space-y-4 mt-6">
+                  <h3 className="font-black uppercase tracking-widest text-sm text-white/60">Bank Transfer Details</h3>
+                  <div className="p-4 bg-white/10 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed border border-white/10">
+                    {settings?.bank_transfer_details || "Bank transfer details are currently being updated. Please contact support."}
+                  </div>
+                  <div className="flex items-start gap-3 p-4 bg-white/5 rounded-xl text-sm">
+                    <Info className="w-5 h-5 text-white/60 shrink-0 mt-0.5" />
+                    <p className="text-white/80 font-medium">Please transfer exactly ₦{totalNgn.toLocaleString()} to the account above, then click &quot;I Have Made Payment&quot;.</p>
+                  </div>
+                </div>
+              )}
+
+              {formData.paymentMethod === 'opay' && (
+                <div className="bg-[#1DCB96] text-white p-6 rounded-2xl space-y-4 mt-6">
+                  <h3 className="font-black uppercase tracking-widest text-sm text-white/80">OPay Details</h3>
+                  <div className="p-4 bg-black/10 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed font-bold">
+                    {settings?.opay_merchant_id || "OPay Merchant ID will be provided soon."}
+                  </div>
+                  <p className="text-white/90 font-medium text-sm">Transfer ₦{totalNgn.toLocaleString()} using OPay, then click &quot;I Have Made Payment&quot;.</p>
+                </div>
+              )}
+
+              {formData.paymentMethod === 'palmpay' && (
+                <div className="bg-[#6F42C1] text-white p-6 rounded-2xl space-y-4 mt-6">
+                  <h3 className="font-black uppercase tracking-widest text-sm text-white/80">PalmPay Details</h3>
+                  <div className="p-4 bg-black/10 rounded-xl whitespace-pre-wrap font-mono text-sm leading-relaxed font-bold">
+                    {settings?.palmpay_merchant_id || "PalmPay Merchant ID will be provided soon."}
+                  </div>
+                  <p className="text-white/90 font-medium text-sm">Transfer ₦{totalNgn.toLocaleString()} using PalmPay, then click &quot;I Have Made Payment&quot;.</p>
+                </div>
+              )}
+
+              {['paystack', 'flutterwave', 'monnify'].includes(formData.paymentMethod) && (
+                <div className="p-4 bg-[#F5F5F7] rounded-xl border border-[#1B1B5E]/10 mt-6 flex items-start gap-3">
+                  <Info className="w-5 h-5 text-[#1B1B5E] shrink-0 mt-0.5" />
+                  <p className="text-[#1B1B5E] text-sm font-medium">You will be redirected to a secure payment gateway to complete your payment of ₦{totalNgn.toLocaleString()} safely.</p>
+                </div>
+              )}
             </div>
           </form>
         </div>
