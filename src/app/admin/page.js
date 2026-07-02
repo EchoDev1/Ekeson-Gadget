@@ -18,8 +18,10 @@ export default function AdminDashboard() {
     categoryData: []
   });
   const [dbStatus, setDbStatus] = useState("checking"); // 'checking', 'connected', 'error'
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // In a real scenario with proper RLS and populated database, we fetch counts:
     const fetchStats = async () => {
       try {
@@ -145,15 +147,17 @@ export default function AdminDashboard() {
         <div className="bg-white p-8 rounded-3xl border border-[#1B1B5E]/5 shadow-sm space-y-6">
           <h3 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider">Revenue Overview</h3>
           <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={stats.revenueData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} tickFormatter={(val) => `₦${(val/1000)}k`} />
-                <RechartsTooltip cursor={{ stroke: '#E5E7EB', strokeWidth: 2 }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Line type="monotone" dataKey="revenue" stroke="#00AEEF" strokeWidth={3} dot={{ r: 4, fill: '#00AEEF', strokeWidth: 0 }} activeDot={{ r: 6 }} />
-              </LineChart>
-            </ResponsiveContainer>
+            {mounted && (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={stats.revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} tickFormatter={(val) => `₦${(val/1000)}k`} />
+                  <RechartsTooltip cursor={{ stroke: '#E5E7EB', strokeWidth: 2 }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                  <Line type="monotone" dataKey="revenue" stroke="#00AEEF" strokeWidth={3} dot={{ r: 4, fill: '#00AEEF', strokeWidth: 0 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
@@ -162,15 +166,17 @@ export default function AdminDashboard() {
       <div className="bg-white p-8 rounded-3xl border border-[#1B1B5E]/5 shadow-sm space-y-6">
         <h3 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider">Top Selling Categories</h3>
         <div className="h-64 w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={stats.categoryData} layout="vertical" margin={{ left: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
-              <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} />
-              <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#1B1B5E', fontWeight: 'bold' }} width={100} />
-              <RechartsTooltip cursor={{ fill: '#F5F5F7' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-              <Bar dataKey="sales" fill="#1B1B5E" radius={[0, 4, 4, 0]} barSize={24} />
-            </BarChart>
-          </ResponsiveContainer>
+          {mounted && (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={stats.categoryData} layout="vertical" margin={{ left: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
+                <XAxis type="number" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} />
+                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#1B1B5E', fontWeight: 'bold' }} width={100} />
+                <RechartsTooltip cursor={{ fill: '#F5F5F7' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                <Bar dataKey="sales" fill="#1B1B5E" radius={[0, 4, 4, 0]} barSize={24} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </div>

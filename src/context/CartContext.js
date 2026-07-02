@@ -11,8 +11,17 @@ export function CartProvider({ children }) {
     const saved = localStorage.getItem('ekeson_cart');
     if (saved) {
       try {
-        setCart(JSON.parse(saved));
-      } catch (e) {}
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setCart(parsed);
+        } else {
+          setCart([]);
+          localStorage.removeItem('ekeson_cart');
+        }
+      } catch (e) {
+        setCart([]);
+        localStorage.removeItem('ekeson_cart');
+      }
     }
     setIsLoaded(true);
   }, []);
@@ -51,8 +60,9 @@ export function CartProvider({ children }) {
 
   const clearCart = () => setCart([]);
 
-  const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+  const cartArray = Array.isArray(cart) ? cart : [];
+  const cartTotal = cartArray.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const cartCount = cartArray.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <CartContext.Provider
