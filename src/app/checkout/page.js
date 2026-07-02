@@ -447,6 +447,7 @@ export default function Checkout() {
                   <div className="space-y-1">
                     <p className="text-white/60 text-xs font-bold uppercase tracking-widest">Amount to Send</p>
                     <div className="text-4xl font-black tracking-tighter">{totalUsdt.toFixed(2)} <span className="text-xl text-[#00AEEF]">USDT</span></div>
+                    <p className="text-white/40 text-xs mt-2 font-bold">Current Rate: 1 USDT = ₦{usdtRate?.toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
                   </div>
                   <div className="p-4 bg-white/10 rounded-xl flex flex-col gap-2">
                     <div className="flex justify-between font-bold text-sm">
@@ -579,7 +580,7 @@ export default function Checkout() {
               {appliedPromo && (
                 <div className="flex justify-between text-sm font-black text-green-500">
                   <span>Discount ({appliedPromo.code})</span>
-                  <span>-₦{discountAmount.toLocaleString()}</span>
+                  <span>₦{discountAmount.toLocaleString()}</span>
                 </div>
               )}
               <div className="flex justify-between items-center text-xl font-black text-[#1B1B5E] pt-3">
