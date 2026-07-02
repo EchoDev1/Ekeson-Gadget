@@ -40,9 +40,10 @@ export default function SignupPage() {
       if (signUpError) throw signUpError;
       
       setSuccess(true);
-      setTimeout(() => {
-        router.push('/');
-      }, 2000);
+      setFullName('');
+      setEmail('');
+      setPassword('');
+      // We no longer redirect automatically so they can read the message
     } catch (err) {
       setError(err.message || "Failed to create account. Please try again.");
     } finally {
@@ -70,9 +71,12 @@ export default function SignupPage() {
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 text-green-600 rounded-2xl flex items-start gap-3 text-sm font-medium">
-            <CheckCircle2 className="w-5 h-5 shrink-0" />
-            <p>Account created successfully! Redirecting...</p>
+          <div className="mb-6 p-4 bg-green-50 border border-green-100 text-green-700 rounded-2xl flex items-start gap-3 text-sm font-medium">
+            <CheckCircle2 className="w-6 h-6 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold text-base mb-1">Account Created Successfully!</p>
+              <p>Please check your email inbox (and spam folder) for a confirmation link to activate your account.</p>
+            </div>
           </div>
         )}
 
