@@ -14,7 +14,8 @@ import {
   HelpCircle,
   LogOut,
   Loader2,
-  ChevronRight
+  ChevronRight,
+  Ticket
 } from "lucide-react";
 
 export default function AdminLayout({ children }) {
@@ -91,6 +92,7 @@ export default function AdminLayout({ children }) {
     { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
     { name: "Customers", href: "/admin/customers", icon: Users },
     { name: "Live Chat", href: "/admin/chat", icon: MessageSquare },
+    { name: "Coupons", href: "/admin/coupons", icon: Ticket },
     { name: "Support Inbox", href: "/admin/support", icon: HelpCircle },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];

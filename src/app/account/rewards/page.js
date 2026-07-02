@@ -8,11 +8,7 @@ export default function RewardsPage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState("");
 
-  const systemCoupons = [
-    { code: "WELCOME10", desc: "10% off your first order", minSpend: 0 },
-    { code: "FREESHIP", desc: "Free shipping on orders above ₦500,000", minSpend: 500000 },
-    { code: "TECHFEST", desc: "5% off all Gadgets and Accessories", minSpend: 0 },
-  ];
+  const [coupons, setCoupons] = useState([]);
 
   useEffect(() => {
     const fetchRewards = async () => {
@@ -23,6 +19,10 @@ export default function RewardsPage() {
           setPoints(data.reward_points || 0);
         }
       }
+      
+      const { data: couponsData } = await supabase.from('coupons').select('*').eq('is_active', true).order('created_at', { ascending: false });
+      if (couponsData) setCoupons(couponsData);
+      
       setLoading(false);
     };
     fetchRewards();
@@ -65,21 +65,28 @@ export default function RewardsPage() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {systemCoupons.map((coupon, idx) => (
-            <div key={idx} className="bg-[#F5F5F7] rounded-2xl p-6 border-2 border-dashed border-[#1B1B5E]/10 flex flex-col sm:flex-row items-center gap-4 hover:border-[#00AEEF]/30 transition-colors">
+          {coupons.map((coupon) => (
+            <div key={coupon.id} className="bg-[#F5F5F7] rounded-2xl p-6 border-2 border-dashed border-[#1B1B5E]/10 flex flex-col sm:flex-row items-center gap-4 hover:border-[#00AEEF]/30 transition-colors">
               <div className="flex-1 text-center sm:text-left w-full">
-                <p className="font-black text-[#1B1B5E] text-lg">{coupon.desc}</p>
-                {coupon.minSpend > 0 && <p className="text-xs font-bold text-[#1B1B5E]/50 uppercase tracking-widest mt-1">Min. spend ₦{coupon.minSpend.toLocaleString()}</p>}
+                <p className="font-black text-[#1B1B5E] text-lg">
+                  {coupon.discount_type === 'percentage' ? `${coupon.discount_value}% OFF` : `₦${coupon.discount_value.toLocaleString()} OFF`}
+                </p>
+                {coupon.min_spend > 0 && <p className="text-xs font-bold text-[#1B1B5E]/50 uppercase tracking-widest mt-1">Min. spend ₦{coupon.min_spend.toLocaleString()}</p>}
               </div>
               <button 
                 onClick={() => copyCode(coupon.code)}
-                className="w-full sm:w-auto bg-white border border-[#1B1B5E]/10 rounded-xl px-4 py-3 flex items-center justify-center gap-2 hover:bg-[#1B1B5E] hover:text-white transition-colors group"
+                className="w-full sm:w-auto bg-white border border-[#1B1B5E]/10 rounded-xl px-4 py-3 flex items-center justify-center gap-2 hover:bg-[#1B1B5E] hover:text-white transition-colors group shadow-sm"
               >
                 <span className="font-mono font-bold tracking-widest">{coupon.code}</span>
                 {copied === coupon.code ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4 text-[#1B1B5E]/40 group-hover:text-white" />}
               </button>
             </div>
           ))}
+          {coupons.length === 0 && (
+            <div className="col-span-full p-8 text-center bg-[#F5F5F7] rounded-2xl border border-[#1B1B5E]/5">
+               <p className="text-[#1B1B5E]/40 font-bold uppercase tracking-widest text-sm">No active coupons right now</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
