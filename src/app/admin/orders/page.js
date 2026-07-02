@@ -11,15 +11,17 @@ export default function AdminOrders() {
   useEffect(() => {
     fetchOrders();
 
-    // Subscribe to new orders
+    // Subscribe to new orders and changes
     const subscription = supabase
       .channel('public:orders')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, payload => {
         setOrders(prev => [payload.new, ...prev]);
-        // Simple browser alert for new order
-        if (typeof window !== "undefined") {
+        if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
           new Notification("New Order Received!", { body: `Order ID: ${payload.new.id}` });
         }
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, payload => {
+         fetchOrders();
       })
       .subscribe();
 
@@ -38,27 +40,7 @@ export default function AdminOrders() {
       console.warn("Failed to fetch orders natively:", err);
     }
     setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchOrders();
-
-    // Subscribe to new orders
-    const subscription = supabase
-      .channel("public:orders")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        (payload) => {
-          fetchOrders(); // Refresh orders on change
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(subscription);
-    };
-  }, []);
+  }
 
   const updateOrderStatus = async (id, status) => {
     try {
