@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Logo } from '@/components/ui/BrandIdentity';
 import { Loader2, Mail, Lock, User, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function SignupPage() {
   const [fullName, setFullName] = useState('');
@@ -15,6 +16,7 @@ export default function SignupPage() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
   const router = useRouter();
 
   const handleSignup = async (e) => {
@@ -29,7 +31,9 @@ export default function SignupPage() {
         options: {
           data: {
             full_name: fullName,
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+          captchaToken,
         }
       });
 
@@ -132,9 +136,18 @@ export default function SignupPage() {
             </div>
           </div>
 
+          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+            <div className="flex justify-center py-2">
+              <Turnstile 
+                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} 
+                onSuccess={(token) => setCaptchaToken(token)}
+              />
+            </div>
+          )}
+
           <button 
             type="submit" 
-            disabled={loading || success}
+            disabled={loading || success || (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken)}
             className="w-full bg-[#1B1B5E] hover:bg-[#00AEEF] text-white py-4 rounded-xl font-bold tracking-wide transition-all duration-300 flex items-center justify-center mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}

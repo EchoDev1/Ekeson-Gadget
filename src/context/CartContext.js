@@ -4,16 +4,16 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [cart, setCart] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ekeson_cart');
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
+  const [cart, setCart] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    const saved = localStorage.getItem('ekeson_cart');
+    if (saved) {
+      try {
+        setCart(JSON.parse(saved));
+      } catch (e) {}
+    }
     setIsLoaded(true);
   }, []);
 

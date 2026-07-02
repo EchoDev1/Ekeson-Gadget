@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Logo } from '@/components/ui/BrandIdentity';
 import { Loader2, Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -24,6 +26,9 @@ export default function LoginPage() {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: {
+          captchaToken,
+        }
       });
 
       if (signInError) throw signInError;
@@ -111,9 +116,18 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+            <div className="flex justify-center py-2">
+              <Turnstile 
+                siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} 
+                onSuccess={(token) => setCaptchaToken(token)}
+              />
+            </div>
+          )}
+
           <button 
             type="submit" 
-            disabled={loading}
+            disabled={loading || (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken)}
             className="w-full bg-[#1B1B5E] hover:bg-[#00AEEF] text-white py-4 rounded-xl font-bold tracking-wide transition-all duration-300 flex items-center justify-center mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
