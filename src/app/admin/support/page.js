@@ -38,6 +38,10 @@ export default function AdminSupport() {
   };
 
   useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  useEffect(() => {
     if (activeTicket?.isAuth) {
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       const channelName = `admin_support_messages_${activeTicket.id}_${Date.now()}`;
