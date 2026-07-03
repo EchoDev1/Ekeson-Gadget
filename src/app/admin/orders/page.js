@@ -7,6 +7,11 @@ import { ShoppingCart, Loader2, Search, CheckCircle, Clock, XCircle, ChevronRigh
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Modal State
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderItems, setOrderItems] = useState([]);
+  const [loadingItems, setLoadingItems] = useState(false);
 
   async function fetchOrders() {
     setLoading(true);
@@ -76,6 +81,22 @@ export default function AdminOrders() {
     } catch (err) {
       console.warn("Failed to update payment status via API:", err);
     }
+  };
+
+  const viewOrderDetails = async (order) => {
+    setSelectedOrder(order);
+    setLoadingItems(true);
+    try {
+      const { data, error } = await supabase
+        .from('order_items')
+        .select('*, products(name, image_url)')
+        .eq('order_id', order.id);
+      
+      if (data) setOrderItems(data);
+    } catch (err) {
+      console.error("Failed to fetch order items:", err);
+    }
+    setLoadingItems(false);
   };
 
   // Removed blocking loader for superfast rendering
@@ -164,7 +185,7 @@ export default function AdminOrders() {
                     </select>
                   </td>
                   <td className="p-4 pr-6 text-right">
-                    <button className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
+                    <button onClick={() => viewOrderDetails(order)} className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors">
                       <ChevronRight className="w-5 h-5" />
                     </button>
                   </td>
@@ -174,6 +195,55 @@ export default function AdminOrders() {
           </tbody>
         </table>
       </div>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1B1B5E]/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="bg-white rounded-3xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative animate-in zoom-in-95 duration-300">
+            <button onClick={() => setSelectedOrder(null)} className="absolute top-6 right-6 text-[#1B1B5E]/40 hover:text-red-500 transition-colors">
+              <XCircle className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-2xl font-black text-[#1B1B5E] uppercase tracking-tighter mb-2 flex items-center gap-3">
+              <ShoppingCart className="w-6 h-6 text-[#00AEEF]" />
+              Order Items
+            </h2>
+            <p className="text-[#1B1B5E]/60 text-xs font-bold uppercase tracking-widest mb-6">
+              Order ID: <span className="text-[#1B1B5E]">{selectedOrder.id.split('-')[0]}</span>
+            </p>
+
+            {loadingItems ? (
+              <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" /></div>
+            ) : orderItems.length === 0 ? (
+              <div className="text-center p-8 text-[#1B1B5E]/40 font-bold uppercase text-sm">No items found for this order.</div>
+            ) : (
+              <div className="space-y-4">
+                {orderItems.map(item => (
+                  <div key={item.id} className="flex gap-4 p-4 bg-[#F5F5F7] rounded-2xl border border-[#1B1B5E]/5">
+                    <div className="w-16 h-16 bg-white rounded-xl border border-[#1B1B5E]/5 flex items-center justify-center overflow-hidden shrink-0">
+                      {item.products?.image_url ? (
+                        <img src={item.products.image_url} alt={item.products.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-xs text-gray-400 font-bold">Img</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-[#1B1B5E] text-sm truncate">{item.products?.name || 'Unknown Product'}</h4>
+                      <p className="text-[#1B1B5E]/60 text-xs font-bold uppercase tracking-widest mt-1">Qty: {item.quantity}</p>
+                      <p className="text-[#00AEEF] font-black text-sm mt-1">₦{item.unit_price?.toLocaleString() || 0}</p>
+                    </div>
+                  </div>
+                ))}
+                
+                <div className="pt-6 mt-6 border-t border-[#1B1B5E]/10 flex justify-between items-center">
+                  <span className="font-bold text-[#1B1B5E]/60 uppercase tracking-widest text-sm">Total Amount</span>
+                  <span className="font-black text-2xl text-[#1B1B5E]">₦{selectedOrder.total_amount?.toLocaleString() || 0}</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
