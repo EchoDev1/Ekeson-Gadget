@@ -228,6 +228,14 @@ export default function Header() {
               >
                 <Search className="w-5 h-5" />
               </button>
+              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors relative">
+                <ShoppingCart className="w-5 h-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#00AEEF] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-black animate-in fade-in zoom-in duration-300">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="text-[#1B1B5E] hover:opacity-70 focus:outline-none"

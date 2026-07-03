@@ -7,13 +7,13 @@ import { supabase } from "@/lib/supabase";
 
 const categoryPortals = [
   { id: "phones", title: "Phones", description: "Discover our curated collection of phones. From the latest releases to certified pre-owned excellence.", image: "/images/luxury_phones_black.png", link: "/category/phones" },
-  { id: "laptops", title: "Laptops", description: "Discover our curated collection of laptops. From the latest releases to certified pre-owned excellence.", image: "/images/luxury_laptop.png", link: "/category/laptops" },
-  { id: "pads", title: "iPads", description: "Discover our curated collection of ipads. From the latest releases to certified pre-owned excellence.", image: "/images/luxury_ipad.png", link: "/category/pads" },
-  { id: "smart_watches", title: "Smart Watches", description: "Discover our curated collection of smart watches. From the latest releases to certified pre-owned excellence.", image: "/images/luxury_watch.png", link: "/category/smart_watches" },
-  { id: "earbuds", title: "Earbuds", description: "Discover our curated collection of earbuds. From the latest releases to certified pre-owned excellence.", image: "/images/luxury_earbuds.jpg", link: "/category/earbuds" },
-  { id: "accessories", title: "Accessories", description: "Discover our curated collection of accessories. From the latest releases to certified pre-owned excellence.", image: "/images/home_accessories.png", link: "/category/accessories" },
-  { id: "playstation", title: "Sony PlayStation", description: "Discover our curated collection of Sony PlayStation consoles. From the latest releases to certified pre-owned excellence.", image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80", link: "/category/playstation" },
-  { id: "drones", title: "Drones", description: "Discover our curated collection of drones. From DJI to premium aerial vehicles.", image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&q=80", link: "/category/drones" }
+  { id: "laptops", title: "Laptops", description: "Unleash ultimate power and sophistication. Explore our elite selection of ultra-premium laptops built for visionaries, creators, and professionals who demand nothing but the best.", image: "/images/luxury_laptop.png", link: "/category/laptops" },
+  { id: "pads", title: "iPads", description: "Experience a canvas of infinite possibilities. Discover iPads that blend breathtaking performance with sleek elegance, redefining how you work, play, and create on the go.", image: "/images/luxury_ipad.png", link: "/category/pads" },
+  { id: "smart_watches", title: "Smart Watches", description: "Timekeeping elevated to an art form. Wrap your wrist in cutting-edge luxury with smartwatches that seamlessly fuse health tracking, connectivity, and timeless design.", image: "/images/luxury_watch.png", link: "/category/smart_watches" },
+  { id: "earbuds", title: "Earbuds", description: "Immerse yourself in acoustic perfection. From noise-canceling mastery to crystal-clear highs, our premium earbuds deliver an unparalleled, studio-grade listening experience.", image: "/images/luxury_earbuds.jpg", link: "/category/earbuds" },
+  { id: "accessories", title: "Accessories", description: "The ultimate finishing touch for your tech arsenal. Elevate your gadgets with our exclusive range of premium, high-performance accessories designed for the modern elite.", image: "/images/home_accessories.png", link: "/category/accessories" },
+  { id: "playstation", title: "Sony PlayStation", description: "Step into the next generation of entertainment. Dominate your reality with industry-leading PlayStation consoles that deliver mind-blowing graphics and heart-pounding gameplay.", image: "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80", link: "/category/playstation" },
+  { id: "drones", title: "Drones", description: "Conquer the skies and capture the extraordinary. Engineer jaw-dropping cinematic masterpieces with our cutting-edge, high-precision aerial drones.", image: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=800&q=80", link: "/category/drones" }
 ];
 
 const brandPortals = [

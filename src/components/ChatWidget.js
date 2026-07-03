@@ -11,6 +11,8 @@ export default function ChatWidget() {
   const [newMessage, setNewMessage] = useState("");
   const [sessionId, setSessionId] = useState("");
   const [liveScript, setLiveScript] = useState("");
+  const [unreadAdmin, setUnreadAdmin] = useState(0);
+  const [toastMsg, setToastMsg] = useState(null);
   const messagesEndRef = useRef(null);
   const pathname = usePathname();
 
@@ -49,7 +51,9 @@ export default function ChatWidget() {
         if (payload.new.session_id === sid) {
           setMessages(prev => [...prev, payload.new]);
           if (payload.new.sender === 'admin' && !isOpen) {
-            // Optional: Show notification if chat is closed
+            setUnreadAdmin(prev => prev + 1);
+            setToastMsg("New message from Support!");
+            setTimeout(() => setToastMsg(null), 4000);
             if (typeof window !== "undefined" && Notification.permission === "granted") {
               new Notification("New message from Support", { body: payload.new.text });
             }
@@ -167,12 +171,28 @@ export default function ChatWidget() {
       {/* Toggle Button */}
       {!isOpen && (
         <button 
-          onClick={() => setIsOpen(true)}
+          onClick={() => { setIsOpen(true); setUnreadAdmin(0); }}
           className="w-16 h-16 bg-[#1B1B5E] hover:bg-[#00AEEF] text-white rounded-full flex items-center justify-center shadow-2xl shadow-[#1B1B5E]/30 hover:scale-110 transition-all duration-300 relative group"
         >
           <MessageSquare className="w-7 h-7" />
-          <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-red-500 border-2 border-white animate-pulse"></span>
+          {unreadAdmin > 0 ? (
+            <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-green-500 border-2 border-white flex items-center justify-center text-[10px] font-black animate-pulse">
+              {unreadAdmin}
+            </span>
+          ) : (
+            <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-green-500 border-2 border-white"></span>
+          )}
         </button>
+      )}
+
+      {/* Green Popup Toast */}
+      {!isOpen && toastMsg && (
+        <div className="fixed bottom-28 right-6 bg-green-500 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+            <MessageSquare className="w-4 h-4" />
+          </div>
+          <div className="text-sm font-bold">{toastMsg}</div>
+        </div>
       )}
     </div>
   );

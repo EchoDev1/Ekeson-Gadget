@@ -33,12 +33,14 @@ export function CartProvider({ children }) {
     }
   }, [cart, isLoaded]);
 
-  const addToCart = (product, quantityToAdd = 1) => {
+  const addToCart = (product, quantityToAdd = 1, replace = false) => {
     setCart((prev) => {
       const existingItem = prev.find((item) => item.id === product.id);
       if (existingItem) {
         return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantityToAdd } : item
+          item.id === product.id 
+            ? { ...item, quantity: replace ? quantityToAdd : item.quantity + quantityToAdd } 
+            : item
         );
       }
       return [...prev, { ...product, quantity: quantityToAdd }];

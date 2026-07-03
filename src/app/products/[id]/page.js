@@ -103,12 +103,12 @@ export default function ProductDetail({ params }) {
 
   const handleAddToCart = () => {
     if (!product) return;
-    addToCart(product, quantity);
+    addToCart(product, quantity, true); // replace quantity exactly
   };
 
   const handleBuyNow = () => {
     if (!product) return;
-    addToCart(product, quantity);
+    addToCart(product, quantity, true); // replace quantity exactly
     router.push("/checkout");
   };
 

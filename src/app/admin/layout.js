@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Ticket
 } from "lucide-react";
+import AdminNotifications from "@/components/admin/AdminNotifications";
 
 export default function AdminLayout({ children }) {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -161,6 +162,7 @@ export default function AdminLayout({ children }) {
 
         {/* Page Content */}
         <div className="flex-1 p-8">
+          <AdminNotifications />
           {children}
         </div>
       </main>

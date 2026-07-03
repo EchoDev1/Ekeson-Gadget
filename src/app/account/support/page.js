@@ -12,6 +12,7 @@ export default function SupportPage() {
   const [newMessage, setNewMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({ subject: "", message: "" });
+  const [toastMsg, setToastMsg] = useState(null);
   const messagesEndRef = useRef(null);
 
   const fetchTickets = async () => {
@@ -27,6 +28,27 @@ export default function SupportPage() {
   useEffect(() => {
     fetchTickets();
   }, []);
+
+  // Global subscription for all tickets
+  useEffect(() => {
+    if (tickets.length === 0) return;
+    const ticketIds = tickets.map(t => t.id);
+    const subscription = supabase
+      .channel(`support_global_${Date.now()}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_ticket_messages' }, payload => {
+        if (ticketIds.includes(payload.new.ticket_id) && payload.new.sender_type === 'admin') {
+          // If the message is for the active ticket, the other subscription handles appending it.
+          // We just show a toast notification if the sender is admin.
+          setToastMsg(`New reply on ticket #${payload.new.ticket_id.substring(0,8)}`);
+          setTimeout(() => setToastMsg(null), 5000);
+          if (typeof window !== "undefined" && Notification.permission === "granted") {
+            new Notification("New Support Reply", { body: payload.new.message });
+          }
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(subscription); };
+  }, [tickets]);
 
   const fetchMessages = async (ticketId) => {
     const { data } = await supabase.from('support_ticket_messages').select('*').eq('ticket_id', ticketId).order('created_at', { ascending: true });
@@ -234,6 +256,16 @@ export default function SupportPage() {
           </div>
         )}
       </div>
+
+      {/* Green Popup Toast */}
+      {toastMsg && (
+        <div className="fixed bottom-10 right-10 bg-green-500 text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
+          <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+            <HeadphonesIcon className="w-5 h-5" />
+          </div>
+          <div className="text-base font-bold">{toastMsg}</div>
+        </div>
+      )}
     </div>
   );
 }

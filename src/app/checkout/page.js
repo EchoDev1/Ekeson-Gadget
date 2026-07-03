@@ -184,12 +184,13 @@ export default function Checkout() {
       amount: totalNgn * 100, // Kobo
       currency: "NGN",
       ref: order.id, // Use our Order ID as reference!
-      callback: async function(response) {
+      callback: function(response) {
         // Optimistically update to paid
-        await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id);
-        clearCart();
-        setSuccess(true);
-        window.scrollTo(0, 0);
+        supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
+          clearCart();
+          setSuccess(true);
+          window.scrollTo(0, 0);
+        });
       },
       onClose: function() {
         alert('Payment window closed. You can complete this payment later from your account.');
@@ -218,11 +219,12 @@ export default function Checkout() {
         description: "Payment for Order " + order.id.substring(0,8),
         logo: "https://ekesontech.com/logo.png",
       },
-      callback: async function(data) {
-        await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id);
-        clearCart();
-        setSuccess(true);
-        window.scrollTo(0, 0);
+      callback: function(data) {
+        supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
+          clearCart();
+          setSuccess(true);
+          window.scrollTo(0, 0);
+        });
       },
       onclose: function() {
         alert('Payment window closed. You can complete this payment later from your account.');
@@ -243,11 +245,12 @@ export default function Checkout() {
       apiKey: settings.monnify_api_key,
       contractCode: settings.monnify_contract_code,
       paymentDescription: "Payment for Order " + order.id.substring(0,8),
-      onComplete: async function(response) {
-        await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id);
-        clearCart();
-        setSuccess(true);
-        window.scrollTo(0, 0);
+      onComplete: function(response) {
+        supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
+          clearCart();
+          setSuccess(true);
+          window.scrollTo(0, 0);
+        });
       },
       onClose: function(data) {
         alert('Payment window closed. You can complete this payment later from your account.');
@@ -316,8 +319,14 @@ export default function Checkout() {
           <h1 className="text-4xl font-black text-[#1B1B5E] uppercase tracking-tighter">Congratulations!</h1>
           <div className="space-y-2">
             <p className="text-[#1B1B5E]/70 font-bold">Your order has been placed successfully.</p>
-            {['crypto', 'bank_transfer', 'opay', 'palmpay'].includes(formData.paymentMethod) && (
+            {['crypto', 'opay', 'palmpay'].includes(formData.paymentMethod) && (
               <p className="text-sm text-[#1B1B5E]/50">Please complete the transfer to the provided details. Our team will verify your payment and process your shipping shortly.</p>
+            )}
+            {formData.paymentMethod === 'bank_transfer' && (
+              <p className="text-sm font-bold text-orange-600 bg-orange-50 p-4 rounded-xl border border-orange-100">
+                Order Placed. Waiting for Payment Verification...<br/>
+                <span className="text-[#1B1B5E]/60 text-xs mt-2 block font-medium">Please note that manual bank transfers require admin verification. You will receive an email once your payment is confirmed.</span>
+              </p>
             )}
           </div>
           <Link href="/account/orders" className="inline-block mt-8 bg-[#1B1B5E] text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-sm hover:bg-[#00AEEF] transition-all shadow-lg hover:-translate-y-1">
@@ -330,9 +339,9 @@ export default function Checkout() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pb-32">
-      <Script src="https://js.paystack.co/v1/inline.js" strategy="lazyOnload" />
-      <Script src="https://checkout.flutterwave.com/v3.js" strategy="lazyOnload" />
-      <Script src="https://sdk.monnify.com/plugin/monnify.js" strategy="lazyOnload" />
+      <Script src="https://js.paystack.co/v1/inline.js" strategy="afterInteractive" />
+      <Script src="https://checkout.flutterwave.com/v3.js" strategy="afterInteractive" />
+      <Script src="https://sdk.monnify.com/plugin/monnify.js" strategy="afterInteractive" />
 
       <Link href="/cart" className="flex items-center gap-2 text-[#1B1B5E]/60 hover:text-[#00AEEF] transition-colors mb-8 font-bold text-sm w-max">
         <ArrowLeft className="w-4 h-4" /> Back to Cart

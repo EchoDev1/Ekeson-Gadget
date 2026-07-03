@@ -16,6 +16,23 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
     }
 
+    // Validate products exist in database to prevent foreign key constraint errors
+    const productIds = cart.map(item => item.id);
+    const { data: validProducts, error: pError } = await supabase.from('products').select('id').in('id', productIds);
+    
+    if (pError) {
+      return NextResponse.json({ error: 'Failed to validate products' }, { status: 500 });
+    }
+
+    const validProductIds = validProducts.map(p => p.id);
+    const invalidItems = cart.filter(item => !validProductIds.includes(item.id));
+    
+    if (invalidItems.length > 0) {
+      return NextResponse.json({ 
+        error: 'Some items in your cart are no longer available. Please clear your cart and try again.' 
+      }, { status: 400 });
+    }
+
     // 1. Insert Order
     // Note: contact_email is omitted because it doesn't exist in the database schema.
     const { data: order, error: orderError } = await supabase.from('orders').insert([{
