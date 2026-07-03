@@ -40,7 +40,7 @@ export async function POST(request) {
       total_amount: totalNgn,
       status: 'processing',
       payment_status: 'pending',
-      shipping_address: formData.address,
+      shipping_address: `${formData.address} | Method: ${formData.paymentMethod}`,
       contact_phone: formData.phone,
     }]).select().single();
 

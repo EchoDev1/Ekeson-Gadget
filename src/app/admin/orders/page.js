@@ -61,6 +61,23 @@ export default function AdminOrders() {
     }
   };
 
+  const updatePaymentStatus = async (id, status) => {
+    try {
+      const res = await fetch(`/api/admin/orders/${id}/payment_status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (res.ok) {
+        setOrders(orders.map(o => o.id === id ? { ...o, payment_status: status } : o));
+      } else {
+        alert("Failed to update payment status");
+      }
+    } catch (err) {
+      console.warn("Failed to update payment status via API:", err);
+    }
+  };
+
   // Removed blocking loader for superfast rendering
 
   return (
@@ -110,18 +127,29 @@ export default function AdminOrders() {
                   <td className="p-4">
                     <p className="font-bold text-[#1B1B5E] text-sm">{order.contact_phone || 'N/A'}</p>
                     <p className="text-xs text-[#1B1B5E]/60 truncate max-w-[200px]" title={order.shipping_address}>
-                      {order.shipping_address || 'No address'}
+                      {order.shipping_address?.split(' | Method: ')[0] || 'No address'}
                     </p>
+                    {order.shipping_address?.includes(' | Method: ') && (
+                      <span className="text-[9px] font-black uppercase tracking-widest text-[#00AEEF] bg-[#00AEEF]/10 px-2 py-0.5 rounded-full mt-1 inline-block">
+                        Paid via {order.shipping_address.split(' | Method: ')[1]}
+                      </span>
+                    )}
                   </td>
                   <td className="p-4 font-black text-[#00AEEF]">₦{order.total_amount?.toLocaleString() || 0}</td>
                   <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                      order.payment_status === 'paid' ? 'bg-green-100 text-green-700' :
-                      order.payment_status === 'failed' ? 'bg-red-100 text-red-700' :
-                      'bg-orange-100 text-orange-700'
-                    }`}>
-                      {order.payment_status}
-                    </span>
+                    <select 
+                      value={order.payment_status} 
+                      onChange={(e) => updatePaymentStatus(order.id, e.target.value)}
+                      className={`bg-transparent border-none text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer hover:bg-[#F5F5F7] p-1.5 rounded-lg ${
+                        order.payment_status === 'paid' ? 'text-green-700' :
+                        order.payment_status === 'failed' ? 'text-red-700' :
+                        'text-orange-700'
+                      }`}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="paid">Paid</option>
+                      <option value="failed">Failed</option>
+                    </select>
                   </td>
                   <td className="p-4">
                     <select 
