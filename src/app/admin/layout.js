@@ -65,7 +65,7 @@ export default function AdminLayout({ children }) {
     };
 
     checkAuth();
-  }, [pathname, router]);
+  }, [pathname]);
 
   const handleLogout = async () => {
     try {

@@ -35,7 +35,7 @@ export default function AccountLayout({ children }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [router]);
+  }, []);
 
   if (loading) {
     return (

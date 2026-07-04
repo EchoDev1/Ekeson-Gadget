@@ -96,7 +96,7 @@ export default function Checkout() {
     } else {
       fetchData();
     }
-  }, [cart, success, router]);
+  }, [cart, success]);
 
   const getShippingFee = () => {
     if (isAdmin) return 0;

@@ -31,7 +31,7 @@ export default function Dashboard() {
       setLoading(false);
     };
     checkUser();
-  }, [router]);
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
