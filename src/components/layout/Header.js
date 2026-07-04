@@ -343,12 +343,11 @@ export default function Header() {
             <button type="submit" className="hidden">Search</button>
           </form>
           <div className="mt-8 flex flex-wrap gap-4 text-xs md:text-sm font-bold text-[#1B1B5E]/40 uppercase tracking-widest pl-4 md:pl-24">
-              <span>Trending:</span>
-              <button onClick={() => executeSearch('Apple')} className="hover:text-[#00AEEF] transition-colors">Apple</button>
-              <button onClick={() => executeSearch('Samsung')} className="hover:text-[#00AEEF] transition-colors">Samsung</button>
-              <button onClick={() => executeSearch('PlayStation')} className="hover:text-[#00AEEF] transition-colors">PlayStation</button>
-              <button onClick={() => executeSearch('DJI')} className="hover:text-[#00AEEF] transition-colors">DJI</button>
-            </div>
+            <span>Trending:</span>
+            <button onClick={() => executeSearch('Apple')} className="hover:text-[#00AEEF] transition-colors">Apple</button>
+            <button onClick={() => executeSearch('Samsung')} className="hover:text-[#00AEEF] transition-colors">Samsung</button>
+            <button onClick={() => executeSearch('PlayStation')} className="hover:text-[#00AEEF] transition-colors">PlayStation</button>
+            <button onClick={() => executeSearch('DJI')} className="hover:text-[#00AEEF] transition-colors">DJI</button>
           </div>
         </div>
       )}
