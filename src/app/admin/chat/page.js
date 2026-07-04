@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { Send, User, Bot, MoreVertical, Search, CheckCheck } from "lucide-react";
+import { Send, User, Bot, MoreVertical, Search, CheckCheck, ChevronLeft } from "lucide-react";
 
 export default function AdminChatRoom() {
   const [messages, setMessages] = useState([]);
@@ -103,7 +103,7 @@ export default function AdminChatRoom() {
   return (
     <div className="flex h-[calc(100vh-8rem)] bg-[#0A0A20] rounded-3xl border border-[#00AEEF]/10 overflow-hidden shadow-2xl">
       {/* Chat List Sidebar */}
-      <div className="w-1/3 border-r border-[#00AEEF]/10 hidden md:flex flex-col bg-[#050510]/50">
+      <div className={`w-full md:w-1/3 border-r border-[#00AEEF]/10 flex flex-col bg-[#050510]/50 ${activeSession ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-6 border-b border-[#00AEEF]/10">
           <h2 className="text-xl font-bold text-white mb-4">Support Messages</h2>
           <div className="relative">
@@ -143,11 +143,14 @@ export default function AdminChatRoom() {
       </div>
 
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col bg-[#050510]/30">
+      <div className={`flex-1 flex flex-col bg-[#050510]/30 w-full md:w-2/3 ${!activeSession ? 'hidden md:flex' : 'flex'}`}>
         {/* Chat Header */}
         <div className="h-20 border-b border-[#00AEEF]/10 flex items-center justify-between px-6 bg-[#0A0A20]">
           {activeSession ? (
             <div className="flex items-center space-x-3">
+              <button onClick={() => setActiveSession(null)} className="md:hidden text-white mr-2">
+                <ChevronLeft className="w-6 h-6" />
+              </button>
               <div className="w-10 h-10 rounded-xl bg-[#1B1B5E] border border-[#00AEEF]/20 flex items-center justify-center text-[#00AEEF]">
                 <User className="w-5 h-5" />
               </div>

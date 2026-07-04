@@ -190,7 +190,8 @@ export default function AdminProducts() {
       </div>
 
       <div className="bg-white rounded-3xl shadow-sm border border-[#1B1B5E]/5 overflow-hidden">
-        <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto w-full">
+        <table className="w-full text-left border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-[#F5F5F7] border-b border-[#1B1B5E]/5 text-[#1B1B5E] text-xs font-black uppercase tracking-widest">
               <th className="p-4 pl-6">Product</th>
@@ -270,6 +271,7 @@ export default function AdminProducts() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {isModalOpen && (

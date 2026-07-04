@@ -136,7 +136,8 @@ export default function AdminCoupons() {
             <p className="font-bold uppercase tracking-widest text-sm">No promo codes active</p>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-[#F5F5F7] border-b border-[#1B1B5E]/5 text-[#1B1B5E] text-[10px] font-black uppercase tracking-widest">
                 <th className="p-4 pl-6">Code</th>
@@ -190,6 +191,7 @@ export default function AdminCoupons() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

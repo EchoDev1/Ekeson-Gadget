@@ -115,7 +115,7 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo Component */}
             <Link href="/" className="hover:opacity-90 transition-opacity relative z-50">
-              <Logo className="h-8 md:h-10 w-auto" mobileText={false} />
+              <Logo className="h-8 md:h-10 w-auto" mobileText={true} />
             </Link>
 
             {/* Desktop Navigation */}
@@ -221,14 +221,14 @@ export default function Header() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center space-x-4 relative z-50">
+            <div className="md:hidden flex items-center space-x-4 relative z-[60]">
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors focus:outline-none"
+                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors focus:outline-none pointer-events-auto"
               >
                 <Search className="w-5 h-5" />
               </button>
-              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors relative">
+              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors relative pointer-events-auto">
                 <ShoppingCart className="w-5 h-5" />
                 {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-[#00AEEF] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-black animate-in fade-in zoom-in duration-300">
@@ -238,7 +238,7 @@ export default function Header() {
               </Link>
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-[#1B1B5E] hover:opacity-70 focus:outline-none"
+                className="text-[#1B1B5E] hover:opacity-70 focus:outline-none pointer-events-auto"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>

@@ -175,7 +175,8 @@ export default function AdminCustomers() {
         
         {/* REGISTERED USERS TAB */}
         {activeTab === 'registered' && (
-          <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-[#F5F5F7] border-b border-[#1B1B5E]/5 text-[#1B1B5E] text-xs font-black uppercase tracking-widest">
                 <th className="p-4 pl-6">User</th>
@@ -238,11 +239,13 @@ export default function AdminCustomers() {
               )}
             </tbody>
           </table>
+          </div>
         )}
 
         {/* GUEST CUSTOMERS TAB */}
         {activeTab === 'guests' && (
-          <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-[#F5F5F7] border-b border-[#1B1B5E]/5 text-[#1B1B5E] text-xs font-black uppercase tracking-widest">
                 <th className="p-4 pl-6">Contact Phone</th>
@@ -308,6 +311,7 @@ export default function AdminCustomers() {
               )}
             </tbody>
           </table>
+          </div>
         )}
 
       </div>
