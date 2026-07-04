@@ -221,30 +221,30 @@ export default function Header() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center space-x-2 sm:space-x-4 relative z-[60] shrink-0">
+            <div className="md:hidden absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-3 z-[9999]">
               <button
                 type="button"
-                onClick={() => setIsSearchOpen(true)}
-                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors focus:outline-none p-2 cursor-pointer pointer-events-auto"
+                onClick={(e) => { e.preventDefault(); setIsSearchOpen(true); }}
+                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] focus:outline-none p-2 cursor-pointer pointer-events-auto touch-manipulation"
                 aria-label="Open Search"
               >
-                <Search className="w-6 h-6" />
+                <Search className="w-6 h-6 pointer-events-none" />
               </button>
-              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors relative p-2 cursor-pointer pointer-events-auto">
-                <ShoppingCart className="w-6 h-6" />
+              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] relative p-2 cursor-pointer pointer-events-auto touch-manipulation">
+                <ShoppingCart className="w-6 h-6 pointer-events-none" />
                 {cartCount > 0 && (
-                  <span className="absolute top-0 right-0 bg-[#00AEEF] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-black animate-in fade-in zoom-in duration-300">
+                  <span className="absolute top-0 right-0 bg-[#00AEEF] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-black pointer-events-none">
                     {cartCount}
                   </span>
                 )}
               </Link>
               <button
                 type="button"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-[#1B1B5E] hover:opacity-70 focus:outline-none p-2 cursor-pointer pointer-events-auto"
+                onClick={(e) => { e.preventDefault(); setIsMenuOpen(!isMenuOpen); }}
+                className="text-[#1B1B5E] focus:outline-none p-2 cursor-pointer pointer-events-auto touch-manipulation"
                 aria-label="Toggle Menu"
               >
-                {isMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+                {isMenuOpen ? <X className="w-7 h-7 pointer-events-none" /> : <Menu className="w-7 h-7 pointer-events-none" />}
               </button>
             </div>
           </div>
