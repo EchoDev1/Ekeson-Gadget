@@ -114,8 +114,8 @@ export default function Header() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo Component */}
-            <Link href="/" className="hover:opacity-90 transition-opacity">
-              <Logo className="h-10 w-auto" />
+            <Link href="/" className="hover:opacity-90 transition-opacity relative z-50">
+              <Logo className="h-8 md:h-10 w-auto" mobileText={false} />
             </Link>
 
             {/* Desktop Navigation */}
@@ -221,7 +221,7 @@ export default function Header() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center space-x-4">
+            <div className="md:hidden flex items-center space-x-4 relative z-50">
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors focus:outline-none"

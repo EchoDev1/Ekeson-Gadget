@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const Logo = ({ className = "h-12 w-auto", showText = true }) => {
+export const Logo = ({ className = "h-12 w-auto", showText = true, mobileText = true }) => {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
       <svg viewBox="0 0 100 100" className="h-full w-auto fill-none" xmlns="http://www.w3.org/2000/svg">
@@ -17,7 +17,7 @@ export const Logo = ({ className = "h-12 w-auto", showText = true }) => {
       </svg>
       
       {showText && (
-        <div className="flex flex-col leading-none">
+        <div className={`flex-col leading-none ${mobileText ? 'flex' : 'hidden md:flex'}`}>
           <span className="text-xl font-black tracking-tighter text-[#1B1B5E]">EKESON GADGETS</span>
           <div className="flex items-center gap-1">
             <div className="h-[1px] w-4 bg-[#1B1B5E]/30" />
