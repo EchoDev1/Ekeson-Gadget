@@ -1,5 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -56,6 +59,33 @@ export async function POST(request) {
 
     const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
     if (itemsError) throw itemsError;
+
+    // 3. Send Email Notification to Admin
+    if (process.env.RESEND_API_KEY) {
+      try {
+        await resend.emails.send({
+          from: 'Ekeson Gadgets <orders@ekesongroup.com>',
+          to: ['office@ekesongroup.com'],
+          subject: `New Purchase Received - Order #${order.id.substring(0, 8)}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+              <h2 style="color: #1B1B5E;">New Order Received!</h2>
+              <p><strong>Order ID:</strong> ${order.id}</p>
+              <p><strong>Total Amount:</strong> ₦${totalNgn.toLocaleString()}</p>
+              <p><strong>Payment Method / Shipping:</strong> ${order.shipping_address}</p>
+              <p><strong>Customer Phone:</strong> ${order.contact_phone}</p>
+              <h3>Order Items:</h3>
+              <ul>
+                ${cart.map(item => `<li>${item.quantity}x ${item.name} - ₦${item.price.toLocaleString()}</li>`).join('')}
+              </ul>
+              <p style="margin-top: 20px;"><a href="https://ekesongroup.com/admin/orders" style="background: #00AEEF; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View in Admin Panel</a></p>
+            </div>
+          `
+        });
+      } catch (emailErr) {
+        console.error("Failed to send admin email notification:", emailErr);
+      }
+    }
 
     return NextResponse.json({ success: true, order });
   } catch (error) {
