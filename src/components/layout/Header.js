@@ -221,26 +221,30 @@ export default function Header() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center space-x-4 relative z-[60] shrink-0">
+            <div className="md:hidden flex items-center space-x-2 sm:space-x-4 relative z-[60] shrink-0">
               <button
+                type="button"
                 onClick={() => setIsSearchOpen(true)}
-                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors focus:outline-none p-1"
+                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors focus:outline-none p-2 cursor-pointer pointer-events-auto"
+                aria-label="Open Search"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-6 h-6" />
               </button>
-              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors relative p-1">
-                <ShoppingCart className="w-5 h-5" />
+              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors relative p-2 cursor-pointer pointer-events-auto">
+                <ShoppingCart className="w-6 h-6" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#00AEEF] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-black animate-in fade-in zoom-in duration-300">
+                  <span className="absolute top-0 right-0 bg-[#00AEEF] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-black animate-in fade-in zoom-in duration-300">
                     {cartCount}
                   </span>
                 )}
               </Link>
               <button
+                type="button"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="text-[#1B1B5E] hover:opacity-70 focus:outline-none p-1"
+                className="text-[#1B1B5E] hover:opacity-70 focus:outline-none p-2 cursor-pointer pointer-events-auto"
+                aria-label="Toggle Menu"
               >
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {isMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
               </button>
             </div>
           </div>
