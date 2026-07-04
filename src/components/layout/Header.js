@@ -83,7 +83,8 @@ export default function Header() {
   }, []);
 
   const handleSearch = (e) => {
-    if (e.key === 'Enter' && searchQuery.trim()) {
+    e.preventDefault();
+    if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
       setIsSearchOpen(false);
     }
@@ -135,12 +136,12 @@ export default function Header() {
             <div className="hidden md:flex items-center space-x-6">
               <button 
                 onClick={() => setIsSearchOpen(true)}
-                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors focus:outline-none"
+                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors focus:outline-none relative z-50 p-2 touch-manipulation cursor-pointer"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-5 h-5 pointer-events-none" />
               </button>
-              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors relative">
-                <ShoppingCart className="w-5 h-5" />
+              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] transition-colors relative z-50 p-2 touch-manipulation cursor-pointer">
+                <ShoppingCart className="w-5 h-5 pointer-events-none" />
                 {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-[#00AEEF] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-black animate-in fade-in zoom-in duration-300">
                     {cartCount}
@@ -292,8 +293,8 @@ export default function Header() {
                           <Link 
                             key={idx} 
                             href={link.url}
-                            onClick={() => setIsMenuOpen(false)}
-                            className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-[#F5F5F7] text-[#1B1B5E] hover:bg-[#00AEEF] hover:text-white transition-all text-center shadow-sm"
+                            onClick={() => setTimeout(() => setIsMenuOpen(false), 300)}
+                            className="flex flex-col items-center justify-center gap-2 p-4 rounded-2xl bg-[#F5F5F7] text-[#1B1B5E] hover:bg-[#00AEEF] hover:text-white transition-all text-center shadow-sm cursor-pointer touch-manipulation"
                           >
                             <Icon className="w-5 h-5" />
                             <span className="text-[10px] font-black uppercase tracking-widest leading-tight">{link.label}</span>
@@ -326,18 +327,22 @@ export default function Header() {
             <X className="w-8 h-8 md:w-12 md:h-12" />
           </button>
           
-          <div className="w-full max-w-4xl relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 text-[#1B1B5E]/30" />
+          <form 
+            onSubmit={handleSearch}
+            className="w-full max-w-4xl relative"
+          >
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-12 md:h-12 text-[#1B1B5E]/20 pointer-events-none" />
             <input 
               type="text"
               placeholder="Search by product name or brand..."
               className="w-full bg-transparent border-b-2 border-[#1B1B5E]/10 text-2xl md:text-5xl font-black text-[#1B1B5E] placeholder:text-[#1B1B5E]/20 pb-4 md:pb-6 pl-16 md:pl-24 focus:outline-none focus:border-[#00AEEF] transition-colors"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={handleSearch}
               autoFocus
             />
-            <div className="mt-8 flex flex-wrap gap-4 text-xs md:text-sm font-bold text-[#1B1B5E]/40 uppercase tracking-widest pl-4 md:pl-24">
+            <button type="submit" className="hidden">Search</button>
+          </form>
+          <div className="mt-8 flex flex-wrap gap-4 text-xs md:text-sm font-bold text-[#1B1B5E]/40 uppercase tracking-widest pl-4 md:pl-24">
               <span>Trending:</span>
               <button onClick={() => executeSearch('Apple')} className="hover:text-[#00AEEF] transition-colors">Apple</button>
               <button onClick={() => executeSearch('Samsung')} className="hover:text-[#00AEEF] transition-colors">Samsung</button>

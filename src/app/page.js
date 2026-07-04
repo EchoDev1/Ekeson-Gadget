@@ -34,9 +34,9 @@ const CategorySection = ({ title, id, icon: Icon, image }) => (
           </p>
           <Link 
             href={`/category/${id}`} 
-            className="inline-flex items-center gap-3 bg-[#1B1B5E] text-white px-8 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-[#00AEEF] transition-all duration-500 shadow-xl"
+            className="inline-flex items-center gap-3 bg-[#1B1B5E] text-white px-8 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-[#00AEEF] transition-all duration-500 shadow-xl relative z-20 cursor-pointer touch-manipulation"
           >
-            Enter {title} Portal <ArrowRight className="w-4 h-4" />
+            Enter {title} Portal <ArrowRight className="w-4 h-4 pointer-events-none" />
           </Link>
         </div>
         <div className="relative w-full aspect-[16/9] rounded-[2.5rem] overflow-hidden shadow-2xl group bg-[#1B1B5E]/5 flex items-center justify-center">
