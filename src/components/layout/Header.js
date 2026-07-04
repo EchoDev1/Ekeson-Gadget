@@ -116,7 +116,7 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo Component */}
             <Link href="/" className="hover:opacity-90 transition-opacity relative z-50 shrink-0 max-w-[65%] overflow-hidden flex items-center">
-              <Logo className="h-8 md:h-10 w-auto" mobileText={true} />
+              <Logo className="h-8 md:h-10 w-auto" mobileText={false} />
             </Link>
 
             {/* Desktop Navigation */}
