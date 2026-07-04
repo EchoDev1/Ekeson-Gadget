@@ -1,8 +1,6 @@
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import GlobalLayoutWrapper from "@/components/layout/GlobalLayoutWrapper";
 import { Inter } from "next/font/google";
 import { CartProvider } from "@/context/CartContext";
-import ChatWidget from "@/components/ChatWidget";
 import MaintenanceWrapper from "@/components/MaintenanceWrapper";
 import "./globals.css";
 
@@ -23,12 +21,9 @@ export default function RootLayout({ children }) {
       <body className={`${inter.variable} antialiased min-h-screen flex flex-col bg-[#FFFDF5]`}>
         <MaintenanceWrapper>
           <CartProvider>
-            <Header />
-            <main className="flex-grow">
+            <GlobalLayoutWrapper>
               {children}
-            </main>
-            <Footer />
-            <ChatWidget />
+            </GlobalLayoutWrapper>
           </CartProvider>
         </MaintenanceWrapper>
       </body>

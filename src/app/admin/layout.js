@@ -15,7 +15,9 @@ import {
   LogOut,
   Loader2,
   ChevronRight,
-  Ticket
+  Ticket,
+  Menu,
+  X
 } from "lucide-react";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 
@@ -23,6 +25,7 @@ export default function AdminLayout({ children }) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -99,9 +102,17 @@ export default function AdminLayout({ children }) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7] flex">
+    <div className="min-h-screen bg-[#F5F5F7] flex w-full overflow-x-hidden">
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-[#1B1B5E]/5 flex flex-col fixed inset-y-0 z-50">
+      <aside className={`w-64 bg-white border-r border-[#1B1B5E]/5 flex flex-col fixed inset-y-0 z-50 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="h-20 flex items-center px-8 border-b border-[#1B1B5E]/5">
           <Link href="/admin" className="text-2xl font-black text-[#1B1B5E] tracking-tighter uppercase">
             Ekeson <span className="text-[#00AEEF]">Admin</span>
@@ -117,6 +128,7 @@ export default function AdminLayout({ children }) {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl transition-all duration-300 group ${
                   isActive 
                     ? "bg-[#1B1B5E] text-white shadow-lg shadow-[#1B1B5E]/20" 
@@ -143,12 +155,20 @@ export default function AdminLayout({ children }) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 min-h-screen flex flex-col">
+      <main className="flex-1 md:ml-64 min-h-screen flex flex-col w-full max-w-full">
         {/* Top Header */}
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-[#1B1B5E]/5 sticky top-0 z-40 flex items-center justify-between px-8">
-          <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider">
-            {navigation.find(n => pathname === n.href || (pathname.startsWith(n.href) && n.href !== '/admin'))?.name || "Dashboard"}
-          </h2>
+        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-[#1B1B5E]/5 sticky top-0 z-30 flex items-center justify-between px-4 md:px-8">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="md:hidden p-2 -ml-2 text-[#1B1B5E] hover:bg-[#F5F5F7] rounded-xl transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <h2 className="text-lg md:text-xl font-black text-[#1B1B5E] uppercase tracking-wider truncate">
+              {navigation.find(n => pathname === n.href || (pathname.startsWith(n.href) && n.href !== '/admin'))?.name || "Dashboard"}
+            </h2>
+          </div>
           <div className="flex items-center gap-4">
             <div className="flex flex-col items-end">
               <span className="text-sm font-bold text-[#1B1B5E]">{profile?.full_name || "Admin User"}</span>
@@ -161,7 +181,7 @@ export default function AdminLayout({ children }) {
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-4 md:p-8 w-full max-w-full overflow-x-hidden">
           <AdminNotifications />
           {children}
         </div>
