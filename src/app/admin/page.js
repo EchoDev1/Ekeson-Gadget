@@ -105,24 +105,24 @@ export default function AdminDashboard() {
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Total Products", value: stats.totalProducts, icon: Package, color: "text-blue-500", bg: "bg-blue-50" },
-          { label: "Total Orders", value: stats.totalOrders, icon: ShoppingCart, color: "text-green-500", bg: "bg-green-50" },
-          { label: "Unread Messages", value: stats.newMessages, icon: Activity, color: "text-orange-500", bg: "bg-orange-50" },
-          { label: "Total Revenue", value: `₦${stats.totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-purple-500", bg: "bg-purple-50" },
+          { label: "Total Products", value: stats.totalProducts, icon: Package, color: "text-blue-500", bg: "bg-blue-50", href: "/admin/products" },
+          { label: "Total Orders", value: stats.totalOrders, icon: ShoppingCart, color: "text-green-500", bg: "bg-green-50", href: "/admin/orders" },
+          { label: "Unread Messages", value: stats.newMessages, icon: Activity, color: "text-orange-500", bg: "bg-orange-50", href: "/admin/messages" },
+          { label: "Total Revenue", value: `₦${stats.totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-purple-500", bg: "bg-purple-50", href: "#revenue-chart" },
         ].map((stat, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl shadow-sm border border-[#1B1B5E]/5 flex items-center gap-5 hover:shadow-md transition-shadow">
-            <div className={`w-14 h-14 rounded-2xl ${stat.bg} flex items-center justify-center`}>
+          <Link href={stat.href} key={i} className="bg-white p-6 rounded-3xl shadow-sm border border-[#1B1B5E]/5 flex items-center gap-5 hover:shadow-lg hover:-translate-y-1 transition-all group">
+            <div className={`w-14 h-14 rounded-2xl ${stat.bg} flex items-center justify-center group-hover:scale-110 transition-transform`}>
               <stat.icon className={`w-7 h-7 ${stat.color}`} />
             </div>
             <div>
-              <p className="text-[#1B1B5E]/40 font-bold uppercase tracking-widest text-xs">{stat.label}</p>
+              <p className="text-[#1B1B5E]/40 font-bold uppercase tracking-widest text-xs group-hover:text-[#00AEEF] transition-colors">{stat.label}</p>
               <h3 className="text-3xl font-black text-[#1B1B5E] tracking-tighter mt-1">{stat.value}</h3>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8" id="revenue-chart">
         {/* Quick Actions */}
         <div className="bg-white p-8 rounded-3xl border border-[#1B1B5E]/5 shadow-sm space-y-6">
           <h3 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
