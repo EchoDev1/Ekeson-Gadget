@@ -2,8 +2,8 @@ import React from 'react';
 
 export const Logo = ({ className = "h-12 w-auto", showText = true, mobileText = true }) => {
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      <svg viewBox="0 0 100 100" className="h-full w-auto fill-none" xmlns="http://www.w3.org/2000/svg">
+    <div className={`flex items-center gap-2 md:gap-3 ${className}`}>
+      <svg viewBox="0 0 100 100" className="h-full w-auto fill-none shrink-0" xmlns="http://www.w3.org/2000/svg">
         {/* The 'E' part (Navy Blue) */}
         <path 
           d="M5 15 H50 V28 H20 V44 H45 V56 H20 V72 H50 V85 H5 Z" 
@@ -17,12 +17,12 @@ export const Logo = ({ className = "h-12 w-auto", showText = true, mobileText = 
       </svg>
       
       {showText && (
-        <div className={`flex-col leading-none ${mobileText ? 'flex' : 'hidden md:flex'}`}>
-          <span className="text-xl font-black tracking-tighter text-[#1B1B5E]">EKESON GADGETS</span>
+        <div className={`flex-col leading-none ${mobileText ? 'flex' : 'hidden md:flex'} shrink-0`}>
+          <span className="text-[14px] md:text-xl font-black tracking-tighter text-[#1B1B5E] whitespace-nowrap">EKESON GADGETS</span>
           <div className="flex items-center gap-1">
-            <div className="h-[1px] w-4 bg-[#1B1B5E]/30" />
-            <span className="text-[7px] font-bold tracking-[0.2em] text-[#00AEEF] uppercase">Building Wealth Through Technology</span>
-            <div className="h-[1px] w-4 bg-[#1B1B5E]/30" />
+            <div className="h-[1px] w-2 md:w-4 bg-[#1B1B5E]/30" />
+            <span className="text-[4.5px] md:text-[7px] font-bold tracking-widest md:tracking-[0.2em] text-[#00AEEF] uppercase whitespace-nowrap">Building Wealth Through Technology</span>
+            <div className="h-[1px] w-2 md:w-4 bg-[#1B1B5E]/30" />
           </div>
         </div>
       )}
