@@ -206,11 +206,38 @@ export default function AdminOrders() {
 
             <h2 className="text-2xl font-black text-[#1B1B5E] uppercase tracking-tighter mb-2 flex items-center gap-3">
               <ShoppingCart className="w-6 h-6 text-[#00AEEF]" />
-              Order Items
+              Order Details
             </h2>
             <p className="text-[#1B1B5E]/60 text-xs font-bold uppercase tracking-widest mb-6">
-              Order ID: <span className="text-[#1B1B5E]">{selectedOrder.id.split('-')[0]}</span>
+              Order ID: <span className="text-[#1B1B5E]">{selectedOrder.id}</span>
             </p>
+
+            {/* Buyer Details Section */}
+            <div className="bg-[#F5F5F7] rounded-2xl p-4 md:p-6 mb-8 border border-[#1B1B5E]/5">
+              <h3 className="text-sm font-black text-[#1B1B5E] uppercase tracking-widest mb-4">Customer Information</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-[10px] font-bold text-[#1B1B5E]/50 uppercase tracking-widest">Contact Phone</p>
+                  <p className="font-bold text-[#1B1B5E] text-sm mt-1">{selectedOrder.contact_phone || 'No phone provided'}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-[#1B1B5E]/50 uppercase tracking-widest">Order Date</p>
+                  <p className="font-bold text-[#1B1B5E] text-sm mt-1">{new Date(selectedOrder.created_at).toLocaleString()}</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <p className="text-[10px] font-bold text-[#1B1B5E]/50 uppercase tracking-widest">Shipping Address</p>
+                  <p className="font-bold text-[#1B1B5E] text-sm mt-1">{selectedOrder.shipping_address?.split(' | Method: ')[0] || 'No address provided'}</p>
+                </div>
+                <div className="sm:col-span-2">
+                  <p className="text-[10px] font-bold text-[#1B1B5E]/50 uppercase tracking-widest">Payment Method</p>
+                  <span className="inline-block mt-1 bg-[#00AEEF]/10 text-[#00AEEF] px-3 py-1 rounded-lg text-xs font-black uppercase tracking-widest border border-[#00AEEF]/20">
+                    {selectedOrder.shipping_address?.includes(' | Method: ') ? selectedOrder.shipping_address.split(' | Method: ')[1] : 'Not specified'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <h3 className="text-sm font-black text-[#1B1B5E] uppercase tracking-widest mb-4 border-b border-[#1B1B5E]/5 pb-2">Purchased Items</h3>
 
             {loadingItems ? (
               <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" /></div>
