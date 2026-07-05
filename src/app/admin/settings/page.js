@@ -79,6 +79,16 @@ export default function AdminSettings() {
       if (data) {
         setSettings({
           ...data,
+          category_writeups: data.category_writeups || {
+            phones: { title: "Phones", description: "Discover our curated collection of phones. From the latest releases to certified pre-owned excellence.", button_text: "Enter Phones Portal" },
+            laptops: { title: "Laptops", description: "Discover our curated collection of laptops. From the latest releases to certified pre-owned excellence.", button_text: "Enter Laptops Portal" },
+            pads: { title: "iPads", description: "Discover our curated collection of ipads. From the latest releases to certified pre-owned excellence.", button_text: "Enter iPads Portal" },
+            smart_watches: { title: "Smart Watches", description: "Discover our curated collection of smart watches. From the latest releases to certified pre-owned excellence.", button_text: "Enter Smart Watches Portal" },
+            earbuds: { title: "Earbuds", description: "Discover our curated collection of earbuds. From the latest releases to certified pre-owned excellence.", button_text: "Enter Earbuds Portal" },
+            accessories: { title: "Accessories", description: "Discover our curated collection of accessories. From the latest releases to certified pre-owned excellence.", button_text: "Enter Accessories Portal" },
+            playstation: { title: "PlayStation", description: "Discover our curated collection of playstation. From the latest releases to certified pre-owned excellence.", button_text: "Enter PlayStation Portal" },
+            drones: { title: "Drones", description: "Discover our curated collection of drones. From the latest releases to certified pre-owned excellence.", button_text: "Enter Drones Portal" }
+          },
           footer_service_links: data.footer_service_links || [
             { label: "Order Tracking", url: "/track-order" },
             { label: "Technical Support", url: "/support" },
@@ -124,7 +134,6 @@ export default function AdminSettings() {
       .then(data => {
         if (data && data.rate) setLiveApiRate(data.rate);
       })
-      .catch(err => console.warn("Could not fetch live rate reference"));
   }, []);
 
   const handleChange = (e) => {
@@ -133,6 +142,32 @@ export default function AdminSettings() {
       ...prev,
       [name]: name.includes("shipping") ? parseFloat(value) || 0 : value
     }));
+  };
+
+  const handleWriteupChange = (catId, field, value) => {
+    setSettings(prev => {
+      const currentWriteups = prev.category_writeups || {
+        phones: { title: "Phones", description: "Discover our curated collection of phones. From the latest releases to certified pre-owned excellence.", button_text: "Enter Phones Portal" },
+        laptops: { title: "Laptops", description: "Discover our curated collection of laptops. From the latest releases to certified pre-owned excellence.", button_text: "Enter Laptops Portal" },
+        pads: { title: "iPads", description: "Discover our curated collection of ipads. From the latest releases to certified pre-owned excellence.", button_text: "Enter iPads Portal" },
+        smart_watches: { title: "Smart Watches", description: "Discover our curated collection of smart watches. From the latest releases to certified pre-owned excellence.", button_text: "Enter Smart Watches Portal" },
+        earbuds: { title: "Earbuds", description: "Discover our curated collection of earbuds. From the latest releases to certified pre-owned excellence.", button_text: "Enter Earbuds Portal" },
+        accessories: { title: "Accessories", description: "Discover our curated collection of accessories. From the latest releases to certified pre-owned excellence.", button_text: "Enter Accessories Portal" },
+        playstation: { title: "PlayStation", description: "Discover our curated collection of playstation. From the latest releases to certified pre-owned excellence.", button_text: "Enter PlayStation Portal" },
+        drones: { title: "Drones", description: "Discover our curated collection of drones. From the latest releases to certified pre-owned excellence.", button_text: "Enter Drones Portal" }
+      };
+      
+      return {
+        ...prev,
+        category_writeups: {
+          ...currentWriteups,
+          [catId]: {
+            ...currentWriteups[catId],
+            [field]: value
+          }
+        }
+      };
+    });
   };
 
   const handleLinkChange = (type, index, field, value) => {
@@ -695,7 +730,51 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        {/* Footer Configuration */}
+        {/* Category Portal Writeups */}
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
+          <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
+            <Globe className="w-6 h-6 text-emerald-500" />
+            Homepage Category Portals Writeups
+          </h2>
+          <p className="text-sm text-[#1B1B5E]/60">Customize the descriptions and button texts for each product category portal displayed on the homepage.</p>
+          
+          <div className="space-y-8 divide-y divide-[#1B1B5E]/5">
+            {Object.keys(settings.category_writeups || {}).map((catId) => {
+              const cat = settings.category_writeups[catId];
+              return (
+                <div key={catId} className="pt-6 first:pt-0 space-y-4">
+                  <h3 className="font-black text-[#1B1B5E] text-sm uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#00AEEF]"></span>
+                    {catId === 'pads' ? 'iPads' : catId.replace('_', ' ')}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-[#1B1B5E] uppercase tracking-widest block">Portal Description</label>
+                      <textarea
+                        value={cat.description || ""}
+                        onChange={(e) => handleWriteupChange(catId, 'description', e.target.value)}
+                        rows={2}
+                        className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors text-sm font-medium"
+                        placeholder="Discover our curated collection..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-[#1B1B5E] uppercase tracking-widest block">Portal Button Text</label>
+                      <input
+                        type="text"
+                        value={cat.button_text || ""}
+                        onChange={(e) => handleWriteupChange(catId, 'button_text', e.target.value)}
+                        className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors text-sm font-bold"
+                        placeholder="Enter Portal"
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-[#1B1B5E]/5 space-y-6">
           <h2 className="text-xl font-black text-[#1B1B5E] uppercase tracking-wider flex items-center gap-3">
             <MapPin className="w-6 h-6 text-blue-500" />

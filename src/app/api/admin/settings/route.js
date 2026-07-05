@@ -28,15 +28,34 @@ export async function POST(request) {
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { persistSession: false }
     });
-
     // Update settings (id = 1)
-    const { data, error } = await supabaseAdmin
+    let { data, error } = await supabaseAdmin
       .from("settings")
       .update({
         ...settingsData,
         updated_at: new Date().toISOString()
       })
       .eq('id', 1);
+
+    let warning = null;
+    if (error && error.code === '42703') {
+      console.warn("category_writeups column not found. Retrying update without category_writeups...");
+      const { category_writeups, ...settingsWithoutWriteups } = settingsData;
+      const retryResult = await supabaseAdmin
+        .from("settings")
+        .update({
+          ...settingsWithoutWriteups,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', 1);
+      
+      if (retryResult.error) {
+        return NextResponse.json({ error: retryResult.error.message }, { status: 500 });
+      }
+      
+      warning = "category_writeups column does not exist in your database settings table. Run the SQL migration in your Supabase SQL Editor to enable category editing.";
+      error = null;
+    }
 
     if (error) {
       console.error("Supabase Admin Update Error:", error);
@@ -46,8 +65,10 @@ export async function POST(request) {
     // Clear the Next.js cache so all frontend pages update instantly
     const { revalidatePath } = require('next/cache');
     revalidatePath('/', 'layout');
-
-    return NextResponse.json({ success: true, message: 'Settings saved successfully' });
+    return NextResponse.json({ 
+      success: true, 
+      message: warning ? `Settings saved successfully. (Warning: ${warning})` : 'Settings saved successfully' 
+    });
   } catch (error) {
     console.error("API Route Error:", error);
     return NextResponse.json({ error: error.message || 'Internal server error', stack: error.stack }, { status: 500 });

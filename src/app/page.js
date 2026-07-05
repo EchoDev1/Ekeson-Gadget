@@ -14,8 +14,42 @@ const categories = [
   { id: "playstation", title: "PlayStation", icon: Gamepad2, image: "/images/home_playstation_real.jpg" },
   { id: "drones", title: "Drones", icon: Drone, image: "/images/home_drones_real.jpg" }
 ];
+const defaultWriteups = {
+  phones: {
+    description: "Discover our curated collection of phones. From the latest releases to certified pre-owned excellence.",
+    button_text: "Enter Phones Portal"
+  },
+  laptops: {
+    description: "Discover our curated collection of laptops. From the latest releases to certified pre-owned excellence.",
+    button_text: "Enter Laptops Portal"
+  },
+  pads: {
+    description: "Discover our curated collection of ipads. From the latest releases to certified pre-owned excellence.",
+    button_text: "Enter iPads Portal"
+  },
+  smart_watches: {
+    description: "Discover our curated collection of smart watches. From the latest releases to certified pre-owned excellence.",
+    button_text: "Enter Smart Watches Portal"
+  },
+  earbuds: {
+    description: "Discover our curated collection of earbuds. From the latest releases to certified pre-owned excellence.",
+    button_text: "Enter Earbuds Portal"
+  },
+  accessories: {
+    description: "Discover our curated collection of accessories. From the latest releases to certified pre-owned excellence.",
+    button_text: "Enter Accessories Portal"
+  },
+  playstation: {
+    description: "Discover our curated collection of playstation. From the latest releases to certified pre-owned excellence.",
+    button_text: "Enter PlayStation Portal"
+  },
+  drones: {
+    description: "Discover our curated collection of drones. From the latest releases to certified pre-owned excellence.",
+    button_text: "Enter Drones Portal"
+  }
+};
 
-const CategorySection = ({ title, id, icon: Icon, image }) => (
+const CategorySection = ({ title, id, icon: Icon, image, writeup }) => (
   <section className="py-20 border-t border-[#1B1B5E]/5">
     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -30,16 +64,15 @@ const CategorySection = ({ title, id, icon: Icon, image }) => (
             </div>
           </div>
           <p className="text-lg text-[#1B1B5E]/60 max-w-md font-medium leading-relaxed">
-            Discover our curated collection of {title.toLowerCase()}. From the latest releases to certified pre-owned excellence.
+            {writeup?.description}
           </p>
           <Link 
             href={`/category/${id}`} 
             className="inline-flex items-center gap-3 bg-[#1B1B5E] text-white px-8 py-4 rounded-full font-black text-xs uppercase tracking-widest hover:bg-[#00AEEF] transition-all duration-500 shadow-xl relative z-20 cursor-pointer touch-manipulation"
           >
-            Enter {title} Portal <ArrowRight className="w-4 h-4 pointer-events-none" />
+            {writeup?.button_text} <ArrowRight className="w-4 h-4 pointer-events-none" />
           </Link>
-        </div>
-        <div className="relative w-full aspect-[16/9] rounded-[2.5rem] overflow-hidden shadow-2xl group bg-[#1B1B5E]/5 flex items-center justify-center">
+        </div>        <div className="relative w-full aspect-[16/9] rounded-[2.5rem] overflow-hidden shadow-2xl group bg-[#1B1B5E]/5 flex items-center justify-center">
           {image ? (
             <Image 
               src={image} 
@@ -150,12 +183,11 @@ export default async function Home() {
 
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-[#1B1B5E]/10 to-transparent" />
       </section>
-
       {/* Categories Sections */}
-      {categories.map((cat) => (
-        <CategorySection key={cat.id} {...cat} />
-      ))}
-
+      {categories.map((cat) => {
+        const writeup = (settings?.category_writeups && settings.category_writeups[cat.id]) || defaultWriteups[cat.id];
+        return <CategorySection key={cat.id} {...cat} writeup={writeup} />;
+      })}
       {/* Trust Section */}
       <section className="py-24 bg-[#1B1B5E] text-white overflow-hidden relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
