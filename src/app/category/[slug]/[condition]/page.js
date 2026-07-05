@@ -79,30 +79,27 @@ export default function CategoryConditionPage() {
   const isNew = condition === "new";
   const title = isNew ? "Direct / Brand New" : "Highest Grade UK Used";
   const Icon = icons[slug] || Smartphone;
-
   useEffect(() => {
     async function fetchProducts() {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .eq("category", slug)
-          .eq("condition", condition)
-          .order("created_at", { ascending: false });
+        const res = await fetch('/api/products');
+        let data = [];
+        if (res.ok) {
+          data = await res.json();
+        }
+        
+        // Filter in-memory by category (slug) and condition
+        const filtered = data.filter(p => p.category === slug && p.condition === condition);
 
         let currentCategoryProducts = fallbackProducts[slug] || [];
         // Filter local products to respect the condition parameter
         currentCategoryProducts = currentCategoryProducts.filter(p => p.condition === condition);
 
-        if (error || !data || data.length === 0) {
+        if (filtered.length === 0) {
           setProducts(currentCategoryProducts);
         } else {
-          // If Supabase returned products, we map over them and ensure condition is set
-          // Since our DB doesn't have a condition column, let's merge or use DB data.
-          // In a real-world scenario, we'd add 'condition' column or filter.
-          // Let's filter Supabase data that matches the brand patterns or just use Supabase data.
-          setProducts(data);
+          setProducts(filtered);
         }
       } catch (err) {
         let currentCategoryProducts = fallbackProducts[slug] || [];
@@ -114,7 +111,6 @@ export default function CategoryConditionPage() {
     }
     fetchProducts();
   }, [slug, condition]);
-
   // Grouping logic for Apple & Samsung sections when condition is uk-used
   const isUKUsed = condition === "uk-used";
 

@@ -38,19 +38,20 @@ export default function Header() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
   // Fetch settings safely from the client-side using useEffect
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const { data } = await supabase.from('settings').select('header_links').eq('id', 1).single();
-        if (data?.header_links) {
-          setHeaderLinks(data.header_links);
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.header_links) {
+            setHeaderLinks(data.header_links);
+          }
         }
       } catch (err) {}
     };
     loadSettings();
-
     // Check Auth Session
     const checkUser = async (currentSession) => {
       if (!currentSession?.user?.id) {
@@ -117,10 +118,8 @@ export default function Header() {
           <div className="flex items-center justify-between h-20">
             {/* Logo Component */}
             <Link href="/" className="hover:opacity-90 transition-opacity relative z-50 shrink-0 max-w-[65%] overflow-hidden flex items-center">
-              <Logo className="h-8 md:h-10 w-auto" mobileText={false} />
+              <Logo className="h-8 md:h-10 w-auto" mobileText={true} />
             </Link>
-
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-10">
               {headerLinks.map((item, i) => (
                 <Link 

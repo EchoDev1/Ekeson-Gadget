@@ -19,13 +19,15 @@ import { supabase } from '@/lib/supabase';
 
 export default function Footer() {
   const [settings, setSettings] = useState(null);
-
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const { data } = await supabase.from("settings").select("*").eq("id", 1).single();
-        if (data) {
-          setSettings(data);
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data) {
+            setSettings(data);
+          }
         }
       } catch (error) {
         console.error("Error fetching footer settings:", error);
@@ -33,7 +35,6 @@ export default function Footer() {
     };
     loadSettings();
   }, []);
-
   const hqAddress = settings?.footer_hq_address || "Lagos/Abuja Nigeria";
   const hqPhone = settings?.footer_hq_phone || "+234 814 852 7697";
   const hqEmail = settings?.footer_hq_email || "office@ekesongroup.com";

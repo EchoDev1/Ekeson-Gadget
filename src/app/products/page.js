@@ -73,21 +73,22 @@ export default function ProductsPage() {
     }
     return "";
   });
-
   useEffect(() => {
-
     async function fetchProducts() {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!error) setProducts(data);
-      setLoading(false);
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data);
+        }
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchProducts();
   }, []);
-
   const filteredProducts = products.filter(p => 
     p.name.toLowerCase().includes(search.toLowerCase()) ||
     p.category.toLowerCase().includes(search.toLowerCase()) ||

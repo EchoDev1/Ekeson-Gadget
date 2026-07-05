@@ -11,18 +11,19 @@ export default function MaintenanceWrapper({ children }) {
 
   useEffect(() => {
     if (pathname?.startsWith('/admin')) return;
-
     const checkMaintenance = async () => {
       try {
-        const { data } = await supabase.from('settings').select('is_maintenance_mode').eq('id', 1).single();
-        if (data?.is_maintenance_mode) {
-          setIsMaintenance(true);
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.is_maintenance_mode) {
+            setIsMaintenance(true);
+          }
         }
       } catch (err) {
         // ignore
       }
-    };
-    
+    };    
     checkMaintenance();
   }, [pathname]);
 

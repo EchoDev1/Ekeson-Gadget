@@ -1,8 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { FileText } from 'lucide-react';
-
-export const dynamic = 'force-dynamic';
-
+export const revalidate = 3600; // Cache for 1 hour
 export default async function TermsAndConditions() {
   const { data: settings } = await supabase
     .from('settings')
