@@ -277,7 +277,6 @@ export default function AdminSettings() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl border border-transparent focus:border-[#00AEEF] focus:bg-white outline-none transition-colors font-mono"
                 placeholder="e.g. TYP89..."
-                required
               />
             </div>
             <div className="space-y-2">
