@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from 'react';
+
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -17,7 +18,14 @@ export default function LoginPage() {
   const [captchaToken, setCaptchaToken] = useState(null);
   const turnstileRef = useRef(null);
   const router = useRouter();
+  const [redirectUrl, setRedirectUrl] = useState('');
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setRedirectUrl(params.get('redirect') || '');
+    }
+  }, []);
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -45,6 +53,8 @@ export default function LoginPage() {
         await supabase.auth.signOut();
         throw new Error("Your account has been restricted. Please contact support.");
       }
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectUrl = searchParams.get('redirect');
 
       if (profile?.role === 'admin') {
         // Set secure mock token if they are admin (so old admin layout code doesn't break)
@@ -52,7 +62,7 @@ export default function LoginPage() {
         sessionStorage.setItem('admin_secret_verified', 'true');
         router.push('/admin');
       } else {
-        router.push('/'); // normal users go to homepage after login
+        router.push(redirectUrl || '/'); // normal users go to homepage after login
       }
     } catch (err) {
       setError(err.message || "Failed to sign in. Please check your credentials.");
@@ -142,10 +152,9 @@ export default function LoginPage() {
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
           </button>
         </form>
-
         <div className="mt-8 text-center text-sm font-medium text-[#1B1B5E]/60">
           Don&apos;t have an account?{" "}
-          <Link href="/signup" className="text-[#00AEEF] hover:underline font-bold">
+          <Link href={redirectUrl ? `/signup?redirect=${encodeURIComponent(redirectUrl)}` : "/signup"} className="text-[#00AEEF] hover:underline font-bold">
             Create one now
           </Link>
         </div>

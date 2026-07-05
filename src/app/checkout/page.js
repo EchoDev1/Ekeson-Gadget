@@ -39,12 +39,20 @@ export default function Checkout() {
   async function fetchData() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-        if (profile?.role === 'admin') setIsAdmin(true);
+      if (!session) {
+        router.push("/login?redirect=/checkout");
+        return;
       }
-
+      setUser(session.user);
+      const { data: profile } = await supabase.from('profiles').select('role, full_name, email').eq('id', session.user.id).single();
+      if (profile?.role === 'admin') setIsAdmin(true);
+      if (profile) {
+        setFormData(prev => ({
+          ...prev,
+          fullName: profile.full_name || prev.fullName,
+          email: profile.email || session.user.email || prev.email
+        }));
+      }
       const { data: settingsData } = await supabase.from('settings').select('*').eq('id', 1).single();
       if (settingsData) {
         setSettings(settingsData);

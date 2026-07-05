@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef } from 'react';
+
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -19,7 +20,14 @@ export default function SignupPage() {
   const [captchaToken, setCaptchaToken] = useState(null);
   const turnstileRef = useRef(null);
   const router = useRouter();
+  const [redirectUrl, setRedirectUrl] = useState('');
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setRedirectUrl(params.get('redirect') || '');
+    }
+  }, []);
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -161,10 +169,9 @@ export default function SignupPage() {
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
           </button>
         </form>
-
         <div className="mt-8 text-center text-sm font-medium text-[#1B1B5E]/60">
           Already have an account?{" "}
-          <Link href="/login" className="text-[#00AEEF] hover:underline font-bold">
+          <Link href={redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : "/login"} className="text-[#00AEEF] hover:underline font-bold">
             Sign in
           </Link>
         </div>

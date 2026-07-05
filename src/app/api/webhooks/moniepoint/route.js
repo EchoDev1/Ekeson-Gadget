@@ -9,52 +9,116 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 export async function POST(request) {
   try {
     const bodyText = await request.text();
-    const payload = JSON.parse(bodyText);
+    let payload;
+    try {
+      payload = JSON.parse(bodyText);
+    } catch (e) {
+      console.error("Invalid JSON body received:", bodyText);
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
     
-    // 1. Verify Monnify/Moniepoint Signature
-    // The secret key should be in your Vercel Environment Variables as MONIEPOINT_WEBHOOK_SECRET
-    const secret = process.env.MONIEPOINT_WEBHOOK_SECRET;
-    const signature = request.headers.get('monnify-signature');
+    // 1. Verify Moniepoint/Monnify Signature
+    const secret = process.env.MONIEPOINT_WEBHOOK_SECRET || 
+                   process.env.MONNIFY_SECRET_KEY || 
+                   process.env.MONNIFY_CLIENT_SECRET;
+                   
+    const signature = request.headers.get('moniepoint-signature') ||
+                      request.headers.get('monnify-signature') ||
+                      request.headers.get('x-moniepoint-signature') ||
+                      request.headers.get('signature');
 
     if (secret && signature) {
       const hash = crypto.createHmac('sha512', secret).update(bodyText).digest('hex');
       if (hash !== signature) {
+        console.warn("Webhook Signature Verification Failed.");
         return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
       }
+    } else {
+      console.log("Skipping signature verification: secret or signature header missing.");
     }
 
-    // 2. Handle the Event
-    // Monnify sends eventType "SUCCESSFUL_TRANSACTION"
-    if (payload.eventType === 'SUCCESSFUL_TRANSACTION' || payload.paymentStatus === 'PAID') {
-      const orderId = payload.eventData.paymentReference || payload.paymentReference; 
+    // 2. Identify transaction status (paid or failed)
+    const isPaid = payload.eventType === 'SUCCESSFUL_TRANSACTION' || 
+                   payload.paymentStatus === 'PAID' || 
+                   payload.status === 'SUCCESS' ||
+                   payload.status === 'PAID';
+                   
+    const isFailed = payload.eventType === 'FAILED_TRANSACTION' || 
+                     payload.paymentStatus === 'FAILED' || 
+                     payload.status === 'FAILED';
+
+    if (isPaid || isFailed) {
+      // 3. Extract Order ID or 8-char hex prefix from all possible payload fields
+      let orderRef = null;
+      const fieldsToInspect = [
+        payload.eventData?.paymentReference,
+        payload.paymentReference,
+        payload.eventData?.paymentDescription,
+        payload.paymentDescription,
+        payload.eventData?.narration,
+        payload.narration,
+        payload.eventData?.remarks,
+        payload.remarks,
+        payload.eventData?.transactionReference,
+        payload.transactionReference
+      ];
       
-      if (!orderId) {
-        return NextResponse.json({ error: 'No reference found' }, { status: 400 });
+      for (const val of fieldsToInspect) {
+        if (!val || typeof val !== 'string') continue;
+        
+        // Match full UUID first
+        const uuidMatch = val.match(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i);
+        if (uuidMatch) {
+          orderRef = uuidMatch[0];
+          break;
+        }
+        
+        // Match 8-character hex prefix
+        const hex8Match = val.match(/\b[0-9a-f]{8}\b/i);
+        if (hex8Match) {
+          orderRef = hex8Match[0];
+        }
       }
 
-      // Update order to paid
-      const { error } = await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', orderId);
-      
-      if (error) {
-        console.error("Webhook update error:", error);
-        return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
+      if (!orderRef) {
+        console.warn("Could not find any order reference or 8-character prefix in the webhook payload:", payload);
+        return NextResponse.json({ error: 'No order reference found' }, { status: 400 });
       }
-      
-      return NextResponse.json({ success: true, message: 'Order marked as paid' });
-    }
 
-    // Handle failed transactions
-    if (payload.eventType === 'FAILED_TRANSACTION' || payload.paymentStatus === 'FAILED') {
-      const orderId = payload.eventData.paymentReference || payload.paymentReference; 
+      let finalOrderId = null;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
       
-      const { error } = await supabase.from('orders').update({ payment_status: 'failed' }).eq('id', orderId);
-      
-      if (error) {
-        console.error("Webhook update error:", error);
-        return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
+      if (uuidRegex.test(orderRef)) {
+        const { data: exactOrder } = await supabase.from('orders').select('id').eq('id', orderRef).single();
+        if (exactOrder) {
+          finalOrderId = exactOrder.id;
+        }
       }
       
-      return NextResponse.json({ success: true, message: 'Order marked as failed' });
+      if (!finalOrderId && orderRef.length === 8) {
+        // Find order starting with 8-character prefix
+        const { data: matchingOrders } = await supabase.from('orders').select('id').filter('id', 'like', `${orderRef.toLowerCase()}%`);
+        if (matchingOrders && matchingOrders.length > 0) {
+          finalOrderId = matchingOrders[0].id;
+        }
+      }
+
+      if (!finalOrderId) {
+        console.warn(`No matching order found in database for reference: ${orderRef}`);
+        return NextResponse.json({ error: `No matching order found for ${orderRef}` }, { status: 404 });
+      }
+
+      // 4. Update the order status in Supabase
+      const targetStatus = isPaid ? 'paid' : 'failed';
+      const { error } = await supabase.from('orders').update({ payment_status: targetStatus }).eq('id', finalOrderId);
+      
+      if (error) {
+        console.error("Webhook database update error:", error);
+        return NextResponse.json({ error: 'Failed to update order in database' }, { status: 500 });
+      }
+      
+      console.log(`Successfully updated order ${finalOrderId} payment_status to ${targetStatus}`);
+      return NextResponse.json({ success: true, message: `Order updated to ${targetStatus}` });
     }
 
     return NextResponse.json({ received: true });
