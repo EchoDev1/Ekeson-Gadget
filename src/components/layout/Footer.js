@@ -1,6 +1,8 @@
+"use client";
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const FacebookIcon = ({ className }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -15,14 +17,22 @@ const InstagramIcon = ({ className }) => (
 import { Logo } from '@/components/ui/BrandIdentity';
 import { supabase } from '@/lib/supabase';
 
-export default async function Footer() {
-  let settings = null;
-  try {
-    const { data } = await supabase.from("settings").select("*").eq("id", 1).single();
-    settings = data;
-  } catch (error) {
-    console.error("Error fetching footer settings:", error);
-  }
+export default function Footer() {
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { data } = await supabase.from("settings").select("*").eq("id", 1).single();
+        if (data) {
+          setSettings(data);
+        }
+      } catch (error) {
+        console.error("Error fetching footer settings:", error);
+      }
+    };
+    loadSettings();
+  }, []);
 
   const hqAddress = settings?.footer_hq_address || "Lagos/Abuja Nigeria";
   const hqPhone = settings?.footer_hq_phone || "+234 814 852 7697";

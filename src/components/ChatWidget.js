@@ -19,6 +19,11 @@ export default function ChatWidget() {
   // We cannot return early here because it breaks Rules of Hooks!
   // Instead, we will conditionally render the JSX at the bottom.
 
+  const isOpenRef = useRef(isOpen);
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+  }, [isOpen]);
+
   useEffect(() => {
     // Generate or get a simple session ID for the guest user
     let sid = localStorage.getItem("ekeson_chat_session");
@@ -50,7 +55,7 @@ export default function ChatWidget() {
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
         if (payload.new.session_id === sid) {
           setMessages(prev => [...prev, payload.new]);
-          if (payload.new.sender === 'admin' && !isOpen) {
+          if (payload.new.sender === 'admin' && !isOpenRef.current) {
             setUnreadAdmin(prev => prev + 1);
             setToastMsg("New message from Support!");
             setTimeout(() => setToastMsg(null), 4000);
@@ -65,7 +70,7 @@ export default function ChatWidget() {
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, [isOpen]);
+  }, []);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

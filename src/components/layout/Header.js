@@ -1,7 +1,8 @@
 "use client";
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
-import { ShoppingCart, User, Menu, Search, X, ChevronDown, Package, Heart, MapPin, CreditCard, Gift, Bell, HeadphonesIcon, Settings, ScrollText, LogOut } from 'lucide-react';
+import { ShoppingCart, User, Menu, Search, X, ChevronDown, Package, Heart, MapPin, CreditCard, Gift, Bell, HeadphonesIcon, Settings, ScrollText, LogOut, ArrowRight } from 'lucide-react';
+
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/ui/BrandIdentity';
@@ -222,16 +223,16 @@ export default function Header() {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden absolute right-4 top-1/2 -translate-y-1/2 flex items-center space-x-3 z-[9999]">
+            <div className="md:hidden flex items-center space-x-3 z-50">
               <button
                 type="button"
-                onClick={(e) => { e.preventDefault(); setIsSearchOpen(true); }}
-                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] focus:outline-none p-2 cursor-pointer pointer-events-auto touch-manipulation"
+                onClick={() => setIsSearchOpen(true)}
+                className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] focus:outline-none p-2 cursor-pointer touch-manipulation"
                 aria-label="Open Search"
               >
                 <Search className="w-6 h-6 pointer-events-none" />
               </button>
-              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] relative p-2 cursor-pointer pointer-events-auto touch-manipulation">
+              <Link href="/cart" className="text-[#1B1B5E]/60 hover:text-[#1B1B5E] relative p-2 cursor-pointer touch-manipulation">
                 <ShoppingCart className="w-6 h-6 pointer-events-none" />
                 {cartCount > 0 && (
                   <span className="absolute top-0 right-0 bg-[#00AEEF] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-black pointer-events-none">
@@ -241,13 +242,14 @@ export default function Header() {
               </Link>
               <button
                 type="button"
-                onClick={(e) => { e.preventDefault(); setIsMenuOpen(!isMenuOpen); }}
-                className="text-[#1B1B5E] focus:outline-none p-2 cursor-pointer pointer-events-auto touch-manipulation"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-[#1B1B5E] focus:outline-none p-2 cursor-pointer touch-manipulation"
                 aria-label="Toggle Menu"
               >
                 {isMenuOpen ? <X className="w-7 h-7 pointer-events-none" /> : <Menu className="w-7 h-7 pointer-events-none" />}
               </button>
             </div>
+
           </div>
         </div>
 
@@ -326,22 +328,28 @@ export default function Header() {
           >
             <X className="w-8 h-8 md:w-12 md:h-12" />
           </button>
-          
           <form 
             onSubmit={handleSearch}
-            className="w-full max-w-4xl relative"
+            className="w-full max-w-4xl relative flex items-center"
           >
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 md:w-12 md:h-12 text-[#1B1B5E]/20 pointer-events-none" />
             <input 
               type="text"
               placeholder="Search by product name or brand..."
-              className="w-full bg-transparent border-b-2 border-[#1B1B5E]/10 text-2xl md:text-5xl font-black text-[#1B1B5E] placeholder:text-[#1B1B5E]/20 pb-4 md:pb-6 pl-16 md:pl-24 focus:outline-none focus:border-[#00AEEF] transition-colors"
+              className="w-full bg-transparent border-b-2 border-[#1B1B5E]/10 text-2xl md:text-5xl font-black text-[#1B1B5E] placeholder:text-[#1B1B5E]/20 pb-4 md:pb-6 pl-16 md:pl-24 pr-16 focus:outline-none focus:border-[#00AEEF] transition-colors"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               autoFocus
             />
-            <button type="submit" className="hidden">Search</button>
+            <button 
+              type="submit" 
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1B1B5E]/40 hover:text-[#00AEEF] transition-colors p-2 cursor-pointer"
+              aria-label="Submit Search"
+            >
+              <ArrowRight className="w-8 h-8 md:w-12 md:h-12" />
+            </button>
           </form>
+
           <div className="mt-8 flex flex-wrap gap-4 text-xs md:text-sm font-bold text-[#1B1B5E]/40 uppercase tracking-widest pl-4 md:pl-24">
             <span>Trending:</span>
             <button onClick={() => executeSearch('Apple')} className="hover:text-[#00AEEF] transition-colors">Apple</button>
