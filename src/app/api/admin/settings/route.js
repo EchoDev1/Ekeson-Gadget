@@ -28,31 +28,40 @@ export async function POST(request) {
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { persistSession: false }
     });
+    // Sanitize numeric fields (like usdt_rate) to prevent invalid numeric input syntax errors in PostgreSQL
+    const sanitizedSettings = { ...settingsData };
+    if (sanitizedSettings.usdt_rate === "" || sanitizedSettings.usdt_rate === undefined) {
+      sanitizedSettings.usdt_rate = null;
+    } else if (typeof sanitizedSettings.usdt_rate === 'string') {
+      const parsed = parseFloat(sanitizedSettings.usdt_rate);
+      sanitizedSettings.usdt_rate = isNaN(parsed) ? null : parsed;
+    }
+
     // Update settings (id = 1)
     let { data, error } = await supabaseAdmin
       .from("settings")
       .update({
-        ...settingsData,
+        ...sanitizedSettings,
         updated_at: new Date().toISOString()
       })
       .eq('id', 1);
 
     let warning = null;
+    let retryResult = null;
     if (error && error.code === '42703') {
       console.warn("category_writeups column not found. Retrying update without category_writeups...");
-      const { category_writeups, ...settingsWithoutWriteups } = settingsData;
-      const retryResult = await supabaseAdmin
+      const { category_writeups, ...settingsWithoutWriteups } = sanitizedSettings;
+      retryResult = await supabaseAdmin
         .from("settings")
         .update({
           ...settingsWithoutWriteups,
           updated_at: new Date().toISOString()
         })
         .eq('id', 1);
-      
+
       if (retryResult.error) {
         return NextResponse.json({ error: retryResult.error.message }, { status: 500 });
-      }
-      
+      }      
       warning = "category_writeups column does not exist in your database settings table. Run the SQL migration in your Supabase SQL Editor to enable category editing.";
       error = null;
     }
