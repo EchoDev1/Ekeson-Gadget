@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { sendPaymentConfirmationEmail } from '@/lib/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -110,6 +111,10 @@ export async function POST(request) {
 
       // 4. Update the order status in Supabase
       const targetStatus = isPaid ? 'paid' : 'failed';
+
+      // Fetch order details first for email
+      const { data: order } = await supabase.from('orders').select('user_id, total_amount').eq('id', finalOrderId).single();
+
       const { error } = await supabase.from('orders').update({ payment_status: targetStatus }).eq('id', finalOrderId);
       
       if (error) {
@@ -118,7 +123,21 @@ export async function POST(request) {
       }
       
       console.log(`Successfully updated order ${finalOrderId} payment_status to ${targetStatus}`);
-      return NextResponse.json({ success: true, message: `Order updated to ${targetStatus}` });
+
+      // Send confirmation email
+      if (isPaid && order && order.user_id) {
+        const { data: profile } = await supabase.from('profiles').select('email').eq('id', order.user_id).single();
+        if (profile && profile.email) {
+          await sendPaymentConfirmationEmail({
+            toEmail: profile.email,
+            orderId: finalOrderId,
+            amount: order.total_amount,
+            paymentMethod: 'Moniepoint/Monnify Online'
+          });
+        }
+      }
+
+      return NextResponse.json({ success: true, message: `Order updated to ${targetStatus} and email processing triggered` });
     }
 
     return NextResponse.json({ received: true });

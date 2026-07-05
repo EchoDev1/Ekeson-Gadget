@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
+import { sendPaymentConfirmationEmail } from '@/lib/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -27,6 +28,9 @@ export async function POST(request) {
     if (payload.event === 'charge.success') {
       const orderId = payload.data.reference; // We passed the order.id as reference
       
+      // Fetch order details first for email
+      const { data: order } = await supabase.from('orders').select('user_id, total_amount').eq('id', orderId).single();
+
       // Update order to paid
       const { error } = await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', orderId);
       
@@ -35,7 +39,20 @@ export async function POST(request) {
         return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
       }
       
-      return NextResponse.json({ success: true, message: 'Order marked as paid' });
+      // Send confirmation email
+      if (order && order.user_id) {
+        const { data: profile } = await supabase.from('profiles').select('email').eq('id', order.user_id).single();
+        if (profile && profile.email) {
+          await sendPaymentConfirmationEmail({
+            toEmail: profile.email,
+            orderId: orderId,
+            amount: order.total_amount,
+            paymentMethod: 'Paystack Online'
+          });
+        }
+      }
+
+      return NextResponse.json({ success: true, message: 'Order marked as paid and email sent' });
     }
 
     if (payload.event === 'charge.failed' || payload.event === 'charge.reversed') {
