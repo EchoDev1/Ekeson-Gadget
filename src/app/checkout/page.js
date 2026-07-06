@@ -186,6 +186,7 @@ export default function Checkout() {
 
   const handlePaystack = (order) => {
     if (!settings?.paystack_public_key) return alert("Paystack is not configured.");
+    let paymentCompleted = false;
     const handler = window.PaystackPop.setup({
       key: settings.paystack_public_key,
       email: formData.email || "customer@ekesontech.com",
@@ -193,6 +194,7 @@ export default function Checkout() {
       currency: "NGN",
       ref: order.id, // Use our Order ID as reference!
       callback: function(response) {
+        paymentCompleted = true;
         // Optimistically update to paid
         supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
           clearCart();
@@ -201,6 +203,7 @@ export default function Checkout() {
         });
       },
       onClose: function() {
+        if (paymentCompleted) return;
         alert('Payment window closed. You can complete this payment later from your account.');
         clearCart();
         router.push('/account/orders');
@@ -211,6 +214,7 @@ export default function Checkout() {
 
   const handleFlutterwave = (order) => {
     if (!settings?.flutterwave_public_key) return alert("Flutterwave is not configured.");
+    let paymentCompleted = false;
     window.FlutterwaveCheckout({
       public_key: settings.flutterwave_public_key,
       tx_ref: order.id, // Use our Order ID as reference!
@@ -228,6 +232,7 @@ export default function Checkout() {
         logo: "https://ekesontech.com/logo.png",
       },
       callback: function(data) {
+        paymentCompleted = true;
         supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
           clearCart();
           setSuccess(true);
@@ -235,6 +240,7 @@ export default function Checkout() {
         });
       },
       onclose: function() {
+        if (paymentCompleted) return;
         alert('Payment window closed. You can complete this payment later from your account.');
         clearCart();
         router.push('/account/orders');
@@ -244,6 +250,7 @@ export default function Checkout() {
 
   const handleMonnify = (order) => {
     if (!settings?.monnify_api_key || !settings?.monnify_contract_code) return alert("Monnify is not configured.");
+    let paymentCompleted = false;
     window.MonnifySDK.initialize({
       amount: totalNgn,
       currency: "NGN",
@@ -254,6 +261,7 @@ export default function Checkout() {
       contractCode: settings.monnify_contract_code,
       paymentDescription: "Payment for Order " + order.id.substring(0,8),
       onComplete: function(response) {
+        paymentCompleted = true;
         supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
           clearCart();
           setSuccess(true);
@@ -261,6 +269,7 @@ export default function Checkout() {
         });
       },
       onClose: function(data) {
+        if (paymentCompleted) return;
         alert('Payment window closed. You can complete this payment later from your account.');
         clearCart();
         router.push('/account/orders');
