@@ -68,13 +68,22 @@ export default function OrdersPage() {
                     <p className="text-[10px] font-black text-[#1B1B5E]/50 uppercase tracking-widest mb-1">Total</p>
                     <p className="font-black text-[#00AEEF]">₦{(order.total_amount || 0).toLocaleString()}</p>
                   </div>
-                  <div>
+                  <div className="flex flex-col gap-2 items-end sm:items-start">
                     <span className={`inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${
-                      order.status === 'completed' ? 'bg-green-100 text-green-700' :
+                      order.payment_status === 'paid' ? 'bg-green-100 text-green-700' :
+                      order.payment_status === 'failed' ? 'bg-red-100 text-red-700' :
+                      'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {order.payment_status === 'paid' ? 'Paid' : order.payment_status || 'Unpaid'}
+                    </span>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest ${
+                      order.status === 'completed' ? 'bg-blue-100 text-blue-700' :
                       order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                       'bg-orange-100 text-orange-700'
                     }`}>
-                      {order.status || 'Pending'}
+                      {order.status === 'processing' || order.status === 'pending' || !order.status 
+                        ? 'Order Processing' 
+                        : order.status}
                     </span>
                   </div>
                 </div>
