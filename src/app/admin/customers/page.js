@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Users, Loader2, MapPin, Phone, ShoppingBag, ShieldAlert, UserCheck, AlertTriangle, ShieldX } from "lucide-react";
+import { Users, Loader2, MapPin, Phone, ShoppingBag, ShieldAlert, UserCheck, AlertTriangle, ShieldX, Building, X, CreditCard } from "lucide-react";
 
 export default function AdminCustomers() {
   const [activeTab, setActiveTab] = useState("registered"); // 'registered' or 'guests'
@@ -10,6 +10,7 @@ export default function AdminCustomers() {
   // Registered Users State
   const [profiles, setProfiles] = useState([]);
   const [loadingProfiles, setLoadingProfiles] = useState(true);
+  const [selectedBankUser, setSelectedBankUser] = useState(null);
 
   // Guest Customers State
   const [guests, setGuests] = useState([]);
@@ -197,6 +198,7 @@ export default function AdminCustomers() {
                 <th className="p-4">Email</th>
                 <th className="p-4">Role</th>
                 <th className="p-4">Status</th>
+                <th className="p-4 text-center">Bank Accounts</th>
                 <th className="p-4 text-right pr-6">Joined Date</th>
               </tr>
             </thead>
@@ -258,6 +260,15 @@ export default function AdminCustomers() {
                           <option value="blocked">Blocked</option>
                         </select>
                       </div>
+                    </td>
+                    <td className="p-4 text-center">
+                      <button 
+                        onClick={() => setSelectedBankUser(profile)}
+                        className="bg-[#1B1B5E]/5 hover:bg-[#1B1B5E]/10 text-[#1B1B5E] px-3 py-1.5 rounded-lg text-xs font-bold transition-colors inline-flex items-center gap-1"
+                      >
+                        <Building className="w-3 h-3" />
+                        View ({profile.saved_bank_details?.length || 0})
+                      </button>
                     </td>
                     <td className="p-4 pr-6 text-right">
                       <p className="font-bold text-[#1B1B5E] text-sm">{new Date(profile.created_at).toLocaleDateString()}</p>
@@ -341,8 +352,57 @@ export default function AdminCustomers() {
           </table>
           </div>
         )}
-
       </div>
+
+      {/* Bank Details Modal */}
+      {selectedBankUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
+            <div className="p-6 border-b border-[#1B1B5E]/10 flex items-center justify-between bg-[#F5F5F7]">
+              <div>
+                <h3 className="text-xl font-black text-[#1B1B5E] uppercase tracking-tighter flex items-center gap-2">
+                  <Building className="w-5 h-5 text-[#00AEEF]" />
+                  Saved Bank Accounts
+                </h3>
+                <p className="text-sm font-bold text-[#1B1B5E]/60 mt-1">{selectedBankUser.full_name} ({selectedBankUser.email})</p>
+              </div>
+              <button 
+                onClick={() => setSelectedBankUser(null)}
+                className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-[#1B1B5E]/40 hover:text-red-500 hover:bg-red-50 transition-colors shadow-sm"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto">
+              {!selectedBankUser.saved_bank_details || selectedBankUser.saved_bank_details.length === 0 ? (
+                <div className="text-center py-12 bg-[#F5F5F7] rounded-2xl border-2 border-dashed border-[#1B1B5E]/10">
+                  <Building className="w-12 h-12 text-[#1B1B5E]/20 mx-auto mb-4" />
+                  <p className="text-[#1B1B5E]/50 font-medium">This user has not saved any bank accounts.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4">
+                  {selectedBankUser.saved_bank_details.map((bank, idx) => (
+                    <div key={idx} className="p-5 rounded-2xl border border-[#1B1B5E]/10 bg-white hover:border-[#00AEEF] transition-all flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="bg-[#1B1B5E] text-white text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md">{bank.bankName}</span>
+                        </div>
+                        <p className="font-mono text-xl font-bold text-[#1B1B5E] tracking-widest">{bank.accountNumber}</p>
+                        <p className="text-sm font-bold text-[#1B1B5E]/60 uppercase tracking-widest mt-1">{bank.accountName}</p>
+                      </div>
+                      <div className="w-12 h-12 rounded-full bg-[#F5F5F7] flex items-center justify-center">
+                        <CreditCard className="w-5 h-5 text-[#1B1B5E]/40" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

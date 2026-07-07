@@ -7,17 +7,33 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     const fetchProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const { data } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
         setProfile({ ...data, email: session.user.email });
+        setEditName(data?.full_name || "");
       }
       setLoading(false);
     };
     fetchProfile();
   }, []);
+
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      await supabase.from('profiles').update({ full_name: editName }).eq('id', session.user.id);
+      setProfile(prev => ({ ...prev, full_name: editName }));
+    }
+    setSaving(false);
+    setIsEditing(false);
+  };
 
   if (loading) {
     return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-[#00AEEF]" /></div>;
@@ -42,13 +58,22 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="text-[10px] font-black text-[#1B1B5E]/50 uppercase tracking-widest block mb-2">Full Name</label>
-              <div className="bg-[#F5F5F7] px-4 py-3 rounded-xl text-[#1B1B5E] font-bold">
-                {profile?.full_name || 'Not provided'}
-              </div>
+              {isEditing ? (
+                <input 
+                  type="text" 
+                  value={editName} 
+                  onChange={(e) => setEditName(e.target.value)} 
+                  className="w-full bg-[#F5F5F7] px-4 py-3 rounded-xl text-[#1B1B5E] font-bold border border-[#1B1B5E]/10 focus:outline-none focus:border-[#00AEEF]"
+                />
+              ) : (
+                <div className="bg-[#F5F5F7] px-4 py-3 rounded-xl text-[#1B1B5E] font-bold">
+                  {profile?.full_name || 'Not provided'}
+                </div>
+              )}
             </div>
             <div>
               <label className="text-[10px] font-black text-[#1B1B5E]/50 uppercase tracking-widest block mb-2">Email Address</label>
-              <div className="bg-[#F5F5F7] px-4 py-3 rounded-xl text-[#1B1B5E] font-bold flex items-center justify-between">
+              <div className="bg-[#F5F5F7] px-4 py-3 rounded-xl text-[#1B1B5E] font-bold flex items-center justify-between opacity-70">
                 {profile?.email}
                 <Mail className="w-4 h-4 text-[#1B1B5E]/30" />
               </div>
@@ -63,10 +88,32 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-[#1B1B5E]/5">
-            <button className="bg-[#1B1B5E] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#00AEEF] transition-colors text-sm uppercase tracking-widest">
-              Edit Profile
-            </button>
+          <div className="pt-6 border-t border-[#1B1B5E]/5 flex gap-4">
+            {isEditing ? (
+              <>
+                <button 
+                  onClick={handleSaveProfile} 
+                  disabled={saving}
+                  className="bg-[#1B1B5E] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#00AEEF] transition-colors text-sm uppercase tracking-widest flex items-center gap-2 disabled:opacity-50"
+                >
+                  {saving && <Loader2 className="w-4 h-4 animate-spin" />} Save Changes
+                </button>
+                <button 
+                  onClick={() => { setIsEditing(false); setEditName(profile?.full_name || ""); }} 
+                  disabled={saving}
+                  className="bg-transparent text-[#1B1B5E]/60 px-6 py-3 rounded-xl font-bold hover:bg-[#F5F5F7] transition-colors text-sm uppercase tracking-widest"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <button 
+                onClick={() => setIsEditing(true)}
+                className="bg-[#1B1B5E] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#00AEEF] transition-colors text-sm uppercase tracking-widest"
+              >
+                Edit Profile
+              </button>
+            )}
           </div>
         </div>
       </div>
