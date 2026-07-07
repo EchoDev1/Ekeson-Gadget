@@ -50,12 +50,16 @@ export async function POST(request) {
       }
 
       if (customerEmail) {
-        await sendPaymentConfirmationEmail({
-          toEmail: customerEmail,
-          orderId: orderId,
-          amount: order?.total_amount || (payload.data.amount / 100),
-          paymentMethod: 'Paystack Online'
-        });
+        try {
+          await sendPaymentConfirmationEmail({
+            toEmail: customerEmail,
+            orderId: orderId,
+            amount: order?.total_amount || (payload.data.amount / 100),
+            paymentMethod: 'Paystack Online'
+          });
+        } catch (emailErr) {
+          console.error("Webhook email failed:", emailErr);
+        }
       }
 
       return NextResponse.json({ success: true, message: 'Order marked as paid and email sent' });
