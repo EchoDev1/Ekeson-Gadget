@@ -125,13 +125,21 @@ export async function POST(request) {
       console.log(`Successfully updated order ${finalOrderId} payment_status to ${targetStatus}`);
 
       // Send confirmation email
-      if (isPaid && order && order.user_id) {
-        const { data: profile } = await supabase.from('profiles').select('email').eq('id', order.user_id).single();
-        if (profile && profile.email) {
+      if (isPaid) {
+        let customerEmail = payload.eventData?.customerEmail || payload.customerEmail || payload.customer?.email;
+
+        if (!customerEmail && order && order.user_id) {
+          const { data: profile } = await supabase.from('profiles').select('email').eq('id', order.user_id).single();
+          if (profile && profile.email) {
+            customerEmail = profile.email;
+          }
+        }
+
+        if (customerEmail) {
           await sendPaymentConfirmationEmail({
-            toEmail: profile.email,
+            toEmail: customerEmail,
             orderId: finalOrderId,
-            amount: order.total_amount,
+            amount: order?.total_amount || (payload.amount || payload.eventData?.amount || 0),
             paymentMethod: 'Moniepoint/Monnify Online'
           });
         }

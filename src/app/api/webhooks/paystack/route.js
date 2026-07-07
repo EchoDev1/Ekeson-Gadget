@@ -40,16 +40,22 @@ export async function POST(request) {
       }
       
       // Send confirmation email
-      if (order && order.user_id) {
+      let customerEmail = payload.data?.customer?.email;
+
+      if (!customerEmail && order && order.user_id) {
         const { data: profile } = await supabase.from('profiles').select('email').eq('id', order.user_id).single();
         if (profile && profile.email) {
-          await sendPaymentConfirmationEmail({
-            toEmail: profile.email,
-            orderId: orderId,
-            amount: order.total_amount,
-            paymentMethod: 'Paystack Online'
-          });
+          customerEmail = profile.email;
         }
+      }
+
+      if (customerEmail) {
+        await sendPaymentConfirmationEmail({
+          toEmail: customerEmail,
+          orderId: orderId,
+          amount: order?.total_amount || (payload.data.amount / 100),
+          paymentMethod: 'Paystack Online'
+        });
       }
 
       return NextResponse.json({ success: true, message: 'Order marked as paid and email sent' });
