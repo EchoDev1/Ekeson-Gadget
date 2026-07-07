@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useCart } from "@/context/CartContext";
 import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Wallet, MapPin, CheckCircle, Loader2, ArrowLeft, Copy, Info, CreditCard, Building, Phone, Ticket, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
 
-export default function Checkout() {
+function CheckoutContent() {
   const { cart, cartTotal, clearCart } = useCart();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [settings, setSettings] = useState(null);
   const [usdtRate, setUsdtRate] = useState(null);
@@ -99,12 +100,37 @@ export default function Checkout() {
   }
 
   useEffect(() => {
-    if (cart.length === 0 && !success) {
+    // Check if returning from a mobile gateway redirect
+    const reference = searchParams.get('reference') || searchParams.get('tx_ref') || searchParams.get('paymentReference') || searchParams.get('trxref');
+    
+    if (reference) {
+      setSuccess(true);
+      clearCart();
+      // Silently trigger verification in background to ensure order is marked paid
+      const gateway = searchParams.get('reference') || searchParams.get('trxref') ? 'paystack' : searchParams.get('tx_ref') ? 'flutterwave' : 'monnify';
+      fetch('/api/verify-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: reference,
+          reference: reference,
+          gateway: gateway,
+          customerEmail: user?.email || "customer@ekesontech.com"
+        })
+      }).then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) {
+          alert("Warning: Payment received but server verification failed. Error: " + (result.error || "Unknown"));
+        }
+      }).catch((err) => {
+        console.error("Verification network error:", err);
+      });
+    } else if (cart.length === 0 && !success) {
       router.push("/cart");
     } else {
       fetchData();
     }
-  }, [cart, success]);
+  }, [cart, success, searchParams]);
 
   const getShippingFee = () => {
     if (isAdmin) return 0;
@@ -205,6 +231,13 @@ export default function Checkout() {
             gateway: 'paystack',
             customerEmail: formData.email || "customer@ekesontech.com"
           })
+        }).then(async (res) => {
+          const result = await res.json();
+          if (!res.ok) {
+            alert("Payment recorded, but server verification failed: " + (result.error || "Please contact admin."));
+          }
+        }).catch(() => {
+          alert("Network error while verifying payment.");
         }).finally(() => {
           clearCart();
           setSuccess(true);
@@ -251,7 +284,12 @@ export default function Checkout() {
             gateway: 'flutterwave',
             customerEmail: formData.email || "customer@ekesontech.com"
           })
-        }).finally(() => {
+        }).then(async (res) => {
+          const result = await res.json();
+          if (!res.ok) {
+            alert("Payment recorded, but server verification failed: " + (result.error || "Please contact admin."));
+          }
+        }).catch(() => {}).finally(() => {
           clearCart();
           setSuccess(true);
           window.scrollTo(0, 0);
@@ -285,11 +323,16 @@ export default function Checkout() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             orderId: order.id,
-            reference: response.transactionReference || order.id,
+            reference: response.paymentReference,
             gateway: 'monnify',
             customerEmail: formData.email || "customer@ekesontech.com"
           })
-        }).finally(() => {
+        }).then(async (res) => {
+          const result = await res.json();
+          if (!res.ok) {
+            alert("Payment recorded, but server verification failed: " + (result.error || "Please contact admin."));
+          }
+        }).catch(() => {}).finally(() => {
           clearCart();
           setSuccess(true);
           window.scrollTo(0, 0);
@@ -654,5 +697,13 @@ export default function Checkout() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function Checkout() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#F5F5F7]"><Loader2 className="w-12 h-12 animate-spin text-[#00AEEF]" /></div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }

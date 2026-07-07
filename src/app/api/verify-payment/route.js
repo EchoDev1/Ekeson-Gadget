@@ -69,7 +69,11 @@ export async function POST(request) {
 
     // 3. Update Database and Send Email
     if (isVerified) {
-      await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', orderId);
+      const { error: dbError } = await supabase.from('orders').update({ payment_status: 'paid' }).eq('id', orderId);
+      if (dbError) {
+        console.error("Database Update Error:", dbError);
+        return NextResponse.json({ error: 'Failed to update database: ' + dbError.message }, { status: 500 });
+      }
 
       // Resolve email
       let emailToSend = customerEmail;
@@ -79,20 +83,28 @@ export async function POST(request) {
       }
 
       if (emailToSend) {
-        await sendPaymentConfirmationEmail({
-          toEmail: emailToSend,
-          orderId: orderId,
-          amount: actualAmount,
-          paymentMethod: gateway.toUpperCase()
-        });
+        try {
+          const emailResult = await sendPaymentConfirmationEmail({
+            toEmail: emailToSend,
+            orderId: orderId,
+            amount: actualAmount,
+            paymentMethod: gateway.toUpperCase()
+          });
+          if (emailResult && emailResult.error) {
+             console.error("Email failed (Resend API):", emailResult.error);
+          }
+        } catch (emailError) {
+          // Do NOT crash the payment verification just because email failed
+          console.error("Email critical failure:", emailError);
+        }
       }
 
       return NextResponse.json({ success: true });
     } else {
-      return NextResponse.json({ error: 'Verification failed' }, { status: 400 });
+      return NextResponse.json({ error: 'Gateway verification returned false' }, { status: 400 });
     }
   } catch (error) {
     console.error("Payment Verification Error:", error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
