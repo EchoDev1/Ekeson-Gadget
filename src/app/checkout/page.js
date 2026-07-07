@@ -195,8 +195,17 @@ export default function Checkout() {
       ref: order.id, // Use our Order ID as reference!
       callback: function(response) {
         paymentCompleted = true;
-        // Optimistically update to paid
-        supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
+        // Call our secure backend to verify and update the order
+        fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order.id,
+            reference: response.reference,
+            gateway: 'paystack',
+            customerEmail: formData.email || "customer@ekesontech.com"
+          })
+        }).finally(() => {
           clearCart();
           setSuccess(true);
           window.scrollTo(0, 0);
@@ -233,7 +242,16 @@ export default function Checkout() {
       },
       callback: function(data) {
         paymentCompleted = true;
-        supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
+        fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order.id,
+            reference: data.transaction_id || order.id,
+            gateway: 'flutterwave',
+            customerEmail: formData.email || "customer@ekesontech.com"
+          })
+        }).finally(() => {
           clearCart();
           setSuccess(true);
           window.scrollTo(0, 0);
@@ -262,7 +280,16 @@ export default function Checkout() {
       paymentDescription: "Payment for Order " + order.id.substring(0,8),
       onComplete: function(response) {
         paymentCompleted = true;
-        supabase.from('orders').update({ payment_status: 'paid' }).eq('id', order.id).then(() => {
+        fetch('/api/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: order.id,
+            reference: response.transactionReference || order.id,
+            gateway: 'monnify',
+            customerEmail: formData.email || "customer@ekesontech.com"
+          })
+        }).finally(() => {
           clearCart();
           setSuccess(true);
           window.scrollTo(0, 0);
