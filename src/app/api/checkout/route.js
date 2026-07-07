@@ -87,7 +87,7 @@ export async function POST(request) {
               <ul>
                 ${cart.map(item => `<li>${item.quantity}x ${item.name} - ₦${item.price.toLocaleString()}</li>`).join('')}
               </ul>
-              <p style="margin-top: 20px;"><a href="https://ekesongroup.com/admin/orders" style="background: #00AEEF; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View in Admin Panel</a></p>
+              <p style="margin-top: 20px;"><a href="https://ekesongadgets.com/admin/orders" style="background: #00AEEF; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">View in Admin Panel</a></p>
             </div>
           `
         });
