@@ -73,7 +73,12 @@ export default function AccountLayout({ children }) {
               {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : "U"}
             </div>
             <div>
-              <p className="text-sm font-black text-[#1B1B5E]">{profile?.full_name || 'User'}</p>
+              <p className="text-sm font-black text-[#1B1B5E] flex items-center gap-2">
+                {profile?.full_name || 'User'}
+                {profile?.is_vip && (
+                  <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black shadow-sm" title="VIP Member">VIP</span>
+                )}
+              </p>
               <p className="text-[10px] font-bold text-[#1B1B5E]/40 uppercase tracking-widest">{session?.user?.email}</p>
             </div>
           </div>

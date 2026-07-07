@@ -36,6 +36,15 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
+    let finalShippingAddress = `${formData.address} | Method: ${formData.paymentMethod}`;
+    
+    if (userId) {
+      const { data: profile } = await supabase.from('profiles').select('is_vip').eq('id', userId).single();
+      if (profile?.is_vip) {
+        finalShippingAddress += ` | 🎁 VIP REWARD: Free Silicon Case & Screen Protector Included`;
+      }
+    }
+
     // 1. Insert Order
     // Note: contact_email is omitted because it doesn't exist in the database schema.
     const { data: order, error: orderError } = await supabase.from('orders').insert([{
@@ -43,7 +52,7 @@ export async function POST(request) {
       total_amount: totalNgn,
       status: 'processing',
       payment_status: 'pending',
-      shipping_address: `${formData.address} | Method: ${formData.paymentMethod}`,
+      shipping_address: finalShippingAddress,
       contact_phone: formData.phone,
     }]).select().single();
 

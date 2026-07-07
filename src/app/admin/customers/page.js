@@ -100,6 +100,20 @@ export default function AdminCustomers() {
       fetchProfiles(); // revert
     }
   };
+  // Handle VIP Status Change
+  const toggleVipStatus = async (userId, currentVipStatus) => {
+    const newStatus = !currentVipStatus;
+    setProfiles(prev => prev.map(p => p.id === userId ? { ...p, is_vip: newStatus } : p));
+    
+    try {
+      const { error } = await supabase.from('profiles').update({ is_vip: newStatus }).eq('id', userId);
+      if (error) throw error;
+    } catch (err) {
+      alert("Failed to update VIP status.");
+      fetchProfiles(); // revert
+    }
+  };
+
 
   // Handle Guest Phone Blocking
   const toggleBlockStatus = async (phone, isCurrentlyBlocked) => {
@@ -199,13 +213,27 @@ export default function AdminCustomers() {
                 profiles.map((profile) => (
                   <tr key={profile.id} className="border-b border-[#1B1B5E]/5 hover:bg-[#F5F5F7]/50 transition-colors">
                     <td className="p-4 pl-6">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#1B1B5E]/5 flex items-center justify-center font-black text-[#1B1B5E]">
-                          {profile.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-[#1B1B5E]/5 flex items-center justify-center font-black text-[#1B1B5E]">
+                            {profile.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-[#1B1B5E] text-sm flex items-center gap-2">
+                              {profile.full_name || 'Unknown User'}
+                              {profile.is_vip && (
+                                <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-widest font-black shadow-sm">VIP</span>
+                              )}
+                            </span>
+                          </div>
                         </div>
-                        <span className="font-bold text-[#1B1B5E] text-sm">
-                          {profile.full_name || 'Unknown User'}
-                        </span>
+                        <button 
+                          onClick={() => toggleVipStatus(profile.id, profile.is_vip)}
+                          title={profile.is_vip ? "Revoke VIP" : "Make VIP"}
+                          className={`p-2 rounded-xl transition-all ${profile.is_vip ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' : 'bg-gray-100 text-gray-400 hover:bg-yellow-50 hover:text-yellow-500'}`}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill={profile.is_vip ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
+                        </button>
                       </div>
                     </td>
                     <td className="p-4 text-sm font-medium text-[#1B1B5E]/70">

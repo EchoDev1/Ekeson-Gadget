@@ -26,10 +26,17 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="bg-white rounded-3xl p-8 shadow-sm border border-[#1B1B5E]/5">
-        <h2 className="text-2xl font-black text-[#1B1B5E] uppercase tracking-tighter mb-6 flex items-center gap-2">
-          <User className="w-6 h-6 text-[#00AEEF]" />
-          My Profile
-        </h2>
+        <div className="flex items-center gap-4 mb-6">
+          <h2 className="text-2xl font-black text-[#1B1B5E] uppercase tracking-tighter flex items-center gap-2 m-0">
+            <User className="w-6 h-6 text-[#00AEEF]" />
+            My Profile
+          </h2>
+          {profile?.is_vip && (
+            <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs px-3 py-1 rounded-full uppercase tracking-widest font-black shadow-sm flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3" /> VIP Member
+            </span>
+          )}
+        </div>
 
         <div className="space-y-6 max-w-2xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
