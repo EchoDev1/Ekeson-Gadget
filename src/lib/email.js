@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const SENDER_EMAIL = 'ekesontechgroup@gmail.com'; // User requested this sender
+const SENDER_EMAIL = 'Office@ekesongadgets.com'; // Must be from verified domain
 
 export const sendPaymentConfirmationEmail = async ({ toEmail, orderId, amount, paymentMethod }) => {
   if (!resend) {
