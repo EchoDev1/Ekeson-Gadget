@@ -76,12 +76,21 @@ export default function AdminProducts() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Clean price by removing commas before submission
+    const cleanedPrice = parseFloat(String(formData.price).replace(/,/g, ''));
+    if (isNaN(cleanedPrice)) {
+      alert("Invalid price value.");
+      return;
+    }
+    const payload = { ...formData, price: cleanedPrice };
+
     try {
       if (editingProduct) {
         const res = await fetch('/api/admin/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'update', payload: { id: editingProduct.id, ...formData } })
+          body: JSON.stringify({ action: 'update', payload: { id: editingProduct.id, ...payload } })
         });
         if (res.ok) {
           setIsModalOpen(false);
@@ -94,7 +103,7 @@ export default function AdminProducts() {
         const res = await fetch('/api/admin/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'insert', payload: formData })
+          body: JSON.stringify({ action: 'insert', payload })
         });
         if (res.ok) {
           setIsModalOpen(false);
@@ -231,12 +240,16 @@ export default function AdminProducts() {
                     <div className="flex items-center gap-1 font-bold text-[#00AEEF] text-sm hover:bg-[#00AEEF]/5 px-2 py-1 rounded-lg transition-colors group">
                       ₦
                       <input 
-                        type="number" 
-                        defaultValue={product.price}
+                        type="text" 
+                        defaultValue={new Intl.NumberFormat('en-US').format(product.price)}
                         onBlur={(e) => {
-                          const newPrice = parseFloat(e.target.value);
-                          if (newPrice !== product.price && !isNaN(newPrice)) {
+                          const rawValue = e.target.value.replace(/,/g, '');
+                          const newPrice = parseFloat(rawValue);
+                          if (!isNaN(newPrice) && newPrice !== product.price) {
                             handleQuickUpdate(product.id, 'price', newPrice);
+                            e.target.value = new Intl.NumberFormat('en-US').format(newPrice);
+                          } else {
+                            e.target.value = new Intl.NumberFormat('en-US').format(product.price);
                           }
                         }}
                         className="w-24 bg-transparent outline-none border-b border-transparent group-hover:border-[#00AEEF]/30 focus:border-[#00AEEF] transition-colors font-bold text-[#00AEEF]"
@@ -293,7 +306,18 @@ export default function AdminProducts() {
                 
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-[#1B1B5E] uppercase tracking-widest">Price (₦)</label>
-                  <input type="number" required value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20" />
+                  <input 
+                    type="text" 
+                    required 
+                    value={formData.price ? String(formData.price).replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""} 
+                    onChange={e => {
+                      const rawValue = e.target.value.replace(/,/g, '');
+                      if (rawValue === '' || /^\d*\.?\d*$/.test(rawValue)) {
+                        setFormData({...formData, price: rawValue});
+                      }
+                    }} 
+                    className="w-full px-4 py-3 bg-[#F5F5F7] rounded-xl outline-none focus:ring-2 focus:ring-[#00AEEF]/20" 
+                  />
                 </div>
 
                 <div className="space-y-2">

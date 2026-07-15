@@ -216,7 +216,7 @@ function CheckoutContent() {
     const handler = window.PaystackPop.setup({
       key: settings.paystack_public_key,
       email: formData.email || "customer@ekesontech.com",
-      amount: totalNgn * 100, // Kobo
+      amount: Math.round(totalNgn * 100), // Kobo rounded to avoid decimal issues
       currency: "NGN",
       ref: order.id, // Use our Order ID as reference!
       callback: function(response) {
